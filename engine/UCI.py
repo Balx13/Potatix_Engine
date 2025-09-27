@@ -12,9 +12,7 @@ board = chess.Board()
 search_thread = threading.Thread()
 
 def timer_worker(time_limit_sec):
-    """
-    Egyszerű időzítő szál. Ha az idő lejár, beállítja a stop_flag-et.
-    """
+
     start = time.time()
     while not stop_flag.stop:
         elapsed = time.time() - start
