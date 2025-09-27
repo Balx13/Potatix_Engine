@@ -4,9 +4,9 @@ from transposition_table import transposition_table
 from search import alphabeta
 from config import board, MAX_DEPTH, killer_moves
 import threading
-from stop_flag import stop_flag
 import time
 from time_manager import estimate_time_for_move
+from stop_event import stop_event
 
 board = chess.Board()
 search_thread = threading.Thread()
@@ -14,15 +14,16 @@ search_thread = threading.Thread()
 def timer_worker(time_limit_sec):
 
     start = time.time()
-    while not stop_flag.stop:
+    while not stop_event.is_set:
         elapsed = time.time() - start
         if elapsed >= time_limit_sec:
-            stop_flag.stop = True
+            stop_event.set()
             break
         time.sleep(0.01)  # kis várakozás, hogy ne terhelje a CPU-t
 
 def search_worker(max_depth_, wtime=None, btime=None, winc=0, binc=0, movestogo=None):
-    stop_flag.stop = False
+    transposition_table.clear()
+    stop_event.clear()
     best_move = None
 
     if board.turn and wtime is not None:
@@ -38,7 +39,7 @@ def search_worker(max_depth_, wtime=None, btime=None, winc=0, binc=0, movestogo=
         timer_thread.start()
 
     for depth in range(1, max_depth_ + 1):
-        if stop_flag.stop:
+        if stop_event.is_set():
             break
         eval_score_, current_best_move = alphabeta(board, board.turn, depth, float('-inf'), float('inf'))
         if current_best_move:
@@ -47,6 +48,7 @@ def search_worker(max_depth_, wtime=None, btime=None, winc=0, binc=0, movestogo=
 
     if timer_thread is not None:
         timer_thread.join()
+    stop_event.clear()
 
     if best_move:
         print(f"bestmove {best_move}", flush=True)
@@ -54,7 +56,6 @@ def search_worker(max_depth_, wtime=None, btime=None, winc=0, binc=0, movestogo=
         legal_moves = list(board.legal_moves)
         fallback_move = legal_moves[0] if legal_moves else None
         print(f"bestmove {fallback_move}", flush=True)
-    stop_flag.stop = False
 
 
 while True:
@@ -74,9 +75,9 @@ while True:
         elif args[0] == "ucinewgame":
             #tt törlés, új tábla, reset
             if search_thread and search_thread.is_alive(): # leállítjuk a keresést, ha a GUI nem tette meg
-                stop_flag.stop = True
+                stop_event.set()
                 search_thread.join()
-            stop_flag.stop = False
+            stop_event.clear()
 
             board = chess.Board()
             transposition_table.clear()
@@ -85,8 +86,10 @@ while True:
 
         elif args[0] == "quit":
             if search_thread and search_thread.is_alive():
-                stop_flag.stop = True
+                stop_event.set()
                 search_thread.join()
+
+            stop_event.clear()
             break
 
         elif args[0] == "position":
@@ -106,9 +109,10 @@ while True:
 
         elif args[0] == "go":
             if search_thread and search_thread.is_alive():
-                stop_flag.stop = True
+                stop_event.set()
                 search_thread.join()
-            stop_flag.stop = False
+            stop_event.clear()
+
             if len(args) == 1:
                 search_thread = threading.Thread(target=search_worker, args=(MAX_DEPTH,))
                 search_thread.start()
@@ -137,7 +141,7 @@ while True:
                     search_thread.start()
 
         elif args[0] == "stop":
-            stop_flag.stop = True
+            stop_event.set()
 
     except IndexError:
         continue

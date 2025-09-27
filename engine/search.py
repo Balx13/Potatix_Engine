@@ -3,7 +3,7 @@ from config import killer_moves
 from transposition_table import store_tt_entry, probe_tt
 from move_ordering import order_moves
 from quiescence import quiescence
-from stop_flag import stop_flag
+from stop_event import stop_event
 
 # Minimax alfa-béta vágással
 def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: float, beta: float):
@@ -12,7 +12,7 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
     if depth == 0 or board.is_game_over():
         return quiescence(board, maximizing_player, alpha, beta), None
 
-    if stop_flag.stop:
+    if stop_event.is_set():
         return 0, None
 
     tt_val = probe_tt(board, depth, alpha, beta)
@@ -26,7 +26,7 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
     if maximizing_player:
         max_eval = float('-inf')
         for move in order_moves(board, board.legal_moves):
-            if stop_flag.stop:
+            if stop_event.is_set():
                 return 0, None
             board.push(move)
             eval_core, _ = alphabeta(board, False, depth - 1, alpha, beta)
@@ -58,7 +58,7 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
     else:
         min_eval = float('inf')
         for move in order_moves(board, board.legal_moves):
-            if stop_flag.stop:
+            if stop_event.is_set():
                 return 0, None
 
             board.push(move)
