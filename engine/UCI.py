@@ -86,6 +86,25 @@ while True:
             elif len(args) == 3 and args[1] == "depth":
                 search_thread = threading.Thread(target=search_worker, args=(int(args[2]),))
                 search_thread.start()
+            elif len(args) > 4:
+                if "wtime" in args: # ha már van wtime, akkor biztos, hogy kapunk időt
+                    wtime_index = args.index("wtime")
+                    btime_index = args.index("btime")
+                    wtime = float(args[wtime_index+1])
+                    btime = float(args[btime_index + 1])
+
+                    winc = 0
+                    binc = 0
+                    moves_to_go = None
+                    if "winc" in args:
+                        winc_index = args.index("winc")
+                        binc_index = args.index("binc")
+                        winc = float(args[winc_index+1])
+                        binc = float(args[binc_index + 1])
+                        if "moves_to_go" in args:
+                            moves_to_go_index = args.index("moves_to_go")
+                            moves_to_go = float(args[moves_to_go_index+1])
+
         elif args[0] == "stop":
             stop_flag.stop = True
 
