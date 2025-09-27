@@ -5,12 +5,39 @@ from search import alphabeta
 from config import board, MAX_DEPTH, killer_moves
 import threading
 from stop_flag import stop_flag
+import time
+from time_manager import estimate_time_for_move
 
 board = chess.Board()
 search_thread = threading.Thread()
 
-def search_worker(max_depth_):
+def timer_worker(time_limit_sec):
+    """
+    Egyszerű időzítő szál. Ha az idő lejár, beállítja a stop_flag-et.
+    """
+    start = time.time()
+    while not stop_flag.stop:
+        elapsed = time.time() - start
+        if elapsed >= time_limit_sec:
+            stop_flag.stop = True
+            break
+        time.sleep(0.01)  # kis várakozás, hogy ne terhelje a CPU-t
+
+def search_worker(max_depth_, wtime=None, btime=None, winc=0, binc=0, movestogo=None):
+    stop_flag.stop = False
     best_move = None
+
+    if board.turn and wtime is not None:
+        time_limit_sec = estimate_time_for_move(board, wtime, winc, movestogo)
+    elif not board.turn and btime is not None:
+        time_limit_sec = estimate_time_for_move(board, btime, binc, movestogo)
+    else:
+        time_limit_sec = None
+
+    timer_thread = None
+    if time_limit_sec is not None:
+        timer_thread = threading.Thread(target=timer_worker, args=(time_limit_sec,))
+        timer_thread.start()
 
     for depth in range(1, max_depth_ + 1):
         if stop_flag.stop:
@@ -20,12 +47,16 @@ def search_worker(max_depth_):
             best_move = current_best_move
         print(f"info depth {depth} score cp {eval_score_} pv {best_move}", flush=True)
 
+    if timer_thread is not None:
+        timer_thread.join()
+
     if best_move:
         print(f"bestmove {best_move}", flush=True)
     else:
         legal_moves = list(board.legal_moves)
         fallback_move = legal_moves[0] if legal_moves else None
         print(f"bestmove {fallback_move}", flush=True)
+    stop_flag.stop = False
 
 
 while True:
