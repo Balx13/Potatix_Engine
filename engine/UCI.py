@@ -69,6 +69,10 @@ while True:
         if args[0] == "uci":
             print("id name Adaptix")
             print("id author AndreBalazs")
+
+            print("option name MaxDepth type spin default 50 min 1 max 100")
+            print("option name TTSize type spin default 16 min 1 max 1024")
+
             print("uciok", flush=True)
         elif args[0] == "isready":
             print("readyok", flush=True)
@@ -139,6 +143,13 @@ while True:
                             moves_to_go = float(args[moves_to_go_index+1])
                     search_thread = threading.Thread(target=search_worker, args=(MAX_DEPTH, wtime, btime, winc, binc, moves_to_go))
                     search_thread.start()
+            elif args[0] == "setoption":
+                name_index = args.index("name")
+                value_index = args.index("value")
+                if args[name_index+1] == "MaxDepth":
+                    MAX_DEPTH = int(args[value_index+1])
+                elif args[name_index+1] == "TTSize":
+                    pass
 
         elif args[0] == "stop":
             stop_event.set()
