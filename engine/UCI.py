@@ -148,6 +148,7 @@ while True:
                 value_index = args.index("value")
                 if args[name_index+1] == "MaxDepth":
                     MAX_DEPTH = int(args[value_index+1])
+                    killer_moves = [[] for _ in range(MAX_DEPTH)]
                 elif args[name_index+1] == "TTSize":
                     pass
 
