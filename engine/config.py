@@ -3,7 +3,7 @@ import chess
 # Kezdőállás
 board = chess.Board(chess.STARTING_FEN)
 
-MAX_DEPTH = 10
+MAX_DEPTH = 50
 killer_moves = [[] for _ in range(MAX_DEPTH)]
 
 
