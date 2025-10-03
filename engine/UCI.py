@@ -1,6 +1,6 @@
 import chess
 
-from transposition_table import transposition_table
+from transposition_table import transposition_table, Max_tt_size
 from search import alphabeta
 from config import board, MAX_DEPTH, killer_moves
 import threading
@@ -71,7 +71,7 @@ while True:
             print("id author AndreBalazs")
 
             print("option name MaxDepth type spin default 50 min 1 max 100")
-            print("option name TTSize type spin default 16 min 1 max 1024")
+            print("option name TTSize type spin default 1_000_000 min 1 max 100_000_000")
 
             print("uciok", flush=True)
         elif args[0] == "isready":
@@ -143,14 +143,16 @@ while True:
                             moves_to_go = float(args[moves_to_go_index+1])
                     search_thread = threading.Thread(target=search_worker, args=(MAX_DEPTH, wtime, btime, winc, binc, moves_to_go))
                     search_thread.start()
-            elif args[0] == "setoption":
-                name_index = args.index("name")
-                value_index = args.index("value")
-                if args[name_index+1] == "MaxDepth":
-                    MAX_DEPTH = int(args[value_index+1])
-                    killer_moves = [[] for _ in range(MAX_DEPTH)]
-                elif args[name_index+1] == "TTSize":
-                    pass
+        elif args[0] == "setoption":
+            name_index = args.index("name")
+            value_index = args.index("value")
+            if args[name_index+1] == "MaxDepth":
+                MAX_DEPTH = int(args[value_index+1])
+                killer_moves = [[] for _ in range(MAX_DEPTH)]
+            elif args[name_index+1] == "TTSize":
+                value_num= int(args[value_index+1])
+                if 1 <= value_num <= 100_000_000:
+                    Max_tt_size = value_num
 
         elif args[0] == "stop":
             stop_event.set()

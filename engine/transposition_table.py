@@ -5,6 +5,7 @@ from collections import namedtuple
 # Transposition table bejegyzés típusa
 TTEntry = namedtuple("TTEntry", ["value", "depth", "flag"])
 transposition_table = {}
+Max_tt_size = 1_000_000
 
 # Transposition table mentése
 def store_tt_entry(board, value, depth, flag):
@@ -15,6 +16,9 @@ def store_tt_entry(board, value, depth, flag):
             return
         if old.depth == depth and old.flag == "EXACT" and flag != "EXACT":
             return
+        del transposition_table[key]
+    if len(transposition_table) >= Max_tt_size:
+        del transposition_table[next(iter(transposition_table))]
     transposition_table[key] = TTEntry(value, depth, flag)
 
 # Transposition table lekérdezése
