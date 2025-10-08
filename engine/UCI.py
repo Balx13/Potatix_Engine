@@ -12,7 +12,6 @@ board = chess.Board()
 search_thread = threading.Thread()
 
 def timer_worker(time_limit_sec):
-
     start = time.time()
     while not stop_event.is_set:
         elapsed = time.time() - start
