@@ -2,3 +2,4 @@
 /.venv/
 /AI_alap/
 list_files.py
+/engine/database.py
