@@ -24,7 +24,7 @@ def count_legal_moves(board: chess.Board, color: chess.Color) -> int:
     return count
 
 
-def evaluate_board(board: chess.Board, with_muster=False):
+def evaluate_board(board: chess.Board, with_muster=False, depth=0):
     if board.is_checkmate():
         return -99999 if board.turn else 99999
     if board.is_stalemate() or board.is_insufficient_material():
@@ -203,7 +203,11 @@ def evaluate_board(board: chess.Board, with_muster=False):
                 "weak_squares": black_weak_squares
             },
             "game_phase": game_phase(board),
-            "evulate": ((white_score - black_score) / 100.0)
+            "evulate": ((white_score - black_score) / 100.0),
+            "adaptive_evaluation_offset": 1.0,
+            "depth": depth,
+            "result": None
+
         }
 
         return (white_score - black_score) / 100.0, musters
