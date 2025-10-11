@@ -3,7 +3,7 @@ import chess
 # Kezdőállás
 board = chess.Board(chess.STARTING_FEN)
 
-MAX_DEPTH = float('inf')
+MAX_DEPTH = 100_000
 killer_moves = [[] for _ in range(MAX_DEPTH)]
 
 
