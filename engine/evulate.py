@@ -155,10 +155,11 @@ def evaluate_board(board: chess.Board, with_muster=False, depth=0):
     black_score += black_pawn_chains * 12
 
     # Nyitott vonal a bástyáknak
-    white_rook_open_files = count_open_files(board, chess.WHITE)
-    black_rook_open_files = count_open_files(board, chess.BLACK)
-    white_score += white_rook_open_files * 22
-    black_score += black_rook_open_files * 22
+    white_rook_open_files_count, white_rook_open_files = count_open_files(board, chess.WHITE)
+    black_rook_open_files_count, black_rook_open_files  = count_open_files(board, chess.BLACK)
+    white_score += white_rook_open_files_count * 22
+    black_score += black_rook_open_files_count * 22
+
 
     # Gyenge mezők
     white_weak_squares = count_weak_squares(board, chess.WHITE)
@@ -186,6 +187,7 @@ def evaluate_board(board: chess.Board, with_muster=False, depth=0):
                 "mobility": white_mobility,
                 "center_control": white_center_control,
                 "pawn_chains": white_pawn_chains,
+                "rook_open_files_count": white_rook_open_files_count,
                 "rook_open_files": white_rook_open_files,
                 "attacks_on_king": white_attacks_on_king,
                 "passed_pawns": white_passed_pawns,
@@ -197,20 +199,21 @@ def evaluate_board(board: chess.Board, with_muster=False, depth=0):
                 "mobility": black_mobility,
                 "center_control": black_center_control,
                 "pawn_chains": black_pawn_chains,
+                "rook_open_files_count": black_rook_open_files_count,
                 "rook_open_files": black_rook_open_files,
                 "attacks_on_king": black_attacks_on_king,
                 "passed_pawns": black_passed_pawns,
                 "weak_squares": black_weak_squares
             },
             "game_phase": game_phase(board),
-            "evulate": ((white_score - black_score) / 100.0),
+            "evulate": None,
             "adaptive_evaluation_offset": 1.0,
             "depth": depth,
             "result": None
 
         }
 
-        return (white_score - black_score) / 100.0, musters
+        return (white_score - black_score) / 100.0 , musters
 
     return (white_score - black_score) / 100.0
 
@@ -233,15 +236,17 @@ def count_isolated_pawns(board, color) -> int:
             isolated += 1
     return isolated
 
-def count_open_files(board, color) -> int:
+def count_open_files(board, color):
     count = 0
+    open_files = []
     for f in range(8):
         # Ha nincs saját gyalog a fájlban
-        if not (chess.square_file(sq) == f and board.piece_at(sq).piece_type == chess.PAWN and board.piece_at(sq).color == color for sq in board.pieces(chess.PAWN, color)):
+        if not any(chess.square_file(sq) == f and board.piece_at(sq).piece_type == chess.PAWN and board.piece_at(sq).color == color for sq in board.pieces(chess.PAWN, color)):
             # Ha van bástya a fájlban → nyitott vonal
             if (chess.square_file(sq) == f and board.piece_at(sq).piece_type == chess.ROOK and board.piece_at(sq).color == color for sq in board.pieces(chess.ROOK, color)):
                 count += 1
-    return count
+                open_files.append(f)
+    return count, open_files
 
 def count_weak_squares(board, color) -> int:
     count = 0
@@ -299,5 +304,3 @@ def count_passed_pawns(board, color) -> int:
             passed += 1
 
     return passed
-
-
