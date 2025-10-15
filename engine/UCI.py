@@ -7,9 +7,13 @@ import threading
 import time
 from time_manager import estimate_time_for_move
 from stop_event import stop_event
+from adaptive_style import playing_style_recognition
+from evulate import evaluate_board
 
 board = chess.Board()
+
 search_thread = threading.Thread()
+
 
 def timer_worker(time_limit_sec):
     start = time.time()
@@ -37,10 +41,20 @@ def search_worker(max_depth_, wtime=None, btime=None, winc=0, binc=0, movestogo=
         timer_thread = threading.Thread(target=timer_worker, args=(time_limit_sec,))
         timer_thread.start()
 
+    _, musters = evaluate_board(board, with_muster=True, adaptive_mode=False)
+    playing_style = playing_style_recognition(musters=musters, color=not board.turn)
+    start_board = chess.Board(chess.STARTING_FEN)
+    diff_count = sum(1 for sq in chess.SQUARES if start_board.piece_at(sq) != board.piece_at(sq))
+
+    if diff_count >= 20:
+        adaptive_mode = True
+    else:
+        adaptive_mode = False
+
     for depth in range(1, max_depth_ + 1):
         if stop_event.is_set():
             break
-        eval_score_, current_best_move = alphabeta(board, board.turn, depth, float('-inf'), float('inf'))
+        eval_score_, current_best_move = alphabeta(board, board.turn, depth, float('-inf'), float('inf'), [playing_style, board.turn, adaptive_mode])
         if current_best_move:
             best_move = current_best_move
         print(f"info depth {depth} score cp {eval_score_} pv {best_move}", flush=True)
@@ -85,7 +99,7 @@ while True:
             board = chess.Board()
             transposition_table.clear()
             killer_moves = [[] for _ in range(MAX_DEPTH)]
-
+            opponent_positions = []
 
         elif args[0] == "quit":
             if search_thread and search_thread.is_alive():

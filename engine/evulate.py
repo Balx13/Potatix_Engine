@@ -1,6 +1,7 @@
 import chess
 from config import position_values, PIECE_VALUES, CENTER_SQUARES
 import random # Értékelési zajhoz csak, de az most le van tiltva
+import adaptive_style
 
 def game_phase(board: chess.Board) -> str:
     # egyszerű becslés: anyag alapján
@@ -24,7 +25,7 @@ def count_legal_moves(board: chess.Board, color: chess.Color) -> int:
     return count
 
 
-def evaluate_board(board: chess.Board, with_muster=False, depth=0):
+def evaluate_board(board: chess.Board, with_muster=False, adaptive_mode=True, engine_white=True, opponent_sytle="balanced"):
     if board.is_checkmate():
         return -99999 if board.turn else 99999
     if board.is_stalemate() or board.is_insufficient_material():
@@ -35,14 +36,16 @@ def evaluate_board(board: chess.Board, with_muster=False, depth=0):
 
     white_material = 0
     black_material = 0
+    white_material_list = []
+    black_material_list = []
     for piece_type, value in PIECE_VALUES.items():
         # Anyagi érték
         white_pcs = board.pieces(piece_type, chess.WHITE)
         black_pcs = board.pieces(piece_type, chess.BLACK)
         white_material = len(white_pcs) * value
         black_material= len(black_pcs) * value
-        white_score += white_material
-        black_score += black_material
+        white_material_list.append(white_material)
+        black_material_list.append(black_material)
 
         # Pozíciós érték
         for sq in white_pcs:
@@ -101,14 +104,10 @@ def evaluate_board(board: chess.Board, with_muster=False, depth=0):
                 white_center_control += 10
             else:
                 black_center_control += 10
-    white_score += white_center_control
-    black_score += black_center_control
 
     # Mobilitás
     white_mobility = count_legal_moves(board, chess.WHITE) * 2
     black_mobility = count_legal_moves(board, chess.BLACK) * 2
-    white_score += white_mobility
-    black_score += black_mobility
 
     # Királybiztonság
     white_king_safety = 0
@@ -116,105 +115,150 @@ def evaluate_board(board: chess.Board, with_muster=False, depth=0):
     if white_king_sq is not None:
         white_king_attackers = board.attackers(chess.BLACK, white_king_sq)
         white_king_safety = len(white_king_attackers) * 20
-        white_score -= white_king_safety
 
     black_king_safety = 0
     black_king_sq = board.king(chess.BLACK)
     if black_king_sq is not None:
         black_king_attackers = board.attackers(chess.WHITE, black_king_sq)
         black_king_safety = len(black_king_attackers) * 20
-        black_score -= black_king_safety
 
     # Izolált gyalogok
     white_isolated_pawns = count_isolated_pawns(board, chess.WHITE) * 25
     black_isolated_pawns = count_isolated_pawns(board, chess.BLACK) * 25
-    white_score -= white_isolated_pawns
-    black_score -= black_isolated_pawns
 
     # Dupla gyalogok büntetése
     white_doubled_pawns = count_doubled_pawns(board, chess.WHITE) * 10
     black_doubled_pawns = count_doubled_pawns(board, chess.BLACK) * 10
-    white_score -= white_doubled_pawns
-    black_score -= black_doubled_pawns
 
     # futópárok
 
     white_bishops_pair = len(board.pieces(chess.BISHOP, chess.WHITE))
     black_bishops_pair = len(board.pieces(chess.BISHOP, chess.BLACK))
-    if white_bishops_pair >= 2:
-        white_score += 25
-
-    if black_bishops_pair >= 2:
-        black_score += 25
 
     # gyalogláncok
     white_pawn_chains = count_pawn_chains(board, chess.WHITE)
     black_pawn_chains = count_pawn_chains(board, chess.BLACK)
 
-    white_score += white_pawn_chains * 12
-    black_score += black_pawn_chains * 12
-
     # Nyitott vonal a bástyáknak
     white_rook_open_files_count, white_rook_open_files = count_open_files(board, chess.WHITE)
     black_rook_open_files_count, black_rook_open_files  = count_open_files(board, chess.BLACK)
-    white_score += white_rook_open_files_count * 22
-    black_score += black_rook_open_files_count * 22
-
 
     # Gyenge mezők
     white_weak_squares = count_weak_squares(board, chess.WHITE)
     black_weak_squares = count_weak_squares(board, chess.BLACK)
-    white_score += white_weak_squares * -7
-    black_score += black_weak_squares * -7
 
     # Király támadói
     white_attacks_on_king = count_attacks_on_king(board, chess.WHITE)
     black_attacks_on_king = count_attacks_on_king(board, chess.BLACK)
-    white_score -= white_attacks_on_king * 36
-    black_score -= black_attacks_on_king * 36
 
     # Szabad gyalogok
     white_passed_pawns = count_passed_pawns(board, chess.WHITE)
     black_passed_pawns = count_passed_pawns(board, chess.BLACK)
-    white_score += white_passed_pawns * 52
-    black_score += black_passed_pawns * 52
+
+    musters = {
+        "white": {
+            "material": white_material,
+            "king_safety": white_king_safety,
+            "mobility": white_mobility,
+            "center_control": white_center_control,
+            "pawn_chains": white_pawn_chains,
+            "rook_open_files_count": white_rook_open_files_count,
+            "rook_open_files": white_rook_open_files,
+            "attacks_on_king": white_attacks_on_king,
+            "passed_pawns": white_passed_pawns,
+            "weak_squares": white_weak_squares
+        },
+        "black": {
+            "material": black_material,
+            "king_safety": black_king_safety,
+            "mobility": black_mobility,
+            "center_control": black_center_control,
+            "pawn_chains": black_pawn_chains,
+            "rook_open_files_count": black_rook_open_files_count,
+            "rook_open_files": black_rook_open_files,
+            "attacks_on_king": black_attacks_on_king,
+            "passed_pawns": black_passed_pawns,
+            "weak_squares": black_weak_squares
+        },
+        "game_phase": game_phase(board),
+        #"evulate": None,
+        #"adaptive_evaluation_offset": 1.0,
+    }
+    white_sytle = "balanced"
+    black_sytle = "balanced"
+
+    if adaptive_mode:
+        if opponent_sytle == adaptive_style.playing_style_recognition(musters, not engine_white):
+            if engine_white:
+                black_score *= 1.2
+            else:
+                white_score *= 1.2
+        else:
+            if engine_white:
+                black_score *= 0.8
+            else:
+                white_score *= 0.8
+        if adaptive_style.counter_styles[opponent_sytle] == adaptive_style.playing_style_recognition(musters, engine_white):
+            if engine_white:
+                white_score *= 1.2
+            else:
+                white_score *= 1.2
+        else:
+            if engine_white:
+                white_score *= 0.8
+            else:
+                white_score *= 0.8
+
+        if engine_white:
+            black_sytle = opponent_sytle
+            white_sytle = adaptive_style.counter_styles[opponent_sytle]
+        else:
+            white_sytle = opponent_sytle
+            black_sytle = adaptive_style.counter_styles[opponent_sytle]
+
+    # hogyha nincs adaptive_mode, akkor a szorzó mindig 1.0
+    white_score += white_center_control * adaptive_style.sytles[white_sytle]["center_control"]
+    black_score += black_center_control * adaptive_style.sytles[black_sytle]["center_control"]
+
+    white_score += white_mobility * adaptive_style.sytles[white_sytle]["mobility"]
+    black_score += black_mobility * adaptive_style.sytles[black_sytle]["mobility"]
+
+    white_score -= white_king_safety * adaptive_style.sytles[white_sytle]["king_safety"]
+    black_score -= black_king_safety * adaptive_style.sytles[black_sytle]["king_safety"]
+
+    white_score -= white_isolated_pawns
+    black_score -= black_isolated_pawns
+
+    white_score -= white_doubled_pawns
+    black_score -= black_doubled_pawns
+
+    if white_bishops_pair >= 2:
+        white_score += 25
+    if black_bishops_pair >= 2:
+        black_score += 25
+
+    white_score += (white_pawn_chains * 12) * adaptive_style.sytles[white_sytle]["pawn_chains"]
+    black_score += (black_pawn_chains * 12) * adaptive_style.sytles[black_sytle]["pawn_chains"]
+
+    white_score += white_rook_open_files_count * 22  * adaptive_style.sytles[white_sytle]["rook_open_files"]
+    black_score += black_rook_open_files_count * 22  * adaptive_style.sytles[black_sytle]["rook_open_files"]
+
+    white_score += (white_weak_squares * -7) * adaptive_style.sytles[white_sytle]["weak_squares"]
+    black_score += (black_weak_squares * -7) * adaptive_style.sytles[black_sytle]["weak_squares"]
+
+    white_score -= (white_attacks_on_king * 36) * adaptive_style.sytles[white_sytle]["attacks_on_king"]
+    black_score -= (black_attacks_on_king * 36) * adaptive_style.sytles[black_sytle]["attacks_on_king"]
+
+    white_score += (white_passed_pawns * 52) * adaptive_style.sytles[white_sytle]["passed_pawns"]
+    black_score += (black_passed_pawns * 52) * adaptive_style.sytles[black_sytle]["passed_pawns"]
+
+    for i in white_material_list:
+        white_score += i * adaptive_style.sytles[white_sytle]["material"]
+    for i in black_material_list:
+        black_score += i * adaptive_style.sytles[black_sytle]["material"]
 
     if with_muster:
-        musters = {
-            "white": {
-                "material": white_material,
-                "king_safety": white_king_safety,
-                "mobility": white_mobility,
-                "center_control": white_center_control,
-                "pawn_chains": white_pawn_chains,
-                "rook_open_files_count": white_rook_open_files_count,
-                "rook_open_files": white_rook_open_files,
-                "attacks_on_king": white_attacks_on_king,
-                "passed_pawns": white_passed_pawns,
-                "weak_squares": white_weak_squares
-            },
-            "black": {
-                "material": black_material,
-                "king_safety": black_king_safety,
-                "mobility": black_mobility,
-                "center_control": black_center_control,
-                "pawn_chains": black_pawn_chains,
-                "rook_open_files_count": black_rook_open_files_count,
-                "rook_open_files": black_rook_open_files,
-                "attacks_on_king": black_attacks_on_king,
-                "passed_pawns": black_passed_pawns,
-                "weak_squares": black_weak_squares
-            },
-            "game_phase": game_phase(board),
-            "evulate": None,
-            "adaptive_evaluation_offset": 1.0,
-            "depth": depth,
-            "result": None
-
-        }
-
-        return (white_score - black_score) / 100.0 , musters
-
+        return (white_score - black_score) / 100.0, musters
     return (white_score - black_score) / 100.0
 
 

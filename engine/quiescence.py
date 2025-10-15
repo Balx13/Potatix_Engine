@@ -49,8 +49,9 @@ def see(board, move):
 
 
 # Quiescence search (csak capture lépéseket vizsgál)
-def quiescence(board: chess.Board, maximizing_player: bool, alpha: float, beta: float) -> float:
-    stand_pat = evaluate_board(board)
+def quiescence(board: chess.Board, maximizing_player: bool, alpha: float, beta: float, datas_for_evulate) -> float:
+    stand_pat = evaluate_board(board, with_muster=False, adaptive_mode=datas_for_evulate[2],
+        engine_white=datas_for_evulate[1], opponent_sytle=datas_for_evulate[0])
 
     if maximizing_player:
         if stand_pat >= beta:
@@ -70,7 +71,7 @@ def quiescence(board: chess.Board, maximizing_player: bool, alpha: float, beta: 
 
         if board.is_capture(move):
             board.push(move)
-            score = quiescence(board, not maximizing_player, alpha, beta)
+            score = quiescence(board, not maximizing_player, alpha, beta, datas_for_evulate)
             board.pop()
 
             if maximizing_player:

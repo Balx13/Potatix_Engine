@@ -6,11 +6,11 @@ from quiescence import quiescence
 from stop_event import stop_event
 
 # Minimax alfa-béta vágással
-def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: float, beta: float):
+def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: float, beta: float, datas_for_evulate):
     #maximizing_player = board.turn
 
     if depth == 0 or board.is_game_over():
-        return quiescence(board, maximizing_player, alpha, beta), None
+        return quiescence(board, maximizing_player, alpha, beta, datas_for_evulate), None
 
     if stop_event.is_set():
         return 0, None
@@ -29,7 +29,7 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
             if stop_event.is_set():
                 return 0, None
             board.push(move)
-            eval_core, _ = alphabeta(board, False, depth - 1, alpha, beta)
+            eval_core, _ = alphabeta(board, False, depth - 1, alpha, beta, datas_for_evulate)
             board.pop()
             if eval_core > max_eval:
                 max_eval = eval_core
@@ -62,7 +62,7 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
                 return 0, None
 
             board.push(move)
-            eval_core, _ = alphabeta(board, True, depth - 1, alpha, beta)
+            eval_core, _ = alphabeta(board, True, depth - 1, alpha, beta, datas_for_evulate)
             board.pop()
             if eval_core < min_eval:
                 min_eval = eval_core

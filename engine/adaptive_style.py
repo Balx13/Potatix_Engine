@@ -4,7 +4,6 @@ def norm(n) -> float:
     return n / 100
 
 def playing_style_recognition(musters, color):
-
     color = "white" if color else "black"
 
     mobility = musters[color]["mobility"]
