@@ -25,7 +25,7 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
 
     if maximizing_player:
         max_eval = float('-inf')
-        for move in order_moves(board, board.legal_moves, depth):
+        for move in order_moves(board, board.legal_moves, depth, datas_for_evulate):
             if stop_event.is_set():
                 return 0, None
             board.push(move)
@@ -57,7 +57,7 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
         return max_eval, best_move
     else:
         min_eval = float('inf')
-        for move in order_moves(board, board.legal_moves, depth):
+        for move in order_moves(board, board.legal_moves, depth, datas_for_evulate):
             if stop_event.is_set():
                 return 0, None
 

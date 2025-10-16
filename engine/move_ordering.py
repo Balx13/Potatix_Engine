@@ -1,7 +1,12 @@
 import chess
 from config import killer_moves, PIECE_VALUES
+from engine.UCI import opponent_positions
+from evulate import evaluate_board
+from adaptive_style import playing_style_recognition, counter_styles
 
-def order_moves(board, moves, depth=None):
+def order_moves(board, moves, depth=None, datas_for_evulate=None):
+    if datas_for_evulate is None:
+        datas_for_evulate = []
     legal_moves_list = list(moves)
 
     killer_moves_ordered = []
@@ -22,9 +27,23 @@ def order_moves(board, moves, depth=None):
             return 10 * (victim_value - attacker_value) + 100
 
         board.push(move)
-        check = 1 if board.is_check() else 0
-        board.pop()
-        return check
+        if board.is_check():
+            board.pop()
+            return 10
+
+        engine_is_white = datas_for_evulate[1]
+        _, musters = evaluate_board(board, with_muster=True)
+
+        opponent_style = datas_for_evulate[0]
+        motor_to_move = (engine_is_white == board.turn)
+        expected_style = counter_styles[opponent_style] if motor_to_move else opponent_style
+
+        if playing_style_recognition(musters, board.turn) == expected_style:
+            board.pop()
+            return 5
+        else:
+            board.pop()
+            return 0
 
     remaining_moves = sorted(remaining_moves, key=score, reverse=True)
     return killer_moves_ordered + remaining_moves
