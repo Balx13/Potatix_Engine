@@ -18,6 +18,18 @@ def order_moves(board, moves, depth=None, datas_for_evulate=None):
 
     remaining_moves = [m for m in moves if m not in killer_moves_ordered]
 
+    def followed_style():
+        engine_is_white = datas_for_evulate[1]
+        _, musters = evaluate_board(board, with_muster=True)
+
+        opponent_style = datas_for_evulate[0]
+        motor_to_move = (engine_is_white == board.turn)
+        expected_style = counter_styles[opponent_style] if motor_to_move else opponent_style
+
+        if playing_style_recognition(musters, board.turn) == expected_style:
+            return True
+        else:
+            return False
     def score(move):
         if board.is_capture(move):
             victim = board.piece_at(move.to_square)
@@ -29,20 +41,15 @@ def order_moves(board, moves, depth=None, datas_for_evulate=None):
         board.push(move)
         if board.is_check():
             board.pop()
-            return 10
+            if followed_style():
+                return 50
+            else:
+                return 10
+        board.pop()
 
-        engine_is_white = datas_for_evulate[1]
-        _, musters = evaluate_board(board, with_muster=True)
-
-        opponent_style = datas_for_evulate[0]
-        motor_to_move = (engine_is_white == board.turn)
-        expected_style = counter_styles[opponent_style] if motor_to_move else opponent_style
-
-        if playing_style_recognition(musters, board.turn) == expected_style:
-            board.pop()
+        if followed_style():
             return 5
         else:
-            board.pop()
             return 0
 
     remaining_moves = sorted(remaining_moves, key=score, reverse=True)
