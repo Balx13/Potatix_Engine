@@ -80,7 +80,7 @@ while True:
 
     try:
         if args[0] == "uci":
-            print("id name Adaptix", flush=True)
+            print("id name Potatix Engine", flush=True)
             print("id author AndreBalazs", flush=True)
 
             print("option name MaxDepth type spin default 50 min 1 max 100", flush=True)
