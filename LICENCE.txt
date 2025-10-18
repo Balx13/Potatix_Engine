@@ -1,0 +1,35 @@
+POTATIX ENGINE – CUSTOM LICENSE
+
+DEFINITIONS
+1. "Software" refers to the Potatix Engine, including all source code, binaries, documentation, and any derivative works or portions thereof.
+2. "Author" refers to the original creator of the Potatix Engine.
+3. "User" refers to any individual or entity accessing, using, modifying, or interacting with the Software.
+4. "Distribution" refers to any form of sharing, publishing, transmitting, selling, licensing, or making the Software or any portion of it available to others, whether digitally, physically, or by any other means.
+5. "Commercial Use" refers to any activity intended for profit, including but not limited to selling, licensing, offering subscriptions, advertising-based revenue, or any transaction that generates financial gain.
+
+1. PERMITTED USE
+1.1 The Software may be used and modified by the User solely for personal, non-commercial, at-home purposes.
+
+2. RESTRICTIONS ON DISTRIBUTION AND PUBLICATION
+2.1 The Software, or any portion of its code in any amount, may not be distributed, sold, published, or otherwise shared on any platform without the Author's **prior written permission**.
+2.2 No modified, derivative, or partial copy of the Software may be made public in any form without the Author's **prior written permission**.
+
+3. COMMERCIAL RESTRICTIONS
+3.1 The Software may not be used for Commercial Use without the Author's **prior written permission**.
+3.2 Any attempt to monetize, sell, license, or otherwise profit from the Software, or any derivative work thereof, without the Author's consent, is strictly prohibited.
+
+4. NAME AND DONATION PROTECTION
+4.1 No one may use the name "Potatix Engine" for any other project, product, service, or derivative work without the Author's prior written permission.
+4.2 No User may request donations, funding, or financial contributions in the name of the Potatix Engine or imply that such funds are for the Author without explicit written consent from the Author.
+
+
+5. DISCLAIMER OF WARRANTY
+5.1 The Software is provided "as is" without warranty of any kind, express or implied, including but not limited to fitness for a particular purpose, merchantability, or non-infringement.
+5.2 The Author shall not be liable for any damages, direct or indirect, arising from the use, modification, or misuse of the Software.
+
+6. ENFORCEMENT
+6.1 Violation of any section of this license constitutes a breach of copyright and intellectual property rights.
+6.2 Unauthorized use, distribution, modification, or Commercial Use may result in legal action.
+
+© 2025 Potatix Engine – Balázs André
+END OF LICENSE
