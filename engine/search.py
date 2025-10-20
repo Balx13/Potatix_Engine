@@ -6,6 +6,16 @@ from quiescence import quiescence
 from stop_event import stop_event
 from evulate import game_phase
 
+def determine_R(board: chess.Board) -> int:
+    gp = game_phase(board)
+    if gp == "opening":
+        return 4
+    elif gp == "middlegame":
+        return 3
+    elif gp == "endgame":
+        return 2
+    return 2
+
 def can_do_null_move(board: chess.Board, previous_null_move, depth):
 
     if board.is_check():
@@ -44,8 +54,9 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
         max_eval = float('-inf')
 
         if can_do_null_move(board, previous_null_move, depth):
+            R = determine_R(board)
             board.turn = not board.turn
-            score, _ = alphabeta(board, board.turn, depth-1-2, -beta, -beta+1, datas_for_evulate, previous_null_move=True, )
+            score, _ = alphabeta(board, board.turn, depth-1-R, -beta, -beta+1, datas_for_evulate, previous_null_move=True, )
             board.turn = not board.turn
             if score >= beta:
                 return score, None
@@ -84,8 +95,9 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
         min_eval = float('inf')
 
         if can_do_null_move(board, previous_null_move, depth):
+            R = determine_R(board)
             board.turn = not board.turn
-            score, _ = alphabeta(board, board.turn, depth-1-2, -alpha-1, -alpha, datas_for_evulate, previous_null_move=True, )
+            score, _ = alphabeta(board, board.turn, depth-1-R, -alpha-1, -alpha, datas_for_evulate, previous_null_move=True, )
             board.turn = not board.turn
             if score <= alpha:
                 return score, None
