@@ -4,9 +4,26 @@ from transposition_table import store_tt_entry, probe_tt
 from move_ordering import order_moves
 from quiescence import quiescence
 from stop_event import stop_event
+from evulate import game_phase
 
+def can_do_null_move(board: chess.Board, previous_null_move, depth):
+
+    if board.is_check():
+        return False
+
+    if previous_null_move:
+        return False
+
+    if not depth or depth <= 4:
+        return False
+
+    # zugzwang
+    if game_phase(board) == "endgame":
+        return False
+
+    return True
 # Minimax alfa-béta vágással
-def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: float, beta: float, datas_for_evulate):
+def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: float, beta: float, datas_for_evulate, previous_null_move=False):
     #maximizing_player = board.turn
 
     if depth == 0 or board.is_game_over():
@@ -25,6 +42,14 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
 
     if maximizing_player:
         max_eval = float('-inf')
+
+        if can_do_null_move(board, previous_null_move, depth):
+            board.turn = not board.turn
+            score, _ = alphabeta(board, board.turn, depth-1-2, -beta, -beta+1, datas_for_evulate, previous_null_move=True, )
+            board.turn = not board.turn
+            if score >= beta:
+                return score, None
+
         for move in order_moves(board, board.legal_moves, depth, datas_for_evulate):
             if stop_event.is_set():
                 return 0, None
@@ -57,6 +82,14 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
         return max_eval, best_move
     else:
         min_eval = float('inf')
+
+        if can_do_null_move(board, previous_null_move, depth):
+            board.turn = not board.turn
+            score, _ = alphabeta(board, board.turn, depth-1-2, -alpha-1, -alpha, datas_for_evulate, previous_null_move=True, )
+            board.turn = not board.turn
+            if score <= alpha:
+                return score, None
+
         for move in order_moves(board, board.legal_moves, depth, datas_for_evulate):
             if stop_event.is_set():
                 return 0, None

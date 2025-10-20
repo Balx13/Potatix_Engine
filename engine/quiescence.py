@@ -64,7 +64,7 @@ def quiescence(board: chess.Board, maximizing_player: bool, alpha: float, beta: 
         if stand_pat < beta:
             beta = stand_pat
 
-    for move in order_moves(board, board.legal_moves, datas_for_evulate):
+    for move in order_moves(board, board.legal_moves, datas_for_evulate=datas_for_evulate):
 
         if see(board, move) <= 0:
             continue

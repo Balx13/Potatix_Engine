@@ -1,6 +1,5 @@
 import chess
 from config import killer_moves, PIECE_VALUES
-from engine.UCI import opponent_positions
 from evulate import evaluate_board
 from adaptive_style import playing_style_recognition, counter_styles
 
@@ -30,6 +29,7 @@ def order_moves(board, moves, depth=None, datas_for_evulate=None):
             return True
         else:
             return False
+
     def score(move):
         if board.is_capture(move):
             victim = board.piece_at(move.to_square)
