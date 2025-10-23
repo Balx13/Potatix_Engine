@@ -77,7 +77,8 @@ while True:
         args = line.split()
     except EOFError:
         continue
-
+    except:
+        continue
     try:
         if args[0] == "uci":
             print("id name Potatix Engine", flush=True)
@@ -136,6 +137,10 @@ while True:
             elif len(args) == 3 and args[1] == "depth":
                 search_thread = threading.Thread(target=search_worker, args=(int(args[2]),))
                 search_thread.start()
+            elif len(args) == 3 and args[1] == "movetime":
+                time = (float(args[2]) / 1000)
+                search_thread = threading.Thread(target=search_worker, args=(MAX_DEPTH, time, time, 0, 0, 1))
+                search_thread.start()
             elif len(args) > 4:
                 if "wtime" in args: # ha már van wtime, akkor biztos, hogy kapunk időt
                     wtime_index = args.index("wtime")
@@ -171,6 +176,8 @@ while True:
             stop_event.set()
 
     except IndexError:
+        continue
+    except:
         continue
 
 
