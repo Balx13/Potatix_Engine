@@ -4,3 +4,6 @@
 list_files.py
 /engine/database.py
 /engine/musters_database.json
+UCI.spec
+/build
+/dist
