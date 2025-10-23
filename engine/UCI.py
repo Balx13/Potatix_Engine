@@ -17,12 +17,12 @@ search_thread = threading.Thread()
 
 def timer_worker(time_limit_sec):
     start = time.time()
-    while not stop_event.is_set:
+    while not stop_event.is_set():
         elapsed = time.time() - start
         if elapsed >= time_limit_sec:
             stop_event.set()
             break
-        time.sleep(0.01)  # kis várakozás, hogy ne terhelje a CPU-t
+        time.sleep(0.001)  # kis várakozás, hogy ne terhelje a CPU-t
 
 def search_worker(max_depth_, wtime=None, btime=None, winc=0, binc=0, movestogo=None):
     transposition_table.clear()
@@ -138,8 +138,9 @@ while True:
                 search_thread = threading.Thread(target=search_worker, args=(int(args[2]),))
                 search_thread.start()
             elif len(args) == 3 and args[1] == "movetime":
-                time = (float(args[2]) / 1000)
-                search_thread = threading.Thread(target=search_worker, args=(MAX_DEPTH, time, time, 0, 0, 1))
+                movetime_index = args.index("movetime")
+                movetime = float(args[movetime_index+1]) / 1000
+                search_thread = threading.Thread(target=search_worker, args=(MAX_DEPTH, movetime, movetime, 0, 0, 1))
                 search_thread.start()
             elif len(args) > 4:
                 if "wtime" in args: # ha már van wtime, akkor biztos, hogy kapunk időt
