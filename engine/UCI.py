@@ -1,5 +1,4 @@
 import chess
-
 from transposition_table import transposition_table, Max_tt_size
 from search import alphabeta
 from config import board, MAX_DEPTH, killer_moves
@@ -12,7 +11,7 @@ from evulate import evaluate_board
 
 board = chess.Board()
 
-search_thread = threading.Thread()
+search_thread = None
 
 
 def timer_worker(time_limit_sec):
@@ -114,7 +113,7 @@ while True:
             if  args[1] == "startpos":
                 board = chess.Board(chess.STARTING_FEN)
                 if len(args) > 2:
-                    for move in args[2:]:
+                    for move in args[3:]:
                         board.push_uci(move)
             elif args[1] == "fen":
                 if "moves" in args:
@@ -178,7 +177,9 @@ while True:
 
     except IndexError:
         continue
-    except:
+    except Exception as e:
+        print(f"info string Error: \"{e}\"", flush=True)
+        # Nincs bestmove, a motor csak vár.
         continue
 
 
