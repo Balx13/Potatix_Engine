@@ -50,6 +50,7 @@ def order_moves(board, moves, depth=None, datas_for_evulate=None):
         piece = board.piece_at(move.from_square)
         if piece:
             piece_type = piece.piece_type
+            piece_type -= 1
             from_sq = move.from_square
             to_sq = move.to_square
             history_score = history_heuristic[piece_type][from_sq][to_sq]

@@ -15,6 +15,7 @@ def estimate_moves_to_go(board: chess.Board) -> int:
         phase_factor = 0.7
 
     estimated_moves_to_go = max(5, int(moves_based_on_material * phase_factor))
+    estimated_moves_to_go = min(60, estimated_moves_to_go)
 
     return estimated_moves_to_go
 
