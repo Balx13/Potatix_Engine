@@ -1,5 +1,5 @@
 import chess
-from config import killer_moves, PIECE_VALUES
+from config import killer_moves, PIECE_VALUES, history_heuristic
 from evulate import evaluate_board
 from adaptive_style import playing_style_recognition, counter_styles
 
@@ -47,10 +47,19 @@ def order_moves(board, moves, depth=None, datas_for_evulate=None):
                 return 10
         board.pop()
 
-        if followed_style():
-            return 5
+        piece = board.piece_at(move.from_square)
+        if piece:
+            piece_type = piece.piece_type
+            from_sq = move.from_square
+            to_sq = move.to_square
+            history_score = history_heuristic[piece_type][from_sq][to_sq]
         else:
-            return 0
+            history_score = 0
+
+        if followed_style():
+            return 5 + history_score
+        else:
+            return 0 + history_score
 
     remaining_moves = sorted(remaining_moves, key=score, reverse=True)
     return killer_moves_ordered + remaining_moves

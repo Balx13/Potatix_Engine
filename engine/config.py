@@ -6,6 +6,7 @@ board = chess.Board(chess.STARTING_FEN)
 MAX_DEPTH = 100_000
 killer_moves = [[] for _ in range(MAX_DEPTH)]
 
+history_heuristic = [[[0 for _ in range(64)] for _ in range(64)] for _ in range(6)]
 
 # Bábu értékek
 PIECE_VALUES = {

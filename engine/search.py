@@ -1,5 +1,5 @@
 import chess
-from config import killer_moves
+from config import killer_moves, history_heuristic
 from transposition_table import store_tt_entry, probe_tt
 from move_ordering import order_moves
 from quiescence import quiescence
@@ -90,6 +90,14 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
                 if len(killer_moves[depth]) >= 3:
                     killer_moves[depth].pop(0)
                 killer_moves[depth].append(best_move)
+            board.push(best_move)
+            is_check = board.is_check()
+            board.pop()
+            is_capture = board.is_capture(best_move)
+            if not is_check and not is_capture:
+                piece = board.piece_at(best_move.from_sq)
+                piece_type = piece.piece_type
+                history_heuristic[piece_type][best_move.from_sq][best_move.to_sq] += depth * depth
 
         return max_eval, best_move
     else:
@@ -126,5 +134,19 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
         else:
             flag = 'EXACT'
         store_tt_entry(board, min_eval, depth, flag)
+
+        if cutoff_occurred:
+            if best_move not in killer_moves[depth]:
+                if len(killer_moves[depth]) >= 3:
+                    killer_moves[depth].pop(0)
+                killer_moves[depth].append(best_move)
+            board.push(best_move)
+            is_check = board.is_check()
+            board.pop()
+            is_capture = board.is_capture(best_move)
+            if not is_check and not is_capture:
+                piece = board.piece_at(best_move.from_sq)
+                piece_type = piece.piece_type
+                history_heuristic[piece_type][best_move.from_sq][best_move.to_sq] += depth * depth
 
         return min_eval, best_move

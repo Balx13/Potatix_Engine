@@ -1,7 +1,7 @@
 import chess
 from transposition_table import transposition_table, Max_tt_size
 from search import alphabeta
-from config import board, MAX_DEPTH, killer_moves
+from config import board, MAX_DEPTH, killer_moves, history_heuristic
 import threading
 import time
 from time_manager import estimate_time_for_move
@@ -98,7 +98,15 @@ while True:
 
             board = chess.Board()
             transposition_table.clear()
-            killer_moves = [[] for _ in range(MAX_DEPTH)]
+
+            for km in killer_moves:
+                km.clear()
+
+            for piece_type in range(6):
+                for from_sq in range(64):
+                    for to_sq in range(64):
+                        history_heuristic[piece_type][from_sq][to_sq] = 0
+
             opponent_positions = []
 
         elif args[0] == "quit":
