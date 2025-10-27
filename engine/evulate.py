@@ -1,5 +1,5 @@
 import chess
-from config import position_values, PIECE_VALUES, CENTER_SQUARES
+from config import position_values, PIECE_VALUES, CENTER_SQUARES, styles, counter_styles
 import random # Értékelési zajhoz csak, de az most le van tiltva
 import adaptive_style
 
@@ -7,6 +7,7 @@ def game_phase(board: chess.Board) -> str:
     # egyszerű becslés: anyag alapján
     material = sum(len(board.pieces(pt, chess.WHITE)) + len(board.pieces(pt, chess.BLACK))
                    for pt in [chess.QUEEN, chess.ROOK, chess.BISHOP, chess.KNIGHT])
+
     if material > 12:
         return "opening"
     elif material > 6:
@@ -26,6 +27,7 @@ def count_legal_moves(board: chess.Board, color: chess.Color) -> int:
 
 
 def evaluate_board(board: chess.Board, with_muster=False, adaptive_mode=True, engine_white=True, opponent_sytle="balanced"):
+
     if board.is_checkmate():
         return -99999 if board.turn else 99999
     if board.is_stalemate() or board.is_insufficient_material():
@@ -43,7 +45,7 @@ def evaluate_board(board: chess.Board, with_muster=False, adaptive_mode=True, en
         white_pcs = board.pieces(piece_type, chess.WHITE)
         black_pcs = board.pieces(piece_type, chess.BLACK)
         white_material = len(white_pcs) * value
-        black_material= len(black_pcs) * value
+        black_material = len(black_pcs) * value
         white_material_list.append(white_material)
         black_material_list.append(black_material)
 
@@ -131,7 +133,6 @@ def evaluate_board(board: chess.Board, with_muster=False, adaptive_mode=True, en
     black_doubled_pawns = count_doubled_pawns(board, chess.BLACK) * 10
 
     # futópárok
-
     white_bishops_pair = len(board.pieces(chess.BISHOP, chess.WHITE))
     black_bishops_pair = len(board.pieces(chess.BISHOP, chess.BLACK))
 
@@ -141,7 +142,7 @@ def evaluate_board(board: chess.Board, with_muster=False, adaptive_mode=True, en
 
     # Nyitott vonal a bástyáknak
     white_rook_open_files_count, white_rook_open_files = count_open_files(board, chess.WHITE)
-    black_rook_open_files_count, black_rook_open_files  = count_open_files(board, chess.BLACK)
+    black_rook_open_files_count, black_rook_open_files = count_open_files(board, chess.BLACK)
 
     # Gyenge mezők
     white_weak_squares = count_weak_squares(board, chess.WHITE)
@@ -181,8 +182,6 @@ def evaluate_board(board: chess.Board, with_muster=False, adaptive_mode=True, en
             "weak_squares": black_weak_squares
         },
         "game_phase": game_phase(board),
-        #"evulate": None,
-        #"adaptive_evaluation_offset": 1.0,
     }
     white_sytle = "balanced"
     black_sytle = "balanced"
@@ -198,7 +197,7 @@ def evaluate_board(board: chess.Board, with_muster=False, adaptive_mode=True, en
                 black_score *= 0.8
             else:
                 white_score *= 0.8
-        if adaptive_style.counter_styles[opponent_sytle] == adaptive_style.playing_style_recognition(musters, engine_white):
+        if counter_styles[opponent_sytle] == adaptive_style.playing_style_recognition(musters, engine_white):
             if engine_white:
                 white_score *= 1.2
             else:
@@ -211,20 +210,20 @@ def evaluate_board(board: chess.Board, with_muster=False, adaptive_mode=True, en
 
         if engine_white:
             black_sytle = opponent_sytle
-            white_sytle = adaptive_style.counter_styles[opponent_sytle]
+            white_sytle = counter_styles[opponent_sytle]
         else:
             white_sytle = opponent_sytle
-            black_sytle = adaptive_style.counter_styles[opponent_sytle]
+            black_sytle = counter_styles[opponent_sytle]
 
-    # hogyha nincs adaptive_mode, akkor a szorzó mindig 1.0
-    white_score += white_center_control * adaptive_style.sytles[white_sytle]["center_control"]
-    black_score += black_center_control * adaptive_style.sytles[black_sytle]["center_control"]
+    # hogyha nincs adaptive_mode, akkor a szorzó mindig 1.0 (mert a "balanced" stílus is mindig 1.0)
+    white_score += white_center_control * styles[white_sytle]["center_control"]
+    black_score += black_center_control * styles[black_sytle]["center_control"]
 
-    white_score += white_mobility * adaptive_style.sytles[white_sytle]["mobility"]
-    black_score += black_mobility * adaptive_style.sytles[black_sytle]["mobility"]
+    white_score += white_mobility * styles[white_sytle]["mobility"]
+    black_score += black_mobility * styles[black_sytle]["mobility"]
 
-    white_score -= white_king_safety * adaptive_style.sytles[white_sytle]["king_safety"]
-    black_score -= black_king_safety * adaptive_style.sytles[black_sytle]["king_safety"]
+    white_score -= white_king_safety * styles[white_sytle]["king_safety"]
+    black_score -= black_king_safety * styles[black_sytle]["king_safety"]
 
     white_score -= white_isolated_pawns
     black_score -= black_isolated_pawns
@@ -237,25 +236,25 @@ def evaluate_board(board: chess.Board, with_muster=False, adaptive_mode=True, en
     if black_bishops_pair >= 2:
         black_score += 25
 
-    white_score += (white_pawn_chains * 12) * adaptive_style.sytles[white_sytle]["pawn_chains"]
-    black_score += (black_pawn_chains * 12) * adaptive_style.sytles[black_sytle]["pawn_chains"]
+    white_score += (white_pawn_chains * 12) * styles[white_sytle]["pawn_chains"]
+    black_score += (black_pawn_chains * 12) * styles[black_sytle]["pawn_chains"]
 
-    white_score += white_rook_open_files_count * 22  * adaptive_style.sytles[white_sytle]["rook_open_files"]
-    black_score += black_rook_open_files_count * 22  * adaptive_style.sytles[black_sytle]["rook_open_files"]
+    white_score += white_rook_open_files_count * 22  * styles[white_sytle]["rook_open_files"]
+    black_score += black_rook_open_files_count * 22  * styles[black_sytle]["rook_open_files"]
 
-    white_score += (white_weak_squares * -7) * adaptive_style.sytles[white_sytle]["weak_squares"]
-    black_score += (black_weak_squares * -7) * adaptive_style.sytles[black_sytle]["weak_squares"]
+    white_score += (white_weak_squares * -7) * styles[white_sytle]["weak_squares"]
+    black_score += (black_weak_squares * -7) * styles[black_sytle]["weak_squares"]
 
-    white_score -= (white_attacks_on_king * 36) * adaptive_style.sytles[white_sytle]["attacks_on_king"]
-    black_score -= (black_attacks_on_king * 36) * adaptive_style.sytles[black_sytle]["attacks_on_king"]
+    white_score -= (white_attacks_on_king * 36) * styles[white_sytle]["attacks_on_king"]
+    black_score -= (black_attacks_on_king * 36) * styles[black_sytle]["attacks_on_king"]
 
-    white_score += (white_passed_pawns * 52) * adaptive_style.sytles[white_sytle]["passed_pawns"]
-    black_score += (black_passed_pawns * 52) * adaptive_style.sytles[black_sytle]["passed_pawns"]
+    white_score += (white_passed_pawns * 52) * styles[white_sytle]["passed_pawns"]
+    black_score += (black_passed_pawns * 52) * styles[black_sytle]["passed_pawns"]
 
     for i in white_material_list:
-        white_score += i * adaptive_style.sytles[white_sytle]["material"]
+        white_score += i * styles[white_sytle]["material"]
     for i in black_material_list:
-        black_score += i * adaptive_style.sytles[black_sytle]["material"]
+        black_score += i * styles[black_sytle]["material"]
 
     if with_muster:
         return (white_score - black_score) / 100.0, musters
@@ -266,16 +265,15 @@ def count_doubled_pawns(board, color) -> int:
     pawns = board.pieces(chess.PAWN, color)
     files_count = [0]*8
     for sq in pawns:
-        files_count[chess.square_file(sq)] += 1  # minden fájlban megszámoljuk a gyalogokat
+        files_count[chess.square_file(sq)] += 1
     return sum(c-1 for c in files_count if c>1)
 
 
 def count_isolated_pawns(board, color) -> int:
     pawns = board.pieces(chess.PAWN, color)
-    files = [chess.square_file(sq) for sq in pawns]  # fájlok listája
+    files = [chess.square_file(sq) for sq in pawns]
     isolated = 0
     for f in files:
-        # Ha nincs gyalog a közvetlen szomszédos fájlokon → izolált
         if (f-1 not in files) and (f+1 not in files):
             isolated += 1
     return isolated
@@ -284,9 +282,7 @@ def count_open_files(board, color):
     count = 0
     open_files = []
     for f in range(8):
-        # Ha nincs saját gyalog a fájlban
         if not any(chess.square_file(sq) == f and board.piece_at(sq).piece_type == chess.PAWN and board.piece_at(sq).color == color for sq in board.pieces(chess.PAWN, color)):
-            # Ha van bástya a fájlban → nyitott vonal
             if (chess.square_file(sq) == f and board.piece_at(sq).piece_type == chess.ROOK and board.piece_at(sq).color == color for sq in board.pieces(chess.ROOK, color)):
                 count += 1
                 open_files.append(f)
@@ -297,7 +293,6 @@ def count_weak_squares(board, color) -> int:
     opp_color = not color
     for sq in chess.SQUARES:
         piece = board.piece_at(sq)
-        # Gyenge mező: nincs védve saját figurával, ellenfél támadja
         if piece is None and len(board.attackers(color, sq)) == 0 and len(board.attackers(opp_color, sq)) > 0:
             count += 1
     return count
@@ -339,7 +334,6 @@ def count_passed_pawns(board, color) -> int:
         for ep in enemy_pawns:
             ef, er = chess.square_file(ep), chess.square_rank(ep)
 
-            # Ugyanazon vagy szomszédos fájlon, és előtte áll
             if abs(ef - file) <= 1 and (er - rank) * direction > 0:
                 blocked = True
                 break

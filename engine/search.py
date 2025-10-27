@@ -9,12 +9,11 @@ from evulate import game_phase
 def determine_R(board: chess.Board) -> int:
     gp = game_phase(board)
     if gp == "opening":
-        return 4
+        return 3 # 3 vagy 4
     elif gp == "middlegame":
         return 3
-    elif gp == "endgame":
-        return 2
-    return 2
+    else:
+        return 2 # Endgame
 
 def can_do_null_move(board: chess.Board, previous_null_move, depth, R):
 
@@ -32,9 +31,8 @@ def can_do_null_move(board: chess.Board, previous_null_move, depth, R):
         return False
 
     return True
-# Minimax alfa-béta vágással
+
 def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: float, beta: float, datas_for_evulate, previous_null_move=False):
-    #maximizing_player = board.turn
 
     if depth == 0 or board.is_game_over():
         return quiescence(board, maximizing_player, alpha, beta, datas_for_evulate), None
@@ -56,7 +54,7 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
         R = determine_R(board)
         if can_do_null_move(board, previous_null_move, depth, R):
             board.turn = not board.turn
-            score, _ = alphabeta(board, board.turn, depth-1-R, -beta, -beta+1, datas_for_evulate, previous_null_move=True)
+            score, _   = alphabeta(board, board.turn, depth-1-R, -beta, -beta+1, datas_for_evulate, previous_null_move=True)
             board.turn = not board.turn
             previous_null_move = True
             if score >= beta:
@@ -69,7 +67,7 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
             eval_core, _ = alphabeta(board, False, depth - 1, alpha, beta, datas_for_evulate, previous_null_move=previous_null_move)
             board.pop()
             if eval_core > max_eval:
-                max_eval = eval_core
+                max_eval  = eval_core
                 best_move = move
             alpha = max(alpha, max_eval)
             if beta <= alpha:
@@ -90,6 +88,7 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
                 if len(killer_moves[depth]) >= 3:
                     killer_moves[depth].pop(0)
                 killer_moves[depth].append(best_move)
+
             board.push(best_move)
             is_check = board.is_check()
             board.pop()
@@ -106,7 +105,7 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
         R = determine_R(board)
         if can_do_null_move(board, previous_null_move, depth, R):
             board.turn = not board.turn
-            score, _ = alphabeta(board, board.turn, depth-1-R, -alpha-1, -alpha, datas_for_evulate, previous_null_move=True)
+            score, _   = alphabeta(board, board.turn, depth-1-R, -alpha-1, -alpha, datas_for_evulate, previous_null_move=True)
             board.turn = not board.turn
             previous_null_move = True
             if score <= alpha:
@@ -120,7 +119,7 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
             eval_core, _ = alphabeta(board, True, depth - 1, alpha, beta, datas_for_evulate,  previous_null_move=previous_null_move)
             board.pop()
             if eval_core < min_eval:
-                min_eval = eval_core
+                min_eval  = eval_core
                 best_move = move
             beta = min(beta, min_eval)
             if beta <= alpha:

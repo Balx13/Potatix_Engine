@@ -4,29 +4,26 @@ import chess
 board = chess.Board(chess.STARTING_FEN)
 
 MAX_DEPTH = 100_000
+
 killer_moves = [[] for _ in range(MAX_DEPTH)]
 
 history_heuristic = [[[0 for _ in range(64)] for _ in range(64)] for _ in range(6)]
 
-# Bábu értékek
 PIECE_VALUES = {
-    chess.PAWN: 100,
+    chess.PAWN:   100,
     chess.KNIGHT: 320,
     chess.BISHOP: 330,
-    chess.ROOK: 500,
-    chess.QUEEN: 900,
-    chess.KING: 0
+    chess.ROOK:   500,
+    chess.QUEEN:  900,
+    chess.KING:   0
 }
 
-# Központi mezők
 CENTER_SQUARES = [chess.D4, chess.D5, chess.E4, chess.E5]
 
-#position_values
-# pozícióértékek
-position_values = {
 
+position_values = {
     "pawn": (
-        0,  0,  0,  0,  0,  0,  0,  0,
+         0,  0,  0,  0,  0,  0,  0,  0,
         50, 50, 50, 50, 50, 50, 50, 50,
         10, 10, 20, 30, 30, 20, 10, 10,
          5,  5, 10, 25, 25, 10,  5,  5,
@@ -40,7 +37,7 @@ position_values = {
         -20,-10,-10,-10,-10,-10,-10,-20,
         -10,  0,  0,  0,  0,  0,  0,-10,
         -10,  0,  5, 10, 10,  5,  0,-10,
-        -10,  -3,  5, 10, 10,  5,  -3,-10,
+        -10, -3,  5, 10, 10,  5, -3,-10,
         -10,  0, 10, 10, 10, 10,  0,-10,
         -10, 10, 10, 10, 10, 10, 10,-10,
         -10,  5,  0,  0,  0,  0,  5,-10,
@@ -70,22 +67,22 @@ position_values = {
     ),
 
     "rook": (
-        0, 0, 0, 0, 0, 0, 0, 0,
-        5, 10, 10, 10, 10, 10, 10, 5,
-        -5, 0, 0, 0, 0, 0, 0, -5,
-        -5, 0, 0, 0, 0, 0, 0, -5,
-        -5, 0, 0, 0, 0, 0, 0, -5,
-        -5, 0, 0, 0, 0, 0, 0, -5,
-        -5, 0, 0, 0, 0, 0, 0, -5,
-        0, 0, 0, 5, 5, 0, 0, 0
+         0,  0,  0,  0,  0,  0,  0, 0,
+         5, 10, 10, 10, 10, 10, 10, 5,
+        -5,  0,  0,  0,  0,  0,  0,-5,
+        -5,  0,  0,  0,  0,  0,  0,-5,
+        -5,  0,  0,  0,  0,  0,  0,-5,
+        -5,  0,  0,  0,  0,  0,  0,-5,
+        -5,  0,  0,  0,  0,  0,  0,-5,
+         0,  0,  0,  5,  5,  0,  0, 0
     ),
 
     "queen_mg": (
         -20,-10,-10, -5, -5,-10,-10,-20,
         -10,  0,  0,  0,  0,  0,  0,-10,
         -10,  0,  5,  5,  5,  5,  0,-10,
-        -5,  0,  5,  5,  5,  5,  0, -5,
-          0,  0,  5,  5,  5,  5,  0, -5,
+        -5,   0,  5,  5,  5,  5,  0, -5,
+         0,   0,  5,  5,  5,  5,  0, -5,
         -10,  5,  5,  5,  5,  5,  0,-10,
         -10,  0,  5,  0,  0,  0,  0,-10,
         -20,-10,-10, -5, -5,-10,-10,-20
@@ -93,11 +90,11 @@ position_values = {
 
     "queen_op": (
         -20,-10,-10, -5, -5,-10,-10,-20,
-        -10,  -5,  -5,  -5,  -5,  -5,  -5,-10,
-        -10,  -1,  -5,  -5,  -5,  -5,  -1,-10,
-        -5,  -1,  -3,  -5,  -5,  -3,  -1, -5,
-        0,  -1,  -3,  -5,  -5,  -3,  -1, -5,
-        -10,  -1,  0,  0,  0,  -3,  -1,-10,
+        -10, -5, -5, -5, -5, -5, -5,-10,
+        -10, -1, -5, -5, -5, -5, -1,-10,
+        -5,  -1, -3, -5, -5, -3, -1, -5,
+         0,  -1, -3, -5, -5, -3, -1, -5,
+        -10, -1,  0,  0,  0, -3, -1,-10,
         -10,  0,  0,  5,  5,  0,  0,-10,
         -20,-10,-10, -5, -5,-10,-10,-20
     ),
@@ -109,8 +106,8 @@ position_values = {
         -30,-40,-40,-50,-50,-40,-40,-30,
         -20,-30,-30,-40,-40,-30,-30,-20,
         -10,-20,-20,-20,-20,-20,-20,-10,
-        20, 20,  0,  0,  0,  0, 20, 20,
-        20, 30, 10,  0,  0, 10, 30, 20
+         20, 20,  0,  0,  0,  0, 20, 20,
+         20, 30, 10,  0,  0, 10, 30, 20
     ),
 
     "king_eg": (
@@ -123,4 +120,81 @@ position_values = {
         -30,-30,  0,  0,  0,  0,-30,-30,
         -50,-30,-30,-30,-30,-30,-30,-50
     )
+}
+
+styles = {
+    "attacker": {
+        "material":        0.85,
+        "king_safety":     0.7,
+        "mobility":        1.4,
+        "center_control":  1.1,
+        "pawn_chains":     0.9,
+        "rook_open_files": 1.3,
+        "attacks_on_king": 1.6,
+        "passed_pawns":    0.8,
+        "weak_squares":    0.7
+    },
+    "defensive": {
+        "material":        1.2,
+        "king_safety":     1.6,
+        "mobility":        0.8,
+        "center_control":  1.3,
+        "pawn_chains":     1.4,
+        "rook_open_files": 0.6,
+        "attacks_on_king": 0.4,
+        "passed_pawns":    1.0,
+        "weak_squares":    0.9
+    },
+    "positional": {
+        "material":        1.0,
+        "king_safety":     1.2,
+        "mobility":        1.0,
+        "center_control":  1.5,
+        "pawn_chains":     1.3,
+        "rook_open_files": 0.9,
+        "attacks_on_king": 0.7,
+        "passed_pawns":    1.0,
+        "weak_squares":    0.6
+    },
+    "tactical": {
+        "material":        0.9,
+        "king_safety":     0.8,
+        "mobility":        1.5,
+        "center_control":  1.0,
+        "pawn_chains":     0.8,
+        "rook_open_files": 1.4,
+        "attacks_on_king": 1.5,
+        "passed_pawns":    0.9,
+        "weak_squares":    0.8
+    },
+    "endgame": {
+        "material":        1.0,
+        "king_safety":     1.0,
+        "mobility":        0.8,
+        "center_control":  1.1,
+        "pawn_chains":     1.3,
+        "rook_open_files": 0.8,
+        "attacks_on_king": 0.6,
+        "passed_pawns":    1.5,
+        "weak_squares":    0.9
+    },
+    "balanced": {
+        "material":        1.0,
+        "king_safety":     1.0,
+        "mobility":        1.0,
+        "center_control":  1.0,
+        "pawn_chains":     1.0,
+        "rook_open_files": 1.0,
+        "attacks_on_king": 1.0,
+        "passed_pawns":    1.0,
+        "weak_squares":    1.0
+    },
+}
+counter_styles = {
+    "attacker"  : "defensive",
+    "defensive" : "tactical",
+    "positional": "attacker",
+    "tactical"  : "positional",
+    "endgame"   : "attacker",
+    "balanced"  : "tactical"
 }

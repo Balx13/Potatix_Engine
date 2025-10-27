@@ -10,45 +10,35 @@ def see(board, move):
     attacker = board.piece_at(from_square)
     victim = board.piece_at(to_square)
 
-    # gain lista: minden lépés után mennyit nyerünk/vesztünk
-    gain = []
-    gain.append(PIECE_VALUES[victim.piece_type] if victim else 0)
+    gain = [PIECE_VALUES[victim.piece_type] if victim else 0]
 
-    # átmeneti állapot: kik támadják a célmezőt
     occupied = board.occupied
     attackers = board.attackers(chess.WHITE, to_square) | board.attackers(chess.BLACK, to_square)
 
-    # az ütést végrehajtjuk (attacker átmegy a célmezőre)
     occupied ^= chess.BB_SQUARES[from_square]
     occupied ^= chess.BB_SQUARES[to_square]
 
-    color = not attacker.color  # most az ellenfélé jön
+    color = not attacker.color
 
     while True:
-        # kik tudják visszaütni a célmezőt most?
+
         attackers &= occupied
         possible = [sq for sq in attackers if board.piece_at(sq).color == color]
         if not possible:
             break
 
-        # a legolcsóbb bábuval üssön vissza az ellenfél
         sq = min(possible, key=lambda s: PIECE_VALUES[board.piece_at(s).piece_type])
         piece = board.piece_at(sq)
 
-        # új gain: előző - az ütő bábu értéke
         gain.append(-gain[-1] + PIECE_VALUES[piece.piece_type])
 
-        # frissítjük az állapotot (ő is átáll a célmezőre)
         occupied ^= chess.BB_SQUARES[sq]
         color = not color
 
-    # optimális pont: a sorozat maximuma
     result = max((-1)**i * g for i, g in enumerate(gain))
     return result
 
 
-
-# Quiescence search (csak capture lépéseket vizsgál)
 def quiescence(board: chess.Board, maximizing_player: bool, alpha: float, beta: float, datas_for_evulate) -> float:
     stand_pat = evaluate_board(board, with_muster=False, adaptive_mode=datas_for_evulate[2],
         engine_white=datas_for_evulate[1], opponent_sytle=datas_for_evulate[0])

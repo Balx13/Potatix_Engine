@@ -1,6 +1,8 @@
 import chess
 from config import PIECE_VALUES
 
+
+
 def estimate_moves_to_go(board: chess.Board) -> int:
 
     piece_count = len(board.piece_map())

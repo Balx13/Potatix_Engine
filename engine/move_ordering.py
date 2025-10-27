@@ -1,7 +1,7 @@
 import chess
-from config import killer_moves, PIECE_VALUES, history_heuristic
+from config import killer_moves, PIECE_VALUES, history_heuristic, counter_styles
 from evulate import evaluate_board
-from adaptive_style import playing_style_recognition, counter_styles
+from adaptive_style import playing_style_recognition
 
 def order_moves(board, moves, depth=None, datas_for_evulate=None):
     if datas_for_evulate is None:
