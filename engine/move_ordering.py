@@ -30,15 +30,15 @@ def order_moves(board, moves, depth=None, datas_for_evulate=None):
         else:
             return False
 
-    def score(move):
-        if board.is_capture(move):
-            victim = board.piece_at(move.to_square)
-            attacker = board.piece_at(move.from_square)
+    def score(move_):
+        if board.is_capture(move_):
+            victim = board.piece_at(move_.to_square)
+            attacker = board.piece_at(move_.from_square)
             victim_value = PIECE_VALUES[victim.piece_type] if victim else 0
             attacker_value = PIECE_VALUES[attacker.piece_type] if attacker else 0
             return 10 * (victim_value - attacker_value) + 100
 
-        board.push(move)
+        board.push(move_)
         if board.is_check():
             board.pop()
             if followed_style():
@@ -47,12 +47,12 @@ def order_moves(board, moves, depth=None, datas_for_evulate=None):
                 return 10
         board.pop()
 
-        piece = board.piece_at(move.from_square)
+        piece = board.piece_at(move_.from_square)
         if piece:
             piece_type = piece.piece_type
             piece_type -= 1
-            from_sq = move.from_square
-            to_sq = move.to_square
+            from_sq = move_.from_square
+            to_sq = move_.to_square
             history_score = history_heuristic[piece_type][from_sq][to_sq]
         else:
             history_score = 0
