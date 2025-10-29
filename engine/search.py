@@ -74,29 +74,30 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
                 cutoff_occurred = True
                 break
 
-        # TT mentés
-        if max_eval <= alpha_orig:
-            flag = 'UPPER'
-        elif max_eval >= beta:
-            flag = 'LOWER'
-        else:
-            flag = 'EXACT'
-        store_tt_entry(board, max_eval, depth, flag)
+        if not previous_null_move:
+            # TT mentés
+            if max_eval <= alpha_orig:
+                flag = 'UPPER'
+            elif max_eval >= beta:
+                flag = 'LOWER'
+            else:
+                flag = 'EXACT'
+            store_tt_entry(board, max_eval, depth, flag)
 
-        if cutoff_occurred:
-            if best_move not in killer_moves[depth]:
-                if len(killer_moves[depth]) >= 3:
-                    killer_moves[depth].pop(0)
-                killer_moves[depth].append(best_move)
+            if cutoff_occurred:
+                if best_move not in killer_moves[depth]:
+                    if len(killer_moves[depth]) >= 3:
+                        killer_moves[depth].pop(0)
+                    killer_moves[depth].append(best_move)
 
-            board.push(best_move)
-            is_check = board.is_check()
-            board.pop()
-            is_capture = board.is_capture(best_move)
-            if not is_check and not is_capture:
-                piece = board.piece_at(best_move.from_square)
-                piece_type = piece.piece_type
-                history_heuristic[piece_type][best_move.from_square][best_move.to_square] += depth * depth
+                board.push(best_move)
+                is_check = board.is_check()
+                board.pop()
+                is_capture = board.is_capture(best_move)
+                if not is_check and not is_capture:
+                    piece = board.piece_at(best_move.from_square)
+                    piece_type = piece.piece_type
+                    history_heuristic[piece_type][best_move.from_square][best_move.to_square] += depth * depth
 
         return max_eval, best_move
     else:
@@ -125,27 +126,28 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
             if beta <= alpha:
                 break
 
-        # TT mentés
-        if min_eval <= alpha_orig:
-            flag = 'UPPER'
-        elif min_eval >= beta:
-            flag = 'LOWER'
-        else:
-            flag = 'EXACT'
-        store_tt_entry(board, min_eval, depth, flag)
+        if not previous_null_move:
+            # TT mentés
+            if min_eval <= alpha_orig:
+                flag = 'UPPER'
+            elif min_eval >= beta:
+                flag = 'LOWER'
+            else:
+                flag = 'EXACT'
+            store_tt_entry(board, min_eval, depth, flag)
 
-        if cutoff_occurred:
-            if best_move not in killer_moves[depth]:
-                if len(killer_moves[depth]) >= 3:
-                    killer_moves[depth].pop(0)
-                killer_moves[depth].append(best_move)
-            board.push(best_move)
-            is_check = board.is_check()
-            board.pop()
-            is_capture = board.is_capture(best_move)
-            if not is_check and not is_capture:
-                piece = board.piece_at(best_move.from_sq)
-                piece_type = piece.piece_type
-                history_heuristic[piece_type][best_move.from_sq][best_move.to_sq] += depth * depth
+            if cutoff_occurred:
+                if best_move not in killer_moves[depth]:
+                    if len(killer_moves[depth]) >= 3:
+                        killer_moves[depth].pop(0)
+                    killer_moves[depth].append(best_move)
+                board.push(best_move)
+                is_check = board.is_check()
+                board.pop()
+                is_capture = board.is_capture(best_move)
+                if not is_check and not is_capture:
+                    piece = board.piece_at(best_move.from_sq)
+                    piece_type = piece.piece_type
+                    history_heuristic[piece_type][best_move.from_sq][best_move.to_sq] += depth * depth
 
         return min_eval, best_move
