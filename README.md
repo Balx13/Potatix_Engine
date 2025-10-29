@@ -37,7 +37,7 @@ If you would like to contribute to the project or have found a bug, please open 
 1. Telepítsd a [Git](https://git-scm.com)-et
 2. Telepítsd a [Python](https://www.python.org)-t
 3. Klónozd ezt a repository-t ezzel a paranccsal: `git clone https://github.com/Balx13/Potato_bot.git`
-4. Telepítsd a Pyinstaller-tés a python-chess-t ezzel a paranccsal: `pip install pyinstaller chess`
+4. Telepítsd a Pyinstaller-t és a python-chess-t ezzel a paranccsal: `pip install pyinstaller chess`
 5. Futtasd ezt a parancsot: `pyinstaller --onefile --name MyEngine main.py adaptive_style.py config.py evulate.py move_ordering.py quiescence.py search.py stop_event.py time_manager.py transposition_table.py UCI.py`
 6. A build ezután megjelenik a  *dist* mappában!
 
