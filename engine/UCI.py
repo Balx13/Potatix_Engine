@@ -1,7 +1,7 @@
 import chess
-from transposition_table import transposition_table, Max_tt_size
+import transposition_table
 from search import alphabeta
-from config import board, MAX_DEPTH, killer_moves, history_heuristic
+import config
 import threading
 import time
 from time_manager import estimate_time_for_move
@@ -9,10 +9,14 @@ from stop_event import stop_event
 from adaptive_style import playing_style_recognition
 from evulate import evaluate_board
 
-board = chess.Board()
+board = config.board
+MAX_DEPTH = config.MAX_DEPTH
+killer_moves = config.killer_moves
+history_heuristic = config.history_heuristic
+search_thread = threading.Thread()
 
-search_thread = None
-
+transposition_table_ = transposition_table.transposition_table
+Max_tt_size = transposition_table.Max_tt_size
 
 def timer_worker(time_limit_sec):
     start = time.time()
@@ -23,15 +27,15 @@ def timer_worker(time_limit_sec):
             break
         time.sleep(0.001)  # kis várakozás, hogy ne terhelje a CPU-t
 
-def search_worker(max_depth_, wtime=None, btime=None, winc=0, binc=0, movestogo=None):
-    transposition_table.clear()
+def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movestogo=None):
+    transposition_table_.clear()
     stop_event.clear()
     best_move = None
 
-    if board.turn and wtime is not None:
-        time_limit_sec = estimate_time_for_move(board, wtime, winc, movestogo)
-    elif not board.turn and btime is not None:
-        time_limit_sec = estimate_time_for_move(board, btime, binc, movestogo)
+    if board.turn and wtime_ is not None:
+        time_limit_sec = estimate_time_for_move(board, wtime_, winc_, movestogo)
+    elif not board.turn and btime_ is not None:
+        time_limit_sec = estimate_time_for_move(board, btime_, binc_, movestogo)
     else:
         time_limit_sec = None
 
@@ -70,14 +74,30 @@ def search_worker(max_depth_, wtime=None, btime=None, winc=0, binc=0, movestogo=
         print(f"bestmove {fallback_move}", flush=True)
 
 
-while True:
+
+def read_cmd():
+    args = [""]
     try:
         line = input().strip()
         args = line.split()
+        return args
     except EOFError:
-        continue
+        return args
     except:
-        continue
+        return args
+
+def send_cmd(args=None):
+    if args is None:
+        args = read_cmd()
+    if args != [""]:
+        info_ = UCI(args)
+
+        if info_ == "quit":
+            return "quit"
+    return None
+
+def UCI(args):
+    global search_thread, killer_moves, board, Max_tt_size, MAX_DEPTH
     try:
         if args[0] == "uci":
             print("id name Potatix Engine", flush=True)
@@ -97,7 +117,7 @@ while True:
             stop_event.clear()
 
             board = chess.Board()
-            transposition_table.clear()
+            transposition_table_.clear()
 
             for km in killer_moves:
                 km.clear()
@@ -107,7 +127,7 @@ while True:
                     for to_sq in range(64):
                         history_heuristic[piece_type][from_sq][to_sq] = 0
 
-            opponent_positions = []
+            opponent_positions = [] ####################################################################################
 
         elif args[0] == "quit":
             if search_thread and search_thread.is_alive():
@@ -115,7 +135,7 @@ while True:
                 search_thread.join()
 
             stop_event.clear()
-            break
+            return "quit"
 
         elif args[0] == "position":
             if  args[1] == "startpos":
@@ -178,16 +198,15 @@ while True:
             elif args[name_index+1] == "TTSize":
                 value_num= int(args[value_index+1])
                 if 1 <= value_num <= 100_000_000:
-                    Max_tt_size = value_num
+                    Max_tt_size *= 0
+                    Max_tt_size += value_num
 
         elif args[0] == "stop":
             stop_event.set()
 
     except IndexError:
-        continue
+        return None
     except Exception as e:
         print(f"info string Error: \"{e}\"", flush=True)
-        # Nincs bestmove, a motor csak vár.
-        continue
-
+        return None
 
