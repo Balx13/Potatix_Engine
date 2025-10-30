@@ -59,7 +59,7 @@ If you would like to contribute to the project or have found a bug, please open 
 6. A build ezután megjelenik a  *dist* mappában!
 
 ### 2.) Hogyan használd GUI-val:
-> Ez a folyamat minden GUI  esetében más, ebben a példában egy aréna nevű GUI-t fogunk használni.
+> Ez a folyamat minden GUI  esetében más, ebben a példában az arena nevű GUI-t fogunk használni.
 1. Menj az  *engines -> install new engine...* fülre
 2. Tallózd a motor buildjét
 3. Kattints az **"open"** gombra
