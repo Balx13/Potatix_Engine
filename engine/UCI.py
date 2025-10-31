@@ -127,8 +127,6 @@ def UCI(args):
                     for to_sq in range(64):
                         history_heuristic[piece_type][from_sq][to_sq] = 0
 
-            opponent_positions = [] ####################################################################################
-
         elif args[0] == "quit":
             if search_thread and search_thread.is_alive():
                 stop_event.set()
