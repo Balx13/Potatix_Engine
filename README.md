@@ -53,6 +53,7 @@ The 'Potatix Engine' should not be confused with 'Potato Engine' or 'Potatix'.
 <p align="center"><em>Magyar verzió</em></p>
 
 </div>
+
 ## A porjektről
 ### Magyar fejlesztésű ingyenes és nyílt forráskódú adaptív sakkmotor 🇭🇺
 
