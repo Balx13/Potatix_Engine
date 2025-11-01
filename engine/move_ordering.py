@@ -31,36 +31,38 @@ def order_moves(board, moves, depth=None, datas_for_evulate=None):
             return False
 
     def score(move_):
-        if board.is_capture(move_):
+        piece = board.piece_at(move_.from_square)
+        followed_s = followed_style()
+        if piece:
+            piece_type = piece.piece_type
+            piece_type -= 1
+            history_score = history_heuristic[piece_type][move_.from_square][move_.to_square]
+        else:
+            history_score = 0
+
+        if board.is_capture(move_): # Ütés
             victim = board.piece_at(move_.to_square)
             attacker = board.piece_at(move_.from_square)
             victim_value = PIECE_VALUES[victim.piece_type] if victim else 0
             attacker_value = PIECE_VALUES[attacker.piece_type] if attacker else 0
-            return 10 * (victim_value - attacker_value) + 100
+            if followed_s:
+                return 10 * (victim_value - attacker_value) + 350 + history_score # 350-
+            else:
+                return 10 * (victim_value - attacker_value) + 300 + history_score  # 300-
 
         board.push(move_)
-        if board.is_check():
+        if board.is_check(): # Sakk
             board.pop()
-            if followed_style():
-                return 50
+            if followed_s:
+                return 150 + history_score # 150-250
             else:
-                return 10
+                return 100  + history_score# 100-200
         board.pop()
 
-        piece = board.piece_at(move_.from_square)
-        if piece:
-            piece_type = piece.piece_type
-            piece_type -= 1
-            from_sq = move_.from_square
-            to_sq = move_.to_square
-            history_score = history_heuristic[piece_type][from_sq][to_sq]
+        if followed_s: # Maradék
+            return 5 + history_score # 5-105
         else:
-            history_score = 0
-
-        if followed_style():
-            return 5 + history_score
-        else:
-            return 0 + history_score
+            return 0 + history_score # 0-100
 
     remaining_moves = sorted(remaining_moves, key=score, reverse=True)
     return killer_moves_ordered + remaining_moves

@@ -97,7 +97,10 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
                 if not is_check and not is_capture:
                     piece = board.piece_at(best_move.from_square)
                     piece_type = piece.piece_type
-                    history_heuristic[piece_type][best_move.from_square][best_move.to_square] += depth * depth
+                    history_index = history_heuristic[piece_type][best_move.from_square][best_move.to_square]
+                    history_index += depth * depth
+                    if history_index > 100:
+                        history_index = 100
 
         return max_eval, best_move
     else:
@@ -148,6 +151,9 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
                 if not is_check and not is_capture:
                     piece = board.piece_at(best_move.from_sq)
                     piece_type = piece.piece_type
-                    history_heuristic[piece_type][best_move.from_sq][best_move.to_sq] += depth * depth
+                    history_index = history_heuristic[piece_type][best_move.from_square][best_move.to_square]
+                    history_index += depth * depth
+                    if history_index > 100:
+                        history_index = 100
 
         return min_eval, best_move
