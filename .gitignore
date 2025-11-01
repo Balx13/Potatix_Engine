@@ -2,10 +2,6 @@
 /.venv/
 /AI_alap/
 list_files.py
-/engine/database.py
-/engine/musters_database.json
-/engine/wrapper.py
-/engine/wrapper.exe
-UCI.spec
+main.spec
 /build
 /dist
