@@ -50,22 +50,34 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
 
     if maximizing_player:
         max_eval = float('-inf')
+        cutoff_occurred = False
+        LMR = False
+        reduction = 0
 
         R = determine_R(board)
         if can_do_null_move(board, previous_null_move, depth, R):
             board.turn = not board.turn
-            score, _   = alphabeta(board, board.turn, depth-1-R, -beta, -beta+1, datas_for_evulate, previous_null_move=True)
+            score, _ = alphabeta(board, False, depth - 1 - R, alpha, beta, datas_for_evulate, previous_null_move=True)
             board.turn = not board.turn
-            previous_null_move = True
             if score >= beta:
                 return score, None
 
-        for move in order_moves(board, board.legal_moves, depth, datas_for_evulate):
+        for move, moves_score in order_moves(board, board.legal_moves, depth, datas_for_evulate):
             if stop_event.is_set():
                 return 0, None
+
+            if moves_score < 110 and game_phase(board) != "opening" and not board.is_check() and not board.is_capture(move):
+                if depth >= 3:
+                    LMR = True
+                    reduction = 1 + (depth // 5)
+
             board.push(move)
-            eval_core, _ = alphabeta(board, False, depth - 1, alpha, beta, datas_for_evulate, previous_null_move=previous_null_move)
+            eval_core, _ = alphabeta(board, False, depth-1-reduction, alpha, beta, datas_for_evulate, previous_null_move=previous_null_move)
+
+            if LMR and eval_core > alpha:
+                eval_core, _ = alphabeta(board, False, depth-1, alpha, beta, datas_for_evulate, previous_null_move=previous_null_move)
             board.pop()
+
             if eval_core > max_eval:
                 max_eval  = eval_core
                 best_move = move
@@ -105,28 +117,40 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
         return max_eval, best_move
     else:
         min_eval = float('inf')
+        cutoff_occurred = False
+        LMR = False
+        reduction = 0
 
         R = determine_R(board)
         if can_do_null_move(board, previous_null_move, depth, R):
             board.turn = not board.turn
-            score, _   = alphabeta(board, board.turn, depth-1-R, -alpha-1, -alpha, datas_for_evulate, previous_null_move=True)
+            score, _   = alphabeta(board, board.turn, depth-1-R, alpha, beta, datas_for_evulate, previous_null_move=True)
             board.turn = not board.turn
-            previous_null_move = True
             if score <= alpha:
                 return score, None
 
-        for move in order_moves(board, board.legal_moves, depth, datas_for_evulate):
+        for move, moves_score in order_moves(board, board.legal_moves, depth, datas_for_evulate):
             if stop_event.is_set():
                 return 0, None
 
+            if moves_score < 110 and game_phase(board) != "opening" and not board.is_check() and not board.is_capture(move):
+                if depth >= 3:
+                    LMR = True
+                    reduction = 1 + (depth // 5)
+
             board.push(move)
-            eval_core, _ = alphabeta(board, True, depth - 1, alpha, beta, datas_for_evulate,  previous_null_move=previous_null_move)
+            eval_core, _ = alphabeta(board, True, depth-1-reduction, alpha, beta, datas_for_evulate,  previous_null_move=previous_null_move)
+
+            if LMR and eval_core < beta:
+                eval_core, _ = alphabeta(board, False, depth-1, alpha, beta, datas_for_evulate, previous_null_move=previous_null_move)
+
             board.pop()
             if eval_core < min_eval:
                 min_eval  = eval_core
                 best_move = move
             beta = min(beta, min_eval)
             if beta <= alpha:
+                cutoff_occurred = True
                 break
 
         if not previous_null_move:
@@ -149,7 +173,7 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
                 board.pop()
                 is_capture = board.is_capture(best_move)
                 if not is_check and not is_capture:
-                    piece = board.piece_at(best_move.from_sq)
+                    piece = board.piece_at(best_move.from_square)
                     piece_type = piece.piece_type
                     history_index = history_heuristic[piece_type][best_move.from_square][best_move.to_square]
                     history_index += depth * depth
