@@ -2,12 +2,11 @@ import chess
 import chess.polyglot
 from collections import namedtuple
 
-# Transposition table bejegyzés típusa
+
 TTEntry = namedtuple("TTEntry", ["value", "depth", "flag"])
 transposition_table = {}
 Max_tt_size = 1_000_000
 
-# Transposition table mentése
 def store_tt_entry(board, value, depth, flag):
     key = chess.polyglot.zobrist_hash(board)
     if key in transposition_table:
