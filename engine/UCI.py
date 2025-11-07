@@ -1,5 +1,5 @@
 import chess
-import transposition_table
+import transposition_table as tt
 from search import alphabeta
 import config
 import threading
@@ -15,8 +15,8 @@ killer_moves = config.killer_moves
 history_heuristic = config.history_heuristic
 search_thread = threading.Thread()
 
-transposition_table_ = transposition_table.transposition_table
-Max_tt_size = transposition_table.Max_tt_size
+transposition_table_ = tt.transposition_table
+Max_tt_size = tt.Max_tt_size
 
 def timer_worker(time_limit_sec):
     start = time.time()
