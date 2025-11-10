@@ -43,7 +43,7 @@ The Author shall notify the User of the breach and allow a 30-day period to cure
 ------------------------------------------------------------
 3.1 Every distribution or public use of the Software (original or modified) must include clear and visible credit to the Author using the following notice:
 
-    "This project is based on the Potatix Engine, originally created by Balázs André (https://github.com/Balx13/Potato_bot)."
+    "This project is based on the Potatix Engine, originally created by Balázs André (https://github.com/Balx13/Potatix_Engine)."
 
 3.2 Modified versions must also include the statement:
 
