@@ -1,80 +1,125 @@
 POTATIX ENGINE – CUSTOM REDISTRIBUTION LICENSE
-Version 2.0 (2025)
+Version 2.1 (2025)
+Official language: English
 
+------------------------------------------------------------
 DEFINITIONS
-1. "Software" refers to the Potatix Engine in its entirety, including but not limited to source code, binaries, assets, libraries, documentation, configuration files, scripts, build systems, and any derivative or modified versions thereof.
-2. "Author" refers to the original creator and copyright holder of the Software: Balázs André.
-3. "User" refers to any individual or organization that accesses, uses, modifies, or distributes the Software.
-4. "Distribution" means any act of sharing, transferring, publishing, uploading, or otherwise making the Software available to third parties, in original or modified form.
-5. "Derivative Work" refers to any work that is based on or derived from the Software, including modifications, adaptations, translations, or portions thereof.
-6. "Commercial Use" refers to any activity involving monetary gain, profit, or compensation, including selling, licensing, bundling, or monetizing through advertising, donations, or paid access.
+------------------------------------------------------------
+1. "Software" means the Potatix Engine in its entirety, including source code, binaries, assets, libraries, documentation, configuration files, build systems, scripts, and any derivative or modified works thereof.
 
-----------------------------------------------------------------------
-1. GRANT OF RIGHTS
-1.1 The Author grants the User a worldwide, royalty-free, non-exclusive, and revocable license to use, modify, and distribute the Software, subject to the conditions below.
-1.2 Ownership of the Software and all associated rights remain with the Author. This License does not transfer ownership of any intellectual property.
+2. "Author" means the original creator and copyright holder of the Software: Balázs André.
 
-----------------------------------------------------------------------
+3. "User" means any individual or organization that accesses, uses, modifies, or redistributes the Software or any part of it.
+
+4. "Distribution" means any act of sharing, transferring, publishing, uploading, or otherwise making the Software, or any part thereof, available to third parties, in source or binary form.
+
+5. "Derivative Work" means any work based on or derived from the Software, including modifications, adaptations, translations, or partial reuse of the original code or assets.
+
+6. "Commercial Use" means any use, activity, or distribution intended for or resulting in direct or indirect monetary gain, including but not limited to selling, licensing, paid access, advertisements, sponsorships, donations linked to access, or inclusion in any product or service offered for profit.
+
+------------------------------------------------------------
+1. GRANT OF LICENSE
+------------------------------------------------------------
+1.1 The Author grants the User a worldwide, royalty-free, non-exclusive license to use, study, modify, and distribute the Software under the terms of this License.
+
+1.2 Ownership and all intellectual property rights remain with the Author. This License does not transfer ownership of any rights.
+
+1.3 The License is **revocable only in case of material breach** of its terms, including but not limited to failure to provide attribution, violation of section 3 or 4, or commercial exploitation without permission.  
+The Author shall notify the User of the breach and allow a 30-day period to cure it. If not remedied, this License terminates automatically.
+
+------------------------------------------------------------
 2. PERMITTED USE
-2.1 Users may use, study, and modify the Software for personal, educational, research, or non-commercial projects.
-2.2 Users may distribute unmodified or modified versions of the Software, provided they comply with the attribution and integrity requirements in Section 3.
-2.3 Users may include the Software in open-source or non-commercial projects, as long as attribution is maintained.
+------------------------------------------------------------
+2.1 The Software may be used for personal, educational, research, or non-commercial projects.
 
-----------------------------------------------------------------------
+2.2 Users may modify and distribute the Software or Derivative Works under the same License, provided all attribution and integrity requirements (Section 3) are met.
+
+2.3 The Software may be included in open-source, non-commercial projects if attribution is preserved and the License text is included in full.
+
+2.4 Hosting, cloud use, or software-as-a-service (SaaS) deployments that generate or support revenue are considered Commercial Use and are not permitted without written authorization.
+
+------------------------------------------------------------
 3. ATTRIBUTION AND INTEGRITY REQUIREMENTS
-3.1 Any distribution, whether in original or modified form, must clearly and visibly credit the Author. The following notice must appear in all distributions, including source and binary form:
-    "This project is based on the Potatix Engine, originally created by Balázs André (https://github.com/Balx13/Potatix_Engine)."
-3.2 Attribution must be displayed:
-    - In the documentation or README file of the distributed work.
-    - Within any about, credits, or info screen if the Software is used in a product or executable.
-3.3 Modified versions must include a clear statement such as:
+------------------------------------------------------------
+3.1 Every distribution or public use of the Software (original or modified) must include clear and visible credit to the Author using the following notice:
+
+    "This project is based on the Potatix Engine, originally created by Balázs André (https://github.com/Balx13/Potato_bot)."
+
+3.2 Modified versions must also include the statement:
+
     "Modified version of the Potatix Engine by [Your Name]. Original work by Balázs André."
-3.4 Removal or obfuscation of the Author’s name, license text, or credit notice is strictly prohibited.
-3.5 The Software’s name "Potatix Engine" and any logos or branding associated with it are not officially registered trademarks but are protected under this License. Users may not:
-    - Present their version as the original or official Potatix Engine.
+
+3.3 Attribution must appear in at least one of the following:
+    - The README or documentation of the distributed work.
+    - The in-application "About", "Credits", or "Info" screen.
+    - A NOTICE file included with the binary or source package.
+
+3.4 The Author’s name, credit notice, and this License text must never be removed, hidden, or obfuscated.
+
+3.5 The name "Potatix Engine" and any related logos are reserved.  
+Users may reference it only for attribution or compatibility statements, but may not:
+    - Present their project as the "official" Potatix Engine.
+    - Use the name or logo in a misleading way.
     - Imply endorsement or association with the Author.
-    - Use the name "Potatix Engine" in a misleading way suggesting ownership or authorship.
 
-----------------------------------------------------------------------
+------------------------------------------------------------
 4. RESTRICTIONS
-4.1 Commercial Use of the Software or any Derivative Work is prohibited without the Author’s explicit written permission.
-4.2 The Software may not be sold, rented, or licensed for profit, directly or indirectly, without authorization.
-4.3 Distribution is only permitted under this License; you may not relicense the Software under a different or conflicting license.
-4.4 The Software or any part thereof may not be used for unethical, illegal, or harmful purposes, including but not limited to malware, cheating tools, or deceptive software.
+------------------------------------------------------------
+4.1 **Commercial Use is strictly prohibited** without explicit written permission from the Author.
 
-----------------------------------------------------------------------
+4.2 The Software or any Derivative Work may not be sold, rented, licensed, or monetized in any way.
+
+4.3 Redistribution must be made **under this same License**; relicensing or sublicensing under different or conflicting terms is not allowed.
+
+4.4 The Software may not be used for illegal, unethical, or harmful purposes, including but not limited to malware, cheating tools, or deceptive software.
+
+------------------------------------------------------------
 5. BRANDING AND NAMING
-5.1 The name "Potatix Engine" is reserved for the original work by Balázs André.
-5.2 You may reference the Software by name for attribution, but you may not:
-    - Rename a derivative work to "Potatix Engine" or any similar variant that may cause confusion.
-    - Use the original name or logo as part of your own branding or product name without permission.
-5.3 You may state compatibility with or inspiration from the Potatix Engine, as long as you clearly indicate that your project is independent and not officially endorsed by the Author.
+------------------------------------------------------------
+5.1 The name "Potatix Engine" is reserved exclusively for the original work by Balázs André.
 
-----------------------------------------------------------------------
+5.2 Derivative Works must clearly indicate that they are unofficial and independent from the original.  
+For example:  
+    "Unofficial fork of the Potatix Engine, not endorsed by the original author."
+
+5.3 The Author retains the right to request renaming of any Derivative Work that causes confusion or misrepresents origin or authorship.
+
+------------------------------------------------------------
 6. WARRANTY DISCLAIMER
-6.1 The Software is provided "AS IS", without warranty of any kind, express or implied, including but not limited to merchantability, fitness for a particular purpose, and non-infringement.
-6.2 The Author is not responsible for any damages, losses, or issues arising from the use or misuse of the Software.
+------------------------------------------------------------
+The Software is provided "AS IS", without any warranty, express or implied, including but not limited to merchantability, fitness for a particular purpose, or non-infringement.  
+The Author is not liable for any damages arising from use or misuse of the Software.
 
-----------------------------------------------------------------------
-7. ENFORCEMENT AND TERMINATION
-7.1 Violation of this License, including failure to provide proper attribution, constitutes immediate termination of all granted rights.
-7.2 Upon termination, the User must cease all use, distribution, and remove all public copies of the Software or derivative works.
-7.3 The Author reserves the right to enforce intellectual property rights through legal means if necessary.
+------------------------------------------------------------
+7. TERMINATION AND ENFORCEMENT
+------------------------------------------------------------
+7.1 Any material violation of this License terminates all granted rights.
 
-----------------------------------------------------------------------
+7.2 Upon termination, the User must cease distribution and public use of the Software or Derivative Works and remove accessible copies where reasonably possible.  
+Termination does not affect third parties who obtained the Software lawfully prior to termination.
+
+7.3 The Author reserves the right to enforce their intellectual property rights through legal means, including injunctions and claims for damages.
+
+------------------------------------------------------------
 8. GOVERNING LAW
-8.1 This License shall be governed by and interpreted under the laws of Hungary and, where applicable, the laws of the European Union.
-8.2 Any disputes arising under or in connection with this License shall fall under the exclusive jurisdiction of the competent Hungarian courts.
+------------------------------------------------------------
+This License shall be governed and interpreted under the laws of Hungary and, where applicable, the laws of the European Union.  
+Disputes shall fall under the exclusive jurisdiction of the competent Hungarian courts.
 
-----------------------------------------------------------------------
+------------------------------------------------------------
 9. MISCELLANEOUS
+------------------------------------------------------------
 9.1 This License constitutes the entire agreement between the Author and the User regarding the Software.
-9.2 If any provision of this License is found invalid or unenforceable, the remaining provisions remain in effect.
+
+9.2 If any provision is found invalid or unenforceable, the remaining provisions remain in effect.
+
 9.3 Failure by the Author to enforce any right shall not constitute a waiver of such right.
 
-----------------------------------------------------------------------
-Copyright © 2025 Balázs André – Potatix Engine
-All rights reserved.
-For inquiries or permission for commercial use, contact the Author directly.
+9.4 The official and controlling language of this License is English. In case of translation discrepancies, this version prevails.
 
+------------------------------------------------------------
+Copyright © 2025 Balázs André
+All rights reserved.
+Contact the Author for commercial licensing inquiries.
+------------------------------------------------------------
 END OF LICENSE
