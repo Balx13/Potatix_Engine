@@ -23,7 +23,7 @@ DEFINITIONS
 ----------------------------------------------------------------------
 3. ATTRIBUTION AND INTEGRITY REQUIREMENTS
 3.1 Any distribution, whether in original or modified form, must clearly and visibly credit the Author. The following notice must appear in all distributions, including source and binary form:
-    "This project is based on the Potatix Engine, originally created by Balázs André (https://github.com/Balx13/Potato_bot)."
+    "This project is based on the Potatix Engine, originally created by Balázs André (https://github.com/Balx13/Potatix_Engine)."
 3.2 Attribution must be displayed:
     - In the documentation or README file of the distributed work.
     - Within any about, credits, or info screen if the Software is used in a product or executable.
