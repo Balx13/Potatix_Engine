@@ -257,8 +257,8 @@ def evaluate_board(board: chess.Board, with_muster=False, adaptive_mode=True, en
         black_score += i * styles[black_sytle]["material"]
 
     if with_muster:
-        return (white_score - black_score) / 100.0, musters
-    return (white_score - black_score) / 100.0
+        return white_score - black_score, musters
+    return white_score - black_score
 
 
 def count_doubled_pawns(board, color) -> int:

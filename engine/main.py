@@ -1,10 +1,6 @@
 import UCI
 
 while True:
-    info = ""
-    try:
-        info = UCI.send_cmd()
-    except:
-        continue
+    info = UCI.send_cmd()
     if info == "quit":
         break
