@@ -73,7 +73,8 @@ def evaluate_board(board: chess.Board, with_muster=False, adaptive_mode=True, en
                 else:
                     white_score += position_values["king_mg"][sq]
 
-        for sq in black_pcs:
+        for sq_ in black_pcs:
+            sq = chess.square_mirror(sq_)
             if piece_type == chess.PAWN:
                 black_score += position_values["pawn"][sq]
             elif piece_type == chess.BISHOP:
