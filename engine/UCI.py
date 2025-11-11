@@ -110,7 +110,6 @@ def UCI(args):
         elif args[0] == "isready":
             print("readyok", flush=True)
         elif args[0] == "ucinewgame":
-            #tt törlés, új tábla, reset
             if search_thread and search_thread.is_alive(): # leállítjuk a keresést, ha a GUI nem tette meg
                 stop_event.set()
                 search_thread.join()
@@ -201,6 +200,9 @@ def UCI(args):
 
         elif args[0] == "stop":
             stop_event.set()
+
+        else:
+            print(f"info string Error: unknown command \"{' '.join(args)}\"", flush=True)
 
     except IndexError:
         return None
