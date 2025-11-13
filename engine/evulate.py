@@ -117,6 +117,18 @@ def evaluate_board(board: chess.Board, with_muster=False, adaptive_mode=True, en
             else:
                 black_center_control += 10
 
+    # Sáncolt-e
+
+    if not board.has_castling_rights(chess.WHITE):
+        king_sq = board.king(chess.WHITE)
+        if king_sq in [chess.G1, chess.C1]:
+            white_score += 40
+
+    if not board.has_castling_rights(chess.BLACK):
+        king_sq = board.king(chess.BLACK)
+        if king_sq in [chess.G8, chess.C8]:
+            black_score += 40
+
     # Mobilitás
     white_mobility = count_legal_moves(board, chess.WHITE) * 2
     black_mobility = count_legal_moves(board, chess.BLACK) * 2

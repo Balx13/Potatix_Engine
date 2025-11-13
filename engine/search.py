@@ -75,7 +75,8 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
             if stop_event.is_set():
                 return 0, None
 
-            if moves_score < 110 and game_phase(board) != "opening" and not board.is_check() and not board.is_capture(move):
+            if moves_score < 110 and game_phase(board) != "opening" and not board.is_check() \
+                    and not board.is_capture(move) and not board.is_castling(move):
                 if depth >= 3:
                     LMR = True
                     reduction = 1 + (depth // 5)
@@ -142,7 +143,8 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
             if stop_event.is_set():
                 return 0, None
 
-            if moves_score < 110 and game_phase(board) != "opening" and not board.is_check() and not board.is_capture(move):
+            if moves_score < 110 and game_phase(board) != "opening" and not board.is_check() \
+                    and not board.is_capture(move) and not board.is_castling(move):
                 if depth >= 3:
                     LMR = True
                     reduction = 1 + (depth // 5)
