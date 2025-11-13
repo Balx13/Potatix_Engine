@@ -95,6 +95,13 @@ def order_moves(board, moves, depth, datas_for_evulate):
 
     killer_moves_ordered = []
 
+    for move in moves: # Hogyha van egy lépéses matt, akkor azt adjuk csak vissza
+        board.push(move)
+        if board.is_checkmate():
+            board.pop()
+            return [(move, 9999)]
+        board.pop()
+
     if depth and killer_moves[depth]:
         for move in killer_moves[depth]:
             if move in legal_moves_list:
