@@ -1,11 +1,18 @@
-import chess
+"""
+This file is part of Potatix Engine
+Copyright (C) 2025 Balázs André
+Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.txt)
+"""
 
+import chess
 
 def norm(n) -> float:
     return n / 100
 
 
 def playing_style_recognition(musters, color):
+    # Megmondja, hogy egy adott musters milyen stílusú játékosra utal az adott color-ban
+
     color = "white" if color else "black"
 
     mobility = musters[color]["mobility"]
@@ -18,11 +25,15 @@ def playing_style_recognition(musters, color):
     passed_pawns = musters[color]["passed_pawns"]
     material =     musters[color]["passed_pawns"]
 
+
+    # A pref-ek azt számítjolják ki, hogy az adott játékos leginkább milyen stílusú
+    # (amelyik pref a legnagyobb, az a játékos stílusa)
+
     attack_pref = (
               0.35 * norm(mobility)
             + 0.25 * norm(rook_open_files_count)
             + 0.3  * norm(attacks_on_king)
-            + 0.1  * (1 - abs(norm(center_control) - 0.5))
+            + 0.1  * (1-abs(norm(center_control)-0.5))
     )
 
     defense_pref = (
@@ -34,7 +45,7 @@ def playing_style_recognition(musters, color):
 
     positional_pref = (
               0.3  * norm(center_control)
-            + 0.25 * (1 - norm(weak_squares))
+            + 0.25 * (1-norm(weak_squares))
             + 0.25 * norm(pawn_chains)
             + 0.2  * norm(king_safety)
     )
@@ -49,12 +60,12 @@ def playing_style_recognition(musters, color):
     endgame_pref = (
               0.4 * norm(passed_pawns)
             + 0.3 * norm(pawn_chains)
-            + 0.2 * (1 - abs(norm(material)))
-            + 0.1 * (1 - norm(mobility))
+            + 0.2 * (1-abs(norm(material)))
+            + 0.1 * (1-norm(mobility))
     )
 
     balanced_pref = (
-            1 - sum(abs(norm(x) - 0.5) for x in [mobility, center_control, king_safety, pawn_chains]) / 4
+            1-sum(abs(norm(x)-0.5) for x in [mobility, center_control, king_safety, pawn_chains]) / 4
     )
 
     playing_style = max((attack_pref, defense_pref, positional_pref, tactical_pref, endgame_pref, balanced_pref))

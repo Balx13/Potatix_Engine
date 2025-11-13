@@ -1,3 +1,9 @@
+"""
+This file is part of Potatix Engine
+Copyright (C) 2025 Balázs André
+Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.txt)
+"""
+
 import chess
 import chess.polyglot
 from collections import namedtuple
@@ -8,6 +14,8 @@ transposition_table = {}
 Max_tt_size = 1_000_000
 
 def store_tt_entry(board, value, depth, flag):
+    # Elmenti az állást a TT-be
+
     key = chess.polyglot.zobrist_hash(board)
     if key in transposition_table:
         old = transposition_table[key]
@@ -20,8 +28,10 @@ def store_tt_entry(board, value, depth, flag):
         del transposition_table[next(iter(transposition_table))]
     transposition_table[key] = TTEntry(value, depth, flag)
 
-# Transposition table lekérdezése
+
 def probe_tt(board, depth, alpha, beta):
+    # Lekéri a TT-t
+    
     key = chess.polyglot.zobrist_hash(board)
     entry = transposition_table.get(key)
     if entry is None or entry.depth < depth:

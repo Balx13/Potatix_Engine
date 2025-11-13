@@ -1,10 +1,16 @@
+"""
+This file is part of Potatix Engine
+Copyright (C) 2025 Balázs André
+Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.txt)
+"""
+
 import chess
 from config import position_values, PIECE_VALUES, CENTER_SQUARES, styles, counter_styles
-import random # Értékelési zajhoz csak, de az most le van tiltva
 import adaptive_style
 
 def game_phase(board: chess.Board) -> str:
-    # egyszerű becslés: anyag alapján
+    # Azt próbálja megmondani, hogy megnyitásban, középjátékban, vagy végjátékban vagyunk
+
     material = sum(len(board.pieces(pt, chess.WHITE)) + len(board.pieces(pt, chess.BLACK))
                    for pt in [chess.QUEEN, chess.ROOK, chess.BISHOP, chess.KNIGHT])
 
@@ -17,6 +23,8 @@ def game_phase(board: chess.Board) -> str:
 
 
 def count_legal_moves(board: chess.Board, color: chess.Color) -> int:
+    # Megszámolja a táblán lévő szabályos lépéseket
+
     if board.turn == color:
         return board.legal_moves.count()
     temp_turn = board.turn
@@ -27,6 +35,7 @@ def count_legal_moves(board: chess.Board, color: chess.Color) -> int:
 
 
 def evaluate_board(board: chess.Board, with_muster=False, adaptive_mode=True, engine_white=True, opponent_sytle="balanced"):
+    # A "fő" értékelő függvény, ez értékeli ki az állást
 
     if board.is_checkmate():
         return -99999 if board.turn else 99999
@@ -157,6 +166,7 @@ def evaluate_board(board: chess.Board, with_muster=False, adaptive_mode=True, en
     white_passed_pawns = count_passed_pawns(board, chess.WHITE)
     black_passed_pawns = count_passed_pawns(board, chess.BLACK)
 
+    # Mintázatok
     musters = {
         "white": {
             "material": white_material,
@@ -187,6 +197,7 @@ def evaluate_board(board: chess.Board, with_muster=False, adaptive_mode=True, en
     white_sytle = "balanced"
     black_sytle = "balanced"
 
+    # Adaptív stílus - Jutalom, hoogyha követte az adott játékos a stílusát
     if adaptive_mode:
         if opponent_sytle == adaptive_style.playing_style_recognition(musters, not engine_white):
             if engine_white:
@@ -216,7 +227,9 @@ def evaluate_board(board: chess.Board, with_muster=False, adaptive_mode=True, en
             white_sytle = opponent_sytle
             black_sytle = counter_styles[opponent_sytle]
 
+    # Adaptív torzítások
     # hogyha nincs adaptive_mode, akkor a szorzó mindig 1.0 (mert a "balanced" stílus is mindig 1.0)
+
     white_score += white_center_control * styles[white_sytle]["center_control"]
     black_score += black_center_control * styles[black_sytle]["center_control"]
 
@@ -263,6 +276,8 @@ def evaluate_board(board: chess.Board, with_muster=False, adaptive_mode=True, en
 
 
 def count_doubled_pawns(board, color) -> int:
+    # Megszámolja a dupla gyalogokat
+
     pawns = board.pieces(chess.PAWN, color)
     files_count = [0]*8
     for sq in pawns:
@@ -271,6 +286,8 @@ def count_doubled_pawns(board, color) -> int:
 
 
 def count_isolated_pawns(board, color) -> int:
+    # Megszámolja az izolált gyalogokat
+
     pawns = board.pieces(chess.PAWN, color)
     files = [chess.square_file(sq) for sq in pawns]
     isolated = 0
@@ -280,6 +297,8 @@ def count_isolated_pawns(board, color) -> int:
     return isolated
 
 def count_open_files(board, color):
+    # Megszámolja azokat a nyílt vonalakat, amiken bástyák vannak
+
     count = 0
     open_files = []
     for f in range(8):
@@ -290,6 +309,8 @@ def count_open_files(board, color):
     return count, open_files
 
 def count_weak_squares(board, color) -> int:
+    # Megszámolja azokat a lezőket, amit az egyik figura sem támad
+
     count = 0
     opp_color = not color
     for sq in chess.SQUARES:
@@ -299,12 +320,16 @@ def count_weak_squares(board, color) -> int:
     return count
 
 def count_attacks_on_king(board, color) -> int:
+    # megszámolja a király támadóit (megjegyzés: ezt majd úgy kell átírni, hogy a király melletti figurák támadóit is beleszámolja)
+
     king_sq = board.king(color)
     if king_sq is None:
         return 0
     return len(board.attackers(not color, king_sq))
 
 def count_pawn_chains(board, color) -> int:
+    # Megszámolja a gyalogláncokat
+
     direction = 1 if color == chess.WHITE else -1
     chains = 0
 
@@ -323,6 +348,8 @@ def count_pawn_chains(board, color) -> int:
     return chains
 
 def count_passed_pawns(board, color) -> int:
+    # Megszámolja a szabad gyalogokat
+
     passed = 0
     direction = 1 if color == chess.WHITE else -1
     enemy_pawns = board.pieces(chess.PAWN, not color)

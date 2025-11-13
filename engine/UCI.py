@@ -1,3 +1,9 @@
+"""
+This file is part of Potatix Engine
+Copyright (C) 2025 Balázs André
+Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.txt)
+"""
+
 import chess
 import transposition_table as tt
 from search import alphabeta
@@ -19,6 +25,8 @@ transposition_table_ = tt.transposition_table
 Max_tt_size = tt.Max_tt_size
 
 def timer_worker(time_limit_sec):
+    # Számolja az eltelt időt
+
     start = time.time()
     while not stop_event.is_set():
         elapsed = time.time() - start
@@ -28,6 +36,8 @@ def timer_worker(time_limit_sec):
         time.sleep(0.001)  # kis várakozás, hogy ne terhelje a CPU-t
 
 def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movestogo=None):
+    # Ez indítja el és kezeli a keresést
+
     transposition_table_.clear()
     stop_event.clear()
     best_move = None
@@ -76,6 +86,8 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
 
 
 def read_cmd():
+    # Kiolvassa a konzolból a parancsokat
+
     args = [""]
     try:
         line = input().strip()
@@ -87,6 +99,7 @@ def read_cmd():
         return args
 
 def send_cmd(args=None):
+    # Elküldi a parancsokat az UCI-nek
     if args is None:
         args = read_cmd()
     if args != [""]:
@@ -97,6 +110,8 @@ def send_cmd(args=None):
     return None
 
 def UCI(args):
+    # Ez kezeli az UCI protokollt
+
     global search_thread, killer_moves, board, Max_tt_size, MAX_DEPTH
     try:
         if args[0] == "uci":

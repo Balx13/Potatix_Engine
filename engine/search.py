@@ -1,3 +1,9 @@
+"""
+This file is part of Potatix Engine
+Copyright (C) 2025 Balázs André
+Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.txt)
+"""
+
 import chess
 from config import killer_moves, history_heuristic
 from transposition_table import store_tt_entry, probe_tt
@@ -7,6 +13,8 @@ from stop_event import stop_event
 from evulate import game_phase
 
 def determine_R(board: chess.Board) -> int:
+    # Meghatározza, hogy az LMR mennyivel sekélyebben keressen
+
     gp = game_phase(board)
     if gp == "opening":
         return 3 # 3 vagy 4
@@ -16,6 +24,7 @@ def determine_R(board: chess.Board) -> int:
         return 2 # Endgame
 
 def can_do_null_move(board: chess.Board, previous_null_move, depth, R):
+    # Megmondja, hogy lehet egy Null Move Pruning-ot csinálni
 
     if board.is_check():
         return False
@@ -33,6 +42,7 @@ def can_do_null_move(board: chess.Board, previous_null_move, depth, R):
     return True
 
 def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: float, beta: float, datas_for_evulate, previous_null_move=False):
+    # A fő kereső függvény
 
     if depth == 0 or board.is_game_over():
         return quiescence(board, maximizing_player, alpha, beta, datas_for_evulate), None
@@ -50,7 +60,6 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
 
     if maximizing_player:
         max_eval = float('-inf')
-        cutoff_occurred = False
         LMR = False
         reduction = 0
 
@@ -118,7 +127,6 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
         return max_eval, best_move
     else:
         min_eval = float('inf')
-        cutoff_occurred = False
         LMR = False
         reduction = 0
 

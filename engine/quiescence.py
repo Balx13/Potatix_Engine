@@ -1,3 +1,9 @@
+"""
+This file is part of Potatix Engine
+Copyright (C) 2025 Balázs André
+Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.txt)
+"""
+
 import chess
 from move_ordering import order_moves
 from evulate import evaluate_board
@@ -40,6 +46,8 @@ def see(board, move):
 
 
 def quiescence(board: chess.Board, maximizing_player: bool, alpha: float, beta: float, datas_for_evulate) -> float:
+    # Addig mélyíti a keresést, amíg csndes állás nem lesz(nincs ütés és sakk adás lehetősége)
+
     stand_pat = evaluate_board(board, with_muster=False, adaptive_mode=datas_for_evulate[2],
         engine_white=datas_for_evulate[1], opponent_sytle=datas_for_evulate[0])
 

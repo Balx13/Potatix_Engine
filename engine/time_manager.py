@@ -1,9 +1,15 @@
+"""
+This file is part of Potatix Engine
+Copyright (C) 2025 Balázs André
+Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.txt)
+"""
+
 import chess
 from config import PIECE_VALUES
 
 
-
 def estimate_moves_to_go(board: chess.Board) -> int:
+    # Megbecsli a moves_to_go-t
 
     piece_count = len(board.piece_map())
     moves_based_on_material = max(5, piece_count // 2)
@@ -23,6 +29,7 @@ def estimate_moves_to_go(board: chess.Board) -> int:
 
 
 def estimate_time_for_move(board: chess.Board, base_time: float, increment: float, moves_to_go=None) -> float:
+    # Megbecsli, hogy az adott lépésre mennyi időt érdemes szánni
 
     move_number = board.fullmove_number
     if move_number < 15:
