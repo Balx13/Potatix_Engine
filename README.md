@@ -29,7 +29,7 @@ This adaptive style is built into most NNUEs, but my engine still uses a manual 
 2. Install [Python](https://www.python.org)
 3. Clone this repository with this command: `https://github.com/Balx13/Potatix_Engine.git`
 4. Install Pyinstaller and python-chess with this command: `pip install pyinstaller chess`
-5. Run this command: `pyinstaller --onefile --name MyEngine main.py adaptive_style.py config.py evulate.py move_ordering.py quiescence.py search.py stop_event.py time_manager.py transposition_table.py UCI.py`
+5. Run this command: `pyinstaller --onefile --name Potatix_Engine main.py adaptive_style.py config.py evulate.py move_ordering.py quiescence.py search.py stop_event.py time_manager.py transposition_table.py UCI.py`
 6. The build will appear in the *dist* folder!
 
 ### 2.) How to use with GUI
@@ -77,7 +77,7 @@ Ez az adaptív stílus a legtöbb NNUE-be be van tanítva, de az én motorom mé
 2. Telepítsd a [Python](https://www.python.org)-t
 3. Klónozd ezt a repository-t ezzel a paranccsal: `https://github.com/Balx13/Potatix_Engine.git`
 4. Telepítsd a Pyinstaller-t és a python-chess-t ezzel a paranccsal: `pip install pyinstaller chess`
-5. Futtasd ezt a parancsot: `pyinstaller --onefile --name MyEngine main.py adaptive_style.py config.py evulate.py move_ordering.py quiescence.py search.py stop_event.py time_manager.py transposition_table.py UCI.py`
+5. Futtasd ezt a parancsot: `pyinstaller --onefile --name Potatix_Engine main.py adaptive_style.py config.py evulate.py move_ordering.py quiescence.py search.py stop_event.py time_manager.py transposition_table.py UCI.py`
 6. A build ezután megjelenik a  *dist* mappában!
 
 ### 2.) Hogyan használd GUI-val:
