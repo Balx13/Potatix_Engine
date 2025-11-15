@@ -344,12 +344,43 @@ def count_weak_squares(board, color) -> int:
     return count
 
 def count_attacks_on_king(board, color) -> int:
-    # megszámolja a király támadóit
+    # megszámolja és súlyozza(lásd piece_weights) a király támadóit
 
     king_sq = board.king(color)
     if king_sq is None:
         return 0
-    return len(board.attackers(not color, king_sq))
+
+    piece_weights = {
+        chess.PAWN: 0.5,
+        chess.KNIGHT: 1.0,
+        chess.BISHOP: 1.0,
+        chess.ROOK: 1.5,
+        chess.QUEEN: 2.0,
+        chess.KING: 0.0
+    }
+
+    score = 0.0
+
+    king_file = chess.square_file(king_sq)
+    king_rank = chess.square_rank(king_sq)
+    neighbors = []
+
+    for df in (-1, 0, 1):
+        for dr in (-1, 0, 1):
+            if df == 0 and dr == 0: # király mezője
+                continue
+            f = king_file + df
+            r = king_rank + dr
+            if 0 <= f <= 7 and 0 <= r <= 7:
+                neighbors.append(chess.square(f, r))
+
+    for sq in neighbors:
+        attackers = board.attackers(not color, sq)
+        for atk_sq in attackers:
+            piece = board.piece_at(atk_sq)
+            score += piece_weights.get(piece.piece_type, 0)
+
+    return score
 
 def count_pawn_chains(board, color) -> int:
     # Megszámolja a gyalogláncokat
