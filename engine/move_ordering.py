@@ -31,7 +31,7 @@ def sorted_moves_with_value(moves, board, datas_for_evulate):
 
 
 def followed_style(board, datas_for_evulate):
-    # Visszaadja a soron következő játékos stílusát
+    # Visszaadja, hogy a soron következő játékos követte-e a stílusát
 
     engine_is_white = datas_for_evulate[1]
     _, musters = evaluate_board(board, with_muster=True)
