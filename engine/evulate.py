@@ -14,12 +14,24 @@ def game_phase(board: chess.Board) -> str:
     material = sum(len(board.pieces(pt, chess.WHITE)) + len(board.pieces(pt, chess.BLACK))
                    for pt in [chess.QUEEN, chess.ROOK, chess.BISHOP, chess.KNIGHT])
 
-    if material > 12:
+    white_king_rank = chess.square_rank(board.king(chess.WHITE))
+    black_king_rank = chess.square_rank(board.king(chess.BLACK))
+    king_distance_from_starting = max(white_king_rank, abs(black_king_rank-7))  # Melyik soron van a király
+
+    white_rook_op_files, _ = count_open_files(board, chess.WHITE)
+    black_rook_op_files, _ = count_open_files(board, chess.BLACK)
+    rook_op_files = sum((white_rook_op_files, black_rook_op_files))
+
+    white_passed_pawns = count_passed_pawns(board, chess.WHITE)
+    black_passed_pawns = count_passed_pawns(board, chess.BLACK)
+    passed_pawns = sum((white_passed_pawns, black_passed_pawns))
+
+    if material > 12 and king_distance_from_starting <= 1 and rook_op_files <= 1 and passed_pawns == 0:
         return "opening"
-    elif material > 6:
-        return "middlegame"
-    else:
+    elif material < 6 or king_distance_from_starting > 2 or passed_pawns > 3:
         return "endgame"
+    else:
+        return "middlegame"
 
 
 def count_legal_moves(board: chess.Board, color: chess.Color) -> int:
@@ -332,7 +344,7 @@ def count_weak_squares(board, color) -> int:
     return count
 
 def count_attacks_on_king(board, color) -> int:
-    # megszámolja a király támadóit (megjegyzés: ezt majd úgy kell átírni, hogy a király melletti figurák támadóit is beleszámolja)
+    # megszámolja a király támadóit
 
     king_sq = board.king(color)
     if king_sq is None:
