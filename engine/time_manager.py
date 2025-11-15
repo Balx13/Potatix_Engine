@@ -3,7 +3,7 @@ This file is part of Potatix Engine
 Copyright (C) 2025 Balázs André
 Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.txt)
 """
-
+from evulate import count_attacks_on_king
 import chess
 from config import PIECE_VALUES
 
@@ -33,11 +33,11 @@ def estimate_time_for_move(board: chess.Board, base_time: float, increment: floa
 
     move_number = board.fullmove_number
     if move_number < 15:
-        phase_factor = 0.9
+        phase_factor = 0.85
     elif move_number < 40:
         phase_factor = 1.0
     else:
-        phase_factor = 1.2
+        phase_factor = 1.1
 
     material_balance = 0
 
@@ -45,17 +45,22 @@ def estimate_time_for_move(board: chess.Board, base_time: float, increment: floa
         material_balance += len(board.pieces(piece_type, chess.WHITE)) * value
         material_balance -= len(board.pieces(piece_type, chess.BLACK)) * value
 
-    if abs(material_balance) <= 200:
-        complexity_factor = 1.2
-    else:
-        complexity_factor = 0.9
+    complexity_factor = 1.0
+    if abs(material_balance) <= 2:  # kiegyenlített pozíció
+        complexity_factor += 0.05
+    if count_attacks_on_king(board, chess.WHITE) > 1 or count_attacks_on_king(board, chess.BLACK) > 1:
+        complexity_factor += 0.2  # sakk / támadás
 
-    if not moves_to_go:
+    if moves_to_go is None:
         moves_to_go = estimate_moves_to_go(board)
     base_allocation = (base_time / moves_to_go) + increment
 
+    max_allocation = base_time * 0.4  # 40%
+    min_allocation = base_time * 0.05  # 5%
+
     allocated_time = base_allocation * phase_factor * complexity_factor
 
-    allocated_time = max(0.05, min(allocated_time, base_time * 0.5))
+
+    allocated_time = max(min_allocation, min(allocated_time, base_time * max_allocation))
 
     return allocated_time
