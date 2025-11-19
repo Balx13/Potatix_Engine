@@ -24,7 +24,7 @@ def determine_R(board: chess.Board) -> int:
         return 2 # Endgame
 
 def can_do_null_move(board: chess.Board, previous_null_move, depth, R):
-    # Megmondja, hogy lehet egy Null Move Pruning-ot csinálni
+    # Megmondja, hogy lehet egy Null Move Pruning-ot csinálni vagy nem
 
     if board.is_check():
         return False
