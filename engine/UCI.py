@@ -80,7 +80,15 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
         if stop_event.is_set():
             break
 
-        eval_score_, current_best_move = alphabeta(board, board.turn, depth, float('-inf'), float('inf'), [playing_style, board.turn, adaptive_mode])
+        eval_score_, current_best_move = alphabeta(
+            board=board,
+            maximizing_player=board.turn,
+            depth=depth,
+            alpha=float('-inf'),
+            beta=float('inf'),
+            datas_for_evulate=[playing_style, board.turn, adaptive_mode],
+            previous_null_move=False,
+            danger_score=danger_score)
 
         if current_best_move:
             best_move = current_best_move
@@ -227,7 +235,10 @@ def UCI(args):
                         if "moves_to_go" in args:
                             moves_to_go_index = args.index("moves_to_go")
                             moves_to_go = float(args[moves_to_go_index+1])
-                    search_thread = threading.Thread(target=search_worker, args=(MAX_DEPTH, wtime, btime, winc, binc, moves_to_go))
+                    search_thread = threading.Thread(
+                        target=search_worker,
+                        args=(MAX_DEPTH, wtime, btime, winc, binc, moves_to_go)
+                    )
                     search_thread.start()
         elif args[0] == "setoption":
             name_index = args.index("name")

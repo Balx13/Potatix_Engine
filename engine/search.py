@@ -41,7 +41,16 @@ def can_do_null_move(board: chess.Board, previous_null_move, depth, R):
 
     return True
 
-def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: float, beta: float, datas_for_evulate, previous_null_move=False, danger_score=0):
+def alphabeta(
+        board: chess.Board,
+        maximizing_player: bool,
+        depth: int,
+        alpha: float,
+        beta: float,
+        datas_for_evulate,
+        previous_null_move=False,
+        danger_score=0):
+
     # A fő kereső függvény
 
     if depth == 0 or board.is_game_over():
@@ -66,7 +75,17 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
         R = determine_R(board)
         if can_do_null_move(board, previous_null_move, depth, R):
             board.turn = not board.turn
-            score, _ = alphabeta(board, False, depth - 1 - R, alpha, beta, datas_for_evulate, previous_null_move=True)
+            score, _ = alphabeta(
+                board=board,
+                maximizing_player=False,
+                depth=depth - 1 - R,
+                alpha=alpha,
+                beta=beta,
+                datas_for_evulate=datas_for_evulate,
+                previous_null_move=True,
+                danger_score=danger_score
+            )
+
             board.turn = not board.turn
             if score >= beta:
                 return score, None
@@ -82,10 +101,29 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
                     reduction = 1 + (depth // 5)
 
             board.push(move)
-            eval_core, _ = alphabeta(board, False, depth-1-reduction, alpha, beta, datas_for_evulate, previous_null_move=previous_null_move)
+            eval_core, _ = alphabeta(
+                board=board,
+                maximizing_player=False,
+                depth=depth-1-reduction,
+                alpha=alpha,
+                beta=beta,
+                datas_for_evulate=datas_for_evulate,
+                previous_null_move=previous_null_move,
+                danger_score=danger_score
+            )
 
             if LMR and eval_core > alpha:
-                eval_core, _ = alphabeta(board, False, depth-1, alpha, beta, datas_for_evulate, previous_null_move=previous_null_move)
+                eval_core, _ = alphabeta(
+                    board=board,
+                    maximizing_player=False,
+                    depth=depth - 1,
+                    alpha=alpha,
+                    beta=beta,
+                    datas_for_evulate=datas_for_evulate,
+                    previous_null_move=previous_null_move,
+                    danger_score=danger_score
+                )
+
             board.pop()
 
             if eval_core > max_eval:
@@ -134,7 +172,17 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
         R = determine_R(board)
         if can_do_null_move(board, previous_null_move, depth, R):
             board.turn = not board.turn
-            score, _   = alphabeta(board, board.turn, depth-1-R, alpha, beta, datas_for_evulate, previous_null_move=True)
+            score, _   = alphabeta(
+                board=board,
+                maximizing_player=board.turn,
+                depth=depth-1-R,
+                alpha=alpha,
+                beta=beta,
+                datas_for_evulate=datas_for_evulate,
+                previous_null_move=True,
+                danger_score=danger_score
+            )
+
             board.turn = not board.turn
             if score <= alpha:
                 return score, None
@@ -150,10 +198,28 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
                     reduction = 1 + (depth // 5)
 
             board.push(move)
-            eval_core, _ = alphabeta(board, True, depth-1-reduction, alpha, beta, datas_for_evulate,  previous_null_move=previous_null_move)
+            eval_core, _ = alphabeta(
+                board=board,
+                maximizing_player=True,
+                depth=depth-1-reduction,
+                alpha=alpha,
+                beta=beta,
+                datas_for_evulate=datas_for_evulate,
+                previous_null_move=previous_null_move,
+                danger_score=danger_score
+            )
 
             if LMR and eval_core < beta:
-                eval_core, _ = alphabeta(board, False, depth-1, alpha, beta, datas_for_evulate, previous_null_move=previous_null_move)
+                eval_core, _ = alphabeta(
+                    board=board,
+                    maximizing_player=True,
+                    depth=depth - 1,
+                    alpha=alpha,
+                    beta=beta,
+                    datas_for_evulate=datas_for_evulate,
+                    previous_null_move=previous_null_move,
+                    danger_score=danger_score
+                )
 
             board.pop()
             if eval_core < min_eval:
