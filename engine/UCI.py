@@ -64,12 +64,40 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
     else:
         adaptive_mode = False
 
+    eval_instability = 0
+    tactical_instability = 0
+    best_eval_instability = 0
+    danger_score = 0
+    second_best_eval = None
+    old_eval = None
+
+    """
+    A danger_score egy veszélyességi pontszám: minnél nagyobb, annál kevesebb cutoff
+    a horizon-effektus elkerülése végett
+    """
+
     for depth in range(1, max_depth_ + 1):
         if stop_event.is_set():
             break
+
         eval_score_, current_best_move = alphabeta(board, board.turn, depth, float('-inf'), float('inf'), [playing_style, board.turn, adaptive_mode])
+
         if current_best_move:
             best_move = current_best_move
+            second_best_eval = eval_score_
+            best_eval = eval_score_
+
+            best_eval_instability = abs(best_eval-second_best_eval)
+            best_eval_instability = min(50, best_eval_instability/4)
+
+        if depth % 2 == 0:
+            if old_eval is not None:
+                eval_instability = abs(eval_score_ - old_eval)
+                eval_instability = min(100, eval_instability/4)
+            old_eval = eval_score_
+
+        danger_score = best_eval_instability + eval_instability
+
         print(f"info depth {depth} score cp {eval_score_} pv {best_move}", flush=True)
 
     if timer_thread is not None:

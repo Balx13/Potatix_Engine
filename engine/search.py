@@ -41,7 +41,7 @@ def can_do_null_move(board: chess.Board, previous_null_move, depth, R):
 
     return True
 
-def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: float, beta: float, datas_for_evulate, previous_null_move=False):
+def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: float, beta: float, datas_for_evulate, previous_null_move=False, danger_score=0):
     # A fő kereső függvény
 
     if depth == 0 or board.is_game_over():
@@ -92,7 +92,7 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
                 max_eval  = eval_core
                 best_move = move
             alpha = max(alpha, max_eval)
-            if beta <= alpha:
+            if beta+danger_score <= alpha:
                 cutoff_occurred = True
                 break
 
@@ -160,7 +160,7 @@ def alphabeta(board: chess.Board, maximizing_player: bool, depth: int, alpha: fl
                 min_eval  = eval_core
                 best_move = move
             beta = min(beta, min_eval)
-            if beta <= alpha:
+            if beta+danger_score <= alpha:
                 cutoff_occurred = True
                 break
 
