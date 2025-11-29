@@ -85,12 +85,16 @@ def alphabeta(
                 return score, None
 
         for move, moves_score in order_moves(board, board.legal_moves, depth, datas_for_evulate):
+            reduction = 0
+
             if stop_event.is_set():
                 return 0, None
 
-            if moves_score < 110 and game_phase(board) != "opening" and not board.is_check() \
-                    and not board.is_capture(move) and not board.is_castling(move):
-                if depth >= 3:
+            if  game_phase(board) != "opening" and not board.is_check() \
+                    and not board.is_capture(move) and not board.is_castling(move) and depth >= 3:
+                if moves_score < 50: # LMP
+                    continue
+                elif moves_score < 110: # LMR
                     LMR = True
                     reduction = determine_R(board, depth)
 
@@ -182,12 +186,16 @@ def alphabeta(
                 return score, None
 
         for move, moves_score in order_moves(board, board.legal_moves, depth, datas_for_evulate):
+            reduction = 0
+
             if stop_event.is_set():
                 return 0, None
 
-            if moves_score < 110 and game_phase(board) != "opening" and not board.is_check() \
-                    and not board.is_capture(move) and not board.is_castling(move):
-                if depth >= 3:
+            if game_phase(board) != "opening" and not board.is_check() \
+                    and not board.is_capture(move) and not board.is_castling(move) and depth >= 3:
+                if moves_score < 50: # LMP
+                    continue
+                elif moves_score < 110:  # LMR
                     LMR = True
                     reduction = determine_R(board, depth)
 
