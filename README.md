@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/Balx13/Potatix_Engine/raw/main/potatix_logo.png" alt="PotatixEngine_logo" width="256">
+  <img src="https://github.com/Balx13/Potatix_Engine/blob/main/logo/PotatixEngine_logo1024px.png" alt="PotatixEngine_logo" width="256">
 </p>
 
 <h1 align="center">Potatix Engine</h1>
