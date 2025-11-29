@@ -6,7 +6,13 @@ Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.tx
 
 import UCI
 
-while True:
-    info = UCI.send_cmd()
-    if info == "quit":
-        break
+def main():
+    while True:
+        info = UCI.send_cmd()
+        if info == "quit":
+            return
+
+if __name__ == "__main__":
+    main()
+else:
+    print("Info string Error: The engine did not start. Start the engine as a child process.", flush=True)
