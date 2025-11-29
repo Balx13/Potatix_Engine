@@ -68,7 +68,7 @@ def alphabeta(
 
         R = determine_R(board, depth)
         if can_do_null_move(board, previous_null_move, depth, R):
-            board.turn = not board.turn
+            board.push(chess.Move.null())
             score, _ = alphabeta(
                 board=board,
                 maximizing_player=False,
@@ -80,7 +80,7 @@ def alphabeta(
                 danger_score=danger_score
             )
 
-            board.turn = not board.turn
+            board.pop()
             if score >= beta:
                 return score, None
 
@@ -169,7 +169,7 @@ def alphabeta(
 
         R = determine_R(board, depth)
         if can_do_null_move(board, previous_null_move, depth, R):
-            board.turn = not board.turn
+            board.push(chess.Move.null())
             score, _   = alphabeta(
                 board=board,
                 maximizing_player=board.turn,
@@ -181,7 +181,7 @@ def alphabeta(
                 danger_score=danger_score
             )
 
-            board.turn = not board.turn
+            board.pop()
             if score <= alpha:
                 return score, None
 
