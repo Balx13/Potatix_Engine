@@ -12,16 +12,10 @@ from quiescence import quiescence
 from stop_event import stop_event
 from evulate import game_phase
 
-def determine_R(board: chess.Board) -> int:
+def determine_R(board: chess.Board, depth) -> int:
     # Meghatározza, hogy az LMR mennyivel sekélyebben keressen
 
-    gp = game_phase(board)
-    if gp == "opening":
-        return 3 # 3 vagy 4
-    elif gp == "middlegame":
-        return 3
-    else:
-        return 2 # Endgame
+    return 1 + (depth // 5)
 
 def can_do_null_move(board: chess.Board, previous_null_move, depth, R):
     # Megmondja, hogy lehet egy Null Move Pruning-ot csinálni vagy nem
@@ -98,7 +92,7 @@ def alphabeta(
                     and not board.is_capture(move) and not board.is_castling(move):
                 if depth >= 3:
                     LMR = True
-                    reduction = 1 + (depth // 5)
+                    reduction = determine_R(board)
 
             board.push(move)
             eval_core, _ = alphabeta(
@@ -195,7 +189,7 @@ def alphabeta(
                     and not board.is_capture(move) and not board.is_castling(move):
                 if depth >= 3:
                     LMR = True
-                    reduction = 1 + (depth // 5)
+                    reduction = determine_R(board)
 
             board.push(move)
             eval_core, _ = alphabeta(
