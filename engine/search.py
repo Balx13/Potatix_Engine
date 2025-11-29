@@ -66,7 +66,7 @@ def alphabeta(
         LMR = False
         reduction = 0
 
-        R = determine_R(board)
+        R = determine_R(board, depth)
         if can_do_null_move(board, previous_null_move, depth, R):
             board.turn = not board.turn
             score, _ = alphabeta(
@@ -92,7 +92,7 @@ def alphabeta(
                     and not board.is_capture(move) and not board.is_castling(move):
                 if depth >= 3:
                     LMR = True
-                    reduction = determine_R(board)
+                    reduction = determine_R(board, depth)
 
             board.push(move)
             eval_core, _ = alphabeta(
@@ -163,7 +163,7 @@ def alphabeta(
         LMR = False
         reduction = 0
 
-        R = determine_R(board)
+        R = determine_R(board, depth)
         if can_do_null_move(board, previous_null_move, depth, R):
             board.turn = not board.turn
             score, _   = alphabeta(
@@ -189,7 +189,7 @@ def alphabeta(
                     and not board.is_capture(move) and not board.is_castling(move):
                 if depth >= 3:
                     LMR = True
-                    reduction = determine_R(board)
+                    reduction = determine_R(board, depth)
 
             board.push(move)
             eval_core, _ = alphabeta(
