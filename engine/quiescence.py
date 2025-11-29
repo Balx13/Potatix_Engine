@@ -8,6 +8,7 @@ import chess
 from move_ordering import order_moves
 from evulate import evaluate_board
 from config import PIECE_VALUES
+from stop_event import stop_event
 
 def see(board, move):
     from_square = move.from_square
@@ -63,6 +64,9 @@ def quiescence(board: chess.Board, maximizing_player: bool, alpha: float, beta: 
             beta = stand_pat
 
     for move, _ in order_moves(board, board.legal_moves,depth=None, datas_for_evulate=datas_for_evulate):
+
+        if stop_event.is_set():
+            return 0
 
         if see(board, move) <= 0:
             continue
