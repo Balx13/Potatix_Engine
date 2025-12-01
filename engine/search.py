@@ -193,7 +193,7 @@ def alphabeta(
 
             if game_phase(board) != "opening" and not board.is_check() \
                     and not board.is_capture(move) and not board.is_castling(move) and depth >= 3:
-                if moves_score < 50 is not None: # LMP
+                if moves_score < 50 and best_move is not None: # LMP
                     continue
                 elif moves_score < 110:  # LMR
                     LMR = True
