@@ -43,7 +43,7 @@ def alphabeta(
         beta: float,
         datas_for_evulate,
         previous_null_move=False,
-        danger_score=0):
+        danger_score=0.0):
 
     # A fő kereső függvény
 

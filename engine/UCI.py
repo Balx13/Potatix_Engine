@@ -65,7 +65,7 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
         adaptive_mode = False
 
     best_eval_instability = 0
-    danger_score = 0
+    danger_score = 0.0
     second_best_eval = 0.0
 
     """
@@ -98,7 +98,7 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
             best_eval_instability = min(50, best_eval_instability/4)
             second_best_eval = eval_score_
 
-        danger_score = best_eval_instability
+        danger_score = best_eval_instability/100
 
         print(f"info depth {depth} score cp {eval_score_} pv {best_move}", flush=True)
 
