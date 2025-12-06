@@ -64,12 +64,9 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
     else:
         adaptive_mode = False
 
-    eval_instability = 0
-    tactical_instability = 0
     best_eval_instability = 0
     danger_score = 0
-    second_best_eval = None
-    old_eval = None
+    second_best_eval = 0.0
 
     """
     A danger_score egy veszélyességi pontszám: minnél nagyobb, annál kevesebb cutoff
@@ -92,19 +89,16 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
 
         if current_best_move:
             best_move = current_best_move
-            second_best_eval = eval_score_
             best_eval = eval_score_
-
-            best_eval_instability = abs(best_eval-second_best_eval)
+            if depth % 2 == 0:
+                best_eval_half = best_eval
+            else:
+                best_eval_half = best_eval * 0.9
+            best_eval_instability = abs(best_eval_half-second_best_eval)
             best_eval_instability = min(50, best_eval_instability/4)
+            second_best_eval = eval_score_
 
-        if depth % 2 == 0:
-            if old_eval is not None:
-                eval_instability = abs(eval_score_ - old_eval)
-                eval_instability = min(100, eval_instability/4)
-            old_eval = eval_score_
-
-        danger_score = best_eval_instability + eval_instability
+        danger_score = best_eval_instability
 
         print(f"info depth {depth} score cp {eval_score_} pv {best_move}", flush=True)
 
