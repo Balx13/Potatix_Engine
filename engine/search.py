@@ -128,7 +128,7 @@ def alphabeta(
                 max_eval  = eval_core
                 best_move = move
             alpha = max(alpha, max_eval)
-            if beta+danger_score <= alpha:
+            if beta+danger_score <= alpha or beta == alpha:
                 cutoff_occurred = True
                 break
 
@@ -228,7 +228,7 @@ def alphabeta(
                 min_eval  = eval_core
                 best_move = move
             beta = min(beta, min_eval)
-            if beta+danger_score <= alpha:
+            if beta+danger_score <= alpha or beta == alpha:
                 cutoff_occurred = True
                 break
 
