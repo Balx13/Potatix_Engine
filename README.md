@@ -29,8 +29,10 @@ This adaptive style is built into most NNUEs, but my engine still uses a manual 
 2. Install [Python](https://www.python.org)
 3. Clone this repository with this command: `https://github.com/Balx13/Potatix_Engine.git`
 4. Install Pyinstaller and python-chess with this command: `pip install pyinstaller chess`
-5. Run this command: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "engine:engine" engine/main.py`
-6. The build will appear in the *dist* folder!
+5. Run this command:
+* Linux/MacOS: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "engine:engine" engine/main.py`
+* Windows: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "engine;engine" engine/main.py`
+7. The build will appear in the *dist* folder!
 
 ### 2.) How to use with GUI
 > This process is different for each GUI, in this example we will use a GUI called arena
@@ -77,8 +79,10 @@ Ez az adaptív stílus a legtöbb NNUE-be be van tanítva, de az én motorom mé
 2. Telepítsd a [Python](https://www.python.org)-t
 3. Klónozd ezt a repository-t ezzel a paranccsal: `https://github.com/Balx13/Potatix_Engine.git`
 4. Telepítsd a Pyinstaller-t és a python-chess-t ezzel a paranccsal: `pip install pyinstaller chess`
-5. Futtasd ezt a parancsot: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "engine:engine" engine/main.py`
-6. A build ezután megjelenik a  *dist* mappában!
+5. Futtasd ezt a parancsot:
+* Linux/MacOS: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "engine:engine" engine/main.py`
+* Windows: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "engine;engine" engine/main.py`
+7. A build ezután megjelenik a  *dist* mappában!
 
 ### 2.) Hogyan használd GUI-val:
 > Ez a folyamat minden GUI  esetében más, ebben a példában az arena nevű GUI-t fogjuk használni.
