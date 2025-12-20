@@ -35,7 +35,7 @@ def timer_worker(time_limit_sec):
             break
         time.sleep(0.001)  # kis várakozás, hogy ne terhelje a CPU-t
 
-def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movestogo=None):
+def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movestogo=None, forced_child=False):
     # Ez indítja el és kezeli a keresést
 
     transposition_table_.clear()
@@ -77,15 +77,36 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
         if stop_event.is_set():
             break
 
-        eval_score_, current_best_move = alphabeta(
-            board=board,
-            maximizing_player=board.turn,
-            depth=depth,
-            alpha=float('-inf'),
-            beta=float('inf'),
-            datas_for_evulate=[playing_style, board.turn, adaptive_mode],
-            previous_null_move=False,
-            danger_score=danger_score)
+        if forced_child:
+            best_eval_local = float('-inf') if board.turn else float('inf')
+            best_move_local = None
+            for move in board.legal_moves:
+                board.push(move)
+                eval_score_, _ = alphabeta(
+                    board=board,
+                    maximizing_player=board.turn,
+                    depth=depth-1,
+                    alpha=float('-inf'),
+                    beta=float('inf'),
+                    datas_for_evulate=[playing_style, board.turn, adaptive_mode],
+                    previous_null_move=False,
+                    danger_score=danger_score)
+                board.pop()
+                if (board.turn and eval_score_ > best_eval_local) or \
+               (not board.turn and eval_score_ < best_eval_local):
+                    best_eval_local = eval_score_
+                    best_move_local = move
+            eval_score_, current_best_move = best_eval_local, best_move_local
+        else:
+            eval_score_, current_best_move = alphabeta(
+                board=board,
+                maximizing_player=board.turn,
+                depth=depth,
+                alpha=float('-inf'),
+                beta=float('inf'),
+                datas_for_evulate=[playing_style, board.turn, adaptive_mode],
+                previous_null_move=False,
+                danger_score=danger_score)
 
         if current_best_move:
             best_move = current_best_move
@@ -112,7 +133,6 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
         legal_moves = list(board.legal_moves)
         fallback_move = legal_moves[0] if legal_moves else None
         print(f"bestmove {fallback_move}", flush=True)
-
 
 
 def read_cmd():
@@ -204,7 +224,7 @@ def UCI(args):
                 search_thread = threading.Thread(target=search_worker, args=(MAX_DEPTH,))
                 search_thread.start()
             elif len(args) == 3 and args[1] == "depth":
-                search_thread = threading.Thread(target=search_worker, args=(int(args[2]),))
+                search_thread = threading.Thread(target=search_worker, args=(int(args[2]),), kwargs={"forced_child": True})
                 search_thread.start()
             elif len(args) == 3 and args[1] == "movetime":
                 movetime_index = args.index("movetime")
