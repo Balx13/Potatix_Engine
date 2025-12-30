@@ -4,12 +4,16 @@ Copyright (C) 2025 Balázs André
 Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.txt)
 """
 
+import json
+import random
 import chess
 import transposition_table as tt
+from engine.evulate import game_phase
 from search import alphabeta
 import config
 import threading
 import time
+from pathlib import Path
 from time_manager import estimate_time_for_move
 from stop_event import stop_event
 from adaptive_style import playing_style_recognition
@@ -24,6 +28,18 @@ search_thread = threading.Thread()
 transposition_table_ = tt.transposition_table
 Max_tt_size = tt.Max_tt_size
 
+def is_in_opening_book(board_fen):
+    BASE_DIR = Path(__file__).parent
+    file_path = BASE_DIR / "data" / "opening_book.jsonl"
+    with open(file_path, "r", encoding="utf-8") as f:
+        for position in f:
+            data = json.loads(position)
+            fen = data["fen"]
+            moves = [m["move"] for m in data["top_moves"]]
+            if fen == board_fen:
+                return random.choice(moves)
+        return None
+
 def timer_worker(time_limit_sec):
     # Számolja az eltelt időt
 
@@ -37,6 +53,13 @@ def timer_worker(time_limit_sec):
 
 def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movestogo=None, forced_child=False):
     # Ez indítja el és kezeli a keresést
+
+    if game_phase(board) == "opening":
+        # Csak megnyitásban keres megnyitási könyvet (így végjátékban nem néz át 25 000 állást)
+        opening_move = is_in_opening_book(board.fen())
+        if opening_move is not None:
+            print(f"bestmove {opening_move}", flush=True)
+            return
 
     transposition_table_.clear()
     stop_event.clear()
