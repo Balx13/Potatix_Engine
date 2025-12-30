@@ -7,8 +7,9 @@ Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.tx
 import json
 import random
 import chess
+import sys
 import transposition_table as tt
-from engine.evulate import game_phase
+from evulate import game_phase
 from search import alphabeta
 import config
 import threading
@@ -29,7 +30,12 @@ transposition_table_ = tt.transposition_table
 Max_tt_size = tt.Max_tt_size
 
 def is_in_opening_book(board_fen):
-    BASE_DIR = Path(__file__).parent
+    if getattr(sys, 'frozen', False):
+        # PyInstaller futás közben
+        BASE_DIR = Path(sys._MEIPASS) / "engine"
+    else:
+        # normál futás
+        BASE_DIR = Path(__file__).parent
     file_path = BASE_DIR / "data" / "opening_book.jsonl"
     with open(file_path, "r", encoding="utf-8") as f:
         for position in f:
