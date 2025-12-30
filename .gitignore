@@ -6,6 +6,7 @@
 list_files.py
 # Build
 main.spec
+PotatixEngine.spec
 /build
 /dist
 profil_result.prof
