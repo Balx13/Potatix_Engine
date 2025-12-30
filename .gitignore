@@ -1,7 +1,12 @@
+# Pycarm mappái
 /.idea/
 /.venv/
+# Egyéb
 /AI_alap/
 list_files.py
+# Build
 main.spec
 /build
 /dist
+# Bármilyen UCI sakkmotorral helyettesíthető
+/scripts/opening_book/stockfish_17.1.exe
