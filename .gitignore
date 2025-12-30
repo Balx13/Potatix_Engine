@@ -8,5 +8,8 @@ list_files.py
 main.spec
 /build
 /dist
+profil_result.prof
 # Bármilyen UCI sakkmotorral helyettesíthető
 /scripts/opening_book/stockfish_17.1.exe
+/scripts/opening_book/opening_book.jsonl
+/scripts/opening_book/lichess_elite_database_2021-10.pgn
