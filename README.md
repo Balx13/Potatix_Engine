@@ -41,6 +41,15 @@ This adaptive style is built into most NNUEs, but my engine still uses a manual 
 3. Click the **"open"** button
 4. In the pop-up menu, click *"ok"* or *"yes"*
 
+### Opening Book Generation
+
+The opening book used in this project was generated using:
+
+- [**Lichess Elite Database**](https://database.nikonoel.fr), which contains high-level games used for training and reference.
+- [**Stockfish 17.1**](https://github.com/official-stockfish/Stockfish) chess engine, used to evaluate positions and assign move scores.
+
+**License:** The resulting opening book is released under the [CC BY-NC-SA 4.0 license](https://creativecommons.org/licenses/by-nc-sa/4.0/), allowing non-commercial use with attribution and share-alike requirements.
+
 ## Contributing
 If you would like to contribute to the project or have found a bug, please open a **Pull request** or an **Issue**. \
 **Thanks!**
@@ -90,6 +99,15 @@ Ez az adaptív stílus a legtöbb NNUE-be be van tanítva, de az én motorom mé
 2. Tallózd a motor buildjét
 3. Kattints az **"open"** gombra
 4. A megjelenő menüben kattints az *"ok"* vagy *"yes"* gombra
+
+### Megnyitási könyv létrehozása
+
+A projektben használt megnyitási könyvet a következő források felhasználásával hoztam létre:
+
+- [**Lichess Elite Database**](https://database.nikonoel.fr), amely magas szintű játszmákat tartalmaz a tanuláshoz és referenciaként.
+- [**Stockfish 17.1**](https://github.com/official-stockfish/Stockfish) sakkmotor, amelyet a pozíciók értékelésére és a lépések pontozására használtam.
+
+**Licenc:** A megnyitási könyv a [CC BY-NC-SA 4.0 licenc](https://creativecommons.org/licenses/by-nc-sa/4.0) alatt került kiadásra, amely lehetővé teszi a nem kereskedelmi célú felhasználást, megköveteli a szerző feltüntetését és a share-alike szabályok betartását.
 
 ## Hozzájárulás
 Ha szeretnél hozzájárulni a projekthez, kérlek nyiss egy **Pull request**-et vagy egy **Issue**-t. \
