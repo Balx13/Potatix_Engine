@@ -18,7 +18,7 @@ from pathlib import Path
 from time_manager import estimate_time_for_move
 from stop_event import stop_event
 from adaptive_style import playing_style_recognition
-from evulate import evaluate_board
+from evulate import evaluate
 
 board = config.board
 MAX_DEPTH = config.MAX_DEPTH
@@ -83,8 +83,6 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
         timer_thread = threading.Thread(target=timer_worker, args=(time_limit_sec,))
         timer_thread.start()
 
-    _, musters = evaluate_board(board, with_muster=True, adaptive_mode=False)
-    playing_style = playing_style_recognition(musters=musters, color=not board.turn)
     start_board = chess.Board(chess.STARTING_FEN)
     diff_count = sum(1 for sq in chess.SQUARES if start_board.piece_at(sq) != board.piece_at(sq))
 
@@ -117,7 +115,6 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
                     depth=depth-1,
                     alpha=float('-inf'),
                     beta=float('inf'),
-                    datas_for_evulate=[playing_style, board.turn, adaptive_mode],
                     previous_null_move=False,
                     danger_score=danger_score)
                 board.pop()
@@ -133,7 +130,6 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
                 depth=depth,
                 alpha=float('-inf'),
                 beta=float('inf'),
-                datas_for_evulate=[playing_style, board.turn, adaptive_mode],
                 previous_null_move=False,
                 danger_score=danger_score)
 

@@ -131,6 +131,30 @@ position_values = {
     )
 }
 
+tapered_weights = {
+    "opening": {
+        "king_safety": 1.2,
+        "mobility": 0.8,
+        "pawn_structure": 1.0,
+        "rook_files": 0.8,
+        "bishop_pair": 0.9
+    },
+    "middlegame": {
+        "king_safety": 1.0,
+        "mobility": 1.0,
+        "pawn_structure": 1.0,
+        "rook_files": 1.0,
+        "bishop_pair": 1.0
+    },
+    "endgame": {
+        "king_safety": 0.5,
+        "mobility": 1.2,
+        "pawn_structure": 1.1,
+        "rook_files": 1.2,
+        "bishop_pair": 1.1
+    }
+}
+
 styles = {
     "attacker": {
         "material":        0.85,

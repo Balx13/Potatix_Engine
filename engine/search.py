@@ -41,14 +41,13 @@ def alphabeta(
         depth: int,
         alpha: float,
         beta: float,
-        datas_for_evulate,
         previous_null_move=False,
         danger_score=0.0):
 
     # A fő kereső függvény
 
     if depth == 0 or board.is_game_over():
-        return quiescence(board, maximizing_player, alpha, beta, datas_for_evulate), None
+        return quiescence(board, maximizing_player, alpha, beta), None
 
     if stop_event.is_set():
         return 0, None
@@ -75,7 +74,6 @@ def alphabeta(
                 depth=depth - 1 - R,
                 alpha=alpha,
                 beta=beta,
-                datas_for_evulate=datas_for_evulate,
                 previous_null_move=True,
                 danger_score=danger_score
             )
@@ -84,7 +82,7 @@ def alphabeta(
             if score >= beta:
                 return score, None
 
-        for move, moves_score in order_moves(board, board.legal_moves, depth, datas_for_evulate):
+        for move, moves_score in order_moves(board, board.legal_moves, depth):
             reduction = 0
 
             if stop_event.is_set():
@@ -105,7 +103,6 @@ def alphabeta(
                 depth=depth-1-reduction,
                 alpha=alpha,
                 beta=beta,
-                datas_for_evulate=datas_for_evulate,
                 previous_null_move=previous_null_move,
                 danger_score=danger_score
             )
@@ -117,7 +114,6 @@ def alphabeta(
                     depth=depth - 1,
                     alpha=alpha,
                     beta=beta,
-                    datas_for_evulate=datas_for_evulate,
                     previous_null_move=previous_null_move,
                     danger_score=danger_score
                 )
@@ -176,7 +172,6 @@ def alphabeta(
                 depth=depth-1-R,
                 alpha=alpha,
                 beta=beta,
-                datas_for_evulate=datas_for_evulate,
                 previous_null_move=True,
                 danger_score=danger_score
             )
@@ -185,7 +180,7 @@ def alphabeta(
             if score <= alpha:
                 return score, None
 
-        for move, moves_score in order_moves(board, board.legal_moves, depth, datas_for_evulate):
+        for move, moves_score in order_moves(board, board.legal_moves, depth):
             reduction = 0
 
             if stop_event.is_set():
@@ -206,7 +201,6 @@ def alphabeta(
                 depth=depth-1-reduction,
                 alpha=alpha,
                 beta=beta,
-                datas_for_evulate=datas_for_evulate,
                 previous_null_move=previous_null_move,
                 danger_score=danger_score
             )
@@ -218,7 +212,6 @@ def alphabeta(
                     depth=depth - 1,
                     alpha=alpha,
                     beta=beta,
-                    datas_for_evulate=datas_for_evulate,
                     previous_null_move=previous_null_move,
                     danger_score=danger_score
                 )

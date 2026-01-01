@@ -6,16 +6,14 @@ Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.tx
 
 import chess
 
+
 def norm(n) -> float:
     return n / 100
 
-
-def playing_style_recognition(musters, color):
-    # Megmondja, hogy egy adott musters milyen stílusú játékosra utal az adott color-ban
-
+def playing_style_recognition(board, color):
     color = "white" if color else "black"
 
-    mobility = musters[color]["mobility"]
+    mobility = eval_mobility_raw(board, color)
     rook_open_files_count = musters[color]["rook_open_files_count"]
     attacks_on_king = musters[color]["attacks_on_king"]
     center_control = musters[color]["center_control"]
@@ -79,6 +77,4 @@ def playing_style_recognition(musters, color):
         return "tactical"
     elif endgame_pref == playing_style:
         return "endgame"
-    elif balanced_pref == playing_style:
-        return "balanced"
-    return ""
+    return "balanced"

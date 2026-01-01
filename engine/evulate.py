@@ -5,7 +5,7 @@ Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.tx
 """
 
 import chess
-from config import position_values, PIECE_VALUES, CENTER_SQUARES, styles, counter_styles
+from config import position_values, PIECE_VALUES, CENTER_SQUARES, styles, counter_styles, tapered_weights
 import adaptive_style
 
 def game_phase(board: chess.Board) -> str:
@@ -18,410 +18,244 @@ def game_phase(board: chess.Board) -> str:
     black_king_rank = chess.square_rank(board.king(chess.BLACK))
     king_distance_from_starting = max(white_king_rank, abs(black_king_rank-7))  # Melyik soron van a király
 
-    white_rook_op_files, _ = count_open_files(board, chess.WHITE)
-    black_rook_op_files, _ = count_open_files(board, chess.BLACK)
-    rook_op_files = sum((white_rook_op_files, black_rook_op_files))
-
-    white_passed_pawns = count_passed_pawns(board, chess.WHITE)
-    black_passed_pawns = count_passed_pawns(board, chess.BLACK)
-    passed_pawns = sum((white_passed_pawns, black_passed_pawns))
-
-    if material > 12 and king_distance_from_starting <= 1 and rook_op_files <= 1 and passed_pawns == 0:
+    if material > 12 and king_distance_from_starting <= 1:
         return "opening"
-    elif material < 6 or king_distance_from_starting > 2 or passed_pawns > 3:
+    elif material < 6 or king_distance_from_starting > 2:
         return "endgame"
     else:
         return "middlegame"
 
 
-def count_legal_moves(board: chess.Board, color: chess.Color) -> int:
-    # Megszámolja a táblán lévő szabályos lépéseket
-
-    if board.turn == color:
-        return board.legal_moves.count()
-    temp_turn = board.turn
-    board.turn = color
-    count = board.legal_moves.count()
-    board.turn = temp_turn
-    return count
-
-
-def evaluate_board(board: chess.Board, with_muster=False, adaptive_mode=True, engine_white=True, opponent_sytle="balanced"):
-    # A "fő" értékelő függvény, ez értékeli ki az állást
-
-    if board.is_checkmate():
-        return -99999 if board.turn else 99999
-    if board.is_stalemate() or board.is_insufficient_material():
-        return 0
-
-    white_score = 0
-    black_score = 0
-
-    white_material = 0
-    black_material = 0
-    white_material_list = []
-    black_material_list = []
-    for piece_type, value in PIECE_VALUES.items():
-        # Anyagi érték
-        white_pcs = board.pieces(piece_type, chess.WHITE)
-        black_pcs = board.pieces(piece_type, chess.BLACK)
-        white_material = len(white_pcs) * value
-        black_material = len(black_pcs) * value
-        white_material_list.append(white_material)
-        black_material_list.append(black_material)
-
-        # Pozíciós érték
-        for sq in white_pcs:
-            if piece_type == chess.PAWN:
-                white_score += position_values["pawn"][sq]
-            elif piece_type == chess.BISHOP:
-                if game_phase(board) == "endgame":
-                    white_score += position_values["bishop_eg"][sq]
-                else:
-                    white_score += position_values["bishop_eg"][sq]
-            elif piece_type == chess.KNIGHT:
-                white_score += position_values["knight"][sq]
-            elif piece_type == chess.ROOK:
-                white_score += position_values["rook"][sq]
-            elif piece_type == chess.QUEEN:
-                if game_phase(board) == "opening":
-                    white_score += position_values["queen_op"][sq]
-                else:
-                    white_score += position_values["queen_mg"][sq]
-            elif piece_type == chess.KING:
-                if game_phase(board) == "endgame":
-                    white_score += position_values["king_eg"][sq]
-                else:
-                    white_score += position_values["king_mg"][sq]
-
-        for sq_ in black_pcs:
-            sq = chess.square_mirror(sq_)
-            if piece_type == chess.PAWN:
-                black_score += position_values["pawn"][sq]
-            elif piece_type == chess.BISHOP:
-                if game_phase(board) == "endgame":
-                    black_score += position_values["bishop_eg"][sq]
-                else:
-                    black_score += position_values["bishop_eg"][sq]
-            elif piece_type == chess.KNIGHT:
-                black_score += position_values["knight"][sq]
-            elif piece_type == chess.ROOK:
-                black_score += position_values["rook"][sq]
-            elif piece_type == chess.QUEEN:
-                if game_phase(board) == "opening":
-                    black_score += position_values["queen_op"][sq]
-                else:
-                    black_score += position_values["queen_mg"][sq]
-            elif piece_type == chess.KING:
-                if game_phase(board) == "endgame":
-                    black_score += position_values["king_eg"][sq]
-                else:
-                    black_score += position_values["king_mg"][sq]
-
-    # Központ kontroll
-    white_center_control = 0
-    black_center_control = 0
-    for sq in CENTER_SQUARES:
-        piece = board.piece_at(sq)
-        if piece:
-            if piece.color == chess.WHITE:
-                white_center_control += 10
-            else:
-                black_center_control += 10
-
-    # Sáncolt-e
-
-    if not board.has_castling_rights(chess.WHITE):
-        king_sq = board.king(chess.WHITE)
-        if king_sq in [chess.G1, chess.C1]:
-            white_score += 40
-
-    if not board.has_castling_rights(chess.BLACK):
-        king_sq = board.king(chess.BLACK)
-        if king_sq in [chess.G8, chess.C8]:
-            black_score += 40
-
-    # Mobilitás
-    white_mobility = count_legal_moves(board, chess.WHITE) * 2
-    black_mobility = count_legal_moves(board, chess.BLACK) * 2
-
-    # Királybiztonság
-    white_king_safety = 0
-    white_king_sq = board.king(chess.WHITE)
-    if white_king_sq is not None:
-        white_king_attackers = board.attackers(chess.BLACK, white_king_sq)
-        white_king_safety = len(white_king_attackers) * 20
-
-    black_king_safety = 0
-    black_king_sq = board.king(chess.BLACK)
-    if black_king_sq is not None:
-        black_king_attackers = board.attackers(chess.WHITE, black_king_sq)
-        black_king_safety = len(black_king_attackers) * 20
-
-    # Izolált gyalogok
-    white_isolated_pawns = count_isolated_pawns(board, chess.WHITE) * 25
-    black_isolated_pawns = count_isolated_pawns(board, chess.BLACK) * 25
-
-    # Dupla gyalogok büntetése
-    white_doubled_pawns = count_doubled_pawns(board, chess.WHITE) * 10
-    black_doubled_pawns = count_doubled_pawns(board, chess.BLACK) * 10
-
-    # futópárok
-    white_bishops_pair = len(board.pieces(chess.BISHOP, chess.WHITE))
-    black_bishops_pair = len(board.pieces(chess.BISHOP, chess.BLACK))
-
-    # gyalogláncok
-    white_pawn_chains = count_pawn_chains(board, chess.WHITE)
-    black_pawn_chains = count_pawn_chains(board, chess.BLACK)
-
-    # Nyitott vonal a bástyáknak
-    white_rook_open_files_count, white_rook_open_files = count_open_files(board, chess.WHITE)
-    black_rook_open_files_count, black_rook_open_files = count_open_files(board, chess.BLACK)
-
-    # Gyenge mezők
-    white_weak_squares = count_weak_squares(board, chess.WHITE)
-    black_weak_squares = count_weak_squares(board, chess.BLACK)
-
-    # Király támadói
-    white_attacks_on_king = count_attacks_on_king(board, chess.WHITE)
-    black_attacks_on_king = count_attacks_on_king(board, chess.BLACK)
-
-    # Szabad gyalogok
-    white_passed_pawns = count_passed_pawns(board, chess.WHITE)
-    black_passed_pawns = count_passed_pawns(board, chess.BLACK)
-
-    # Mintázatok
-    musters = {
-        "white": {
-            "material": white_material,
-            "king_safety": white_king_safety,
-            "mobility": white_mobility,
-            "center_control": white_center_control,
-            "pawn_chains": white_pawn_chains,
-            "rook_open_files_count": white_rook_open_files_count,
-            "rook_open_files": white_rook_open_files,
-            "attacks_on_king": white_attacks_on_king,
-            "passed_pawns": white_passed_pawns,
-            "weak_squares": white_weak_squares
-        },
-        "black": {
-            "material": black_material,
-            "king_safety": black_king_safety,
-            "mobility": black_mobility,
-            "center_control": black_center_control,
-            "pawn_chains": black_pawn_chains,
-            "rook_open_files_count": black_rook_open_files_count,
-            "rook_open_files": black_rook_open_files,
-            "attacks_on_king": black_attacks_on_king,
-            "passed_pawns": black_passed_pawns,
-            "weak_squares": black_weak_squares
-        },
-        "game_phase": game_phase(board),
-    }
-    white_sytle = "balanced"
-    black_sytle = "balanced"
-
-    # Adaptív stílus - Jutalom, hoogyha követte az adott játékos a stílusát
-    if adaptive_mode:
-        if opponent_sytle == adaptive_style.playing_style_recognition(musters, not engine_white):
-            if engine_white:
-                black_score *= 1.2
-            else:
-                white_score *= 1.2
+def position_value_get(piece_type, sq, phase) -> int:
+    if piece_type == chess.PAWN:
+        return position_values["pawn"][sq]
+    elif piece_type == chess.KNIGHT:
+        return position_values["knight"][sq]
+    elif piece_type == chess.BISHOP:
+        if phase == "endgame":
+            return position_values["bishop_eg"][sq]
         else:
-            if engine_white:
-                black_score *= 0.8
-            else:
-                white_score *= 0.8
-        if counter_styles[opponent_sytle] == adaptive_style.playing_style_recognition(musters, engine_white):
-            if engine_white:
-                white_score *= 1.2
-            else:
-                white_score *= 1.2
+            return position_values["bishop_mg"][sq]
+    elif piece_type == chess.ROOK:
+        return position_values["rook"][sq]
+    elif piece_type == chess.QUEEN:
+        if phase == "opening":
+            return position_values["queen_op"][sq]
         else:
-            if engine_white:
-                white_score *= 0.8
-            else:
-                white_score *= 0.8
-
-        if engine_white:
-            black_sytle = opponent_sytle
-            white_sytle = counter_styles[opponent_sytle]
+            return position_values["queen_op"][sq]
+    elif piece_type == chess.KING:
+        if phase == "endgame":
+            return position_values["king_eg"][sq]
         else:
-            white_sytle = opponent_sytle
-            black_sytle = counter_styles[opponent_sytle]
-
-    # Adaptív torzítások
-    # hogyha nincs adaptive_mode, akkor a szorzó mindig 1.0 (mert a "balanced" stílus is mindig 1.0)
-
-    white_score += white_center_control * styles[white_sytle]["center_control"]
-    black_score += black_center_control * styles[black_sytle]["center_control"]
-
-    white_score += white_mobility * styles[white_sytle]["mobility"]
-    black_score += black_mobility * styles[black_sytle]["mobility"]
-
-    white_score -= white_king_safety * styles[white_sytle]["king_safety"]
-    black_score -= black_king_safety * styles[black_sytle]["king_safety"]
-
-    white_score -= white_isolated_pawns
-    black_score -= black_isolated_pawns
-
-    white_score -= white_doubled_pawns
-    black_score -= black_doubled_pawns
-
-    if white_bishops_pair >= 2:
-        white_score += 25
-    if black_bishops_pair >= 2:
-        black_score += 25
-
-    white_score += (white_pawn_chains * 12) * styles[white_sytle]["pawn_chains"]
-    black_score += (black_pawn_chains * 12) * styles[black_sytle]["pawn_chains"]
-
-    white_score += white_rook_open_files_count * 22  * styles[white_sytle]["rook_open_files"]
-    black_score += black_rook_open_files_count * 22  * styles[black_sytle]["rook_open_files"]
-
-    white_score += (white_weak_squares * -7) * styles[white_sytle]["weak_squares"]
-    black_score += (black_weak_squares * -7) * styles[black_sytle]["weak_squares"]
-
-    white_score -= (white_attacks_on_king * 36) * styles[white_sytle]["attacks_on_king"]
-    black_score -= (black_attacks_on_king * 36) * styles[black_sytle]["attacks_on_king"]
-
-    white_score += (white_passed_pawns * 52) * styles[white_sytle]["passed_pawns"]
-    black_score += (black_passed_pawns * 52) * styles[black_sytle]["passed_pawns"]
-
-    for i in white_material_list:
-        white_score += i * styles[white_sytle]["material"]
-    for i in black_material_list:
-        black_score += i * styles[black_sytle]["material"]
-
-    if with_muster:
-        return white_score - black_score, musters
-    return white_score - black_score
+            return position_values["king_mg"][sq]
+    return 0
 
 
-def count_doubled_pawns(board, color) -> int:
-    # Megszámolja a dupla gyalogokat
+def eval_position_values(board: chess.Board, phase) -> int:
+    score = 0
+    for piece_type in PIECE_VALUES.keys():
+        for sq in board.pieces(piece_type, chess.WHITE):
+            score += position_value_get(piece_type, sq, phase)
+        for sq in board.pieces(piece_type, chess.BLACK):
+            score -= position_value_get(piece_type, chess.square_mirror(sq), phase)
+    return score
 
-    pawns = board.pieces(chess.PAWN, color)
-    files_count = [0]*8
-    for sq in pawns:
-        files_count[chess.square_file(sq)] += 1
-    return sum(c-1 for c in files_count if c>1)
 
+def eval_material(board: chess.Board) -> int:
+    score = 0
+    for piece, value in PIECE_VALUES.items():
+        score += len(board.pieces(piece, chess.WHITE)) * value
+        score -= len(board.pieces(piece, chess.BLACK)) * value
+    return score
 
-def count_isolated_pawns(board, color) -> int:
-    # Megszámolja az izolált gyalogokat
+def eval_mobility(board: chess.Board) -> int:
+    def mobility(color):
+        b = board.copy(stack=False)
+        b.turn = color
+        return b.legal_moves.count()
+    mobility_score = (mobility(chess.WHITE) - mobility(chess.BLACK))
+    return mobility_score * 2
 
-    pawns = board.pieces(chess.PAWN, color)
-    files = [chess.square_file(sq) for sq in pawns]
-    isolated = 0
-    for f in files:
-        if (f-1 not in files) and (f+1 not in files):
-            isolated += 1
-    return isolated
+def eval_king_safety(board: chess.Board) -> int:
+    score = 0
+    raw_count = 0
 
-def count_open_files(board, color):
-    # Megszámolja azokat a nyílt vonalakat, amiken bástyák vannak
-
-    count = 0
-    open_files = []
-    for f in range(8):
-        if not any(chess.square_file(sq) == f and board.piece_at(sq).piece_type == chess.PAWN and board.piece_at(sq).color == color for sq in board.pieces(chess.PAWN, color)):
-            if (chess.square_file(sq) == f and board.piece_at(sq).piece_type == chess.ROOK and board.piece_at(sq).color == color for sq in board.pieces(chess.ROOK, color)):
-                count += 1
-                open_files.append(f)
-    return count, open_files
-
-def count_weak_squares(board, color) -> int:
-    # Megszámolja azokat a lezőket, amit az egyik figura sem támad
-
-    count = 0
-    opp_color = not color
-    for sq in chess.SQUARES:
-        piece = board.piece_at(sq)
-        if piece is None and len(board.attackers(color, sq)) == 0 and len(board.attackers(opp_color, sq)) > 0:
-            count += 1
-    return count
-
-def count_attacks_on_king(board, color) -> int:
-    # megszámolja és súlyozza(lásd piece_weights) a király támadóit
-
-    king_sq = board.king(color)
-    if king_sq is None:
-        return 0
-
-    piece_weights = {
-        chess.PAWN: 0.5,
-        chess.KNIGHT: 1.0,
-        chess.BISHOP: 1.0,
-        chess.ROOK: 1.5,
-        chess.QUEEN: 2.0,
-        chess.KING: 0.0
+    ATTACK_WEIGHTS = {
+        chess.PAWN: 1,
+        chess.KNIGHT: 2,
+        chess.BISHOP: 2,
+        chess.ROOK: 3,
+        chess.QUEEN: 4
     }
 
-    score = 0.0
+    for color in (chess.WHITE, chess.BLACK):
+        king_sq = board.king(color)
+        if king_sq is None:
+            continue
+        sign = 1 if color == chess.WHITE else -1
+        zone = chess.SquareSet(chess.BB_KING_ATTACKS[king_sq])
+        danger = 0
 
-    king_file = chess.square_file(king_sq)
-    king_rank = chess.square_rank(king_sq)
-    neighbors = []
+        # Ellenséges támadások
+        for piece_type, weight in ATTACK_WEIGHTS.items():
+            for sq in board.pieces(piece_type, not color):
+                attacks = board.attacks(sq)
+                danger += weight * len(attacks & zone)
+                raw_count += 1
 
-    for df in (-1, 0, 1):
-        for dr in (-1, 0, 1):
-            if df == 0 and dr == 0: # király mezője
-                continue
-            f = king_file + df
-            r = king_rank + dr
-            if 0 <= f <= 7 and 0 <= r <= 7:
-                neighbors.append(chess.square(f, r))
+        # Gyalogpajzs
+        file = chess.square_file(king_sq)
+        rank = chess.square_rank(king_sq)
+        shield_rank = rank + 1 if color == chess.WHITE else rank - 1
+        if 0 <= shield_rank <= 7:
+            for df in (-1, 0, 1):
+                f = file+df
+                if 0 <= f <= 7:
+                    shield_sq = chess.square(f, shield_rank)
+                    if board.piece_at(shield_sq) != chess.Piece(chess.PAWN, color):
+                        danger += 2
 
-    for sq in neighbors:
-        attackers = board.attackers(not color, sq)
-        for atk_sq in attackers:
-            piece = board.piece_at(atk_sq)
-            score += piece_weights.get(piece.piece_type, 0)
+        score -= sign * danger * 20
+    return score
+
+def eval_doubled_pawns(board) -> int:
+    score = 0
+    for color in (chess.WHITE, chess.BLACK):
+        pawns = board.pieces(chess.PAWN, color)
+        sign = -1 if color == chess.WHITE else 1
+        files_count = [0]*8
+        for sq in pawns:
+            files_count[chess.square_file(sq)] += 1
+        double_pawns = sum(c-1 for c in files_count if c>1)
+        score += sign * 10 * double_pawns
+    return score
+
+
+def eval_isolated_pawns(board: chess.Board) -> int:
+    score = 0
+    for color in (chess.WHITE, chess.BLACK):
+        pawns = board.pieces(chess.PAWN, color)
+        files = [chess.square_file(sq) for sq in pawns]
+        sign = -1 if color == chess.WHITE else 1
+        isolated = 0
+        for f in files:
+            if (f-1 not in files) and (f+1 not in files):
+                isolated += 1
+        score += sign * isolated * 25
+    return score
+
+
+def eval_passed_pawns(board) -> int:
+    score = 0
+    PASSED_PAWN_BONUS = [0, 0, 10, 20, 35, 60, 90, 0]
+
+    white_pawns = board.pieces(chess.PAWN, chess.WHITE)
+    black_pawns = board.pieces(chess.PAWN, chess.BLACK)
+
+    for sq in white_pawns:
+        file = chess.square_file(sq)
+        rank = chess.square_rank(sq)
+        is_passed = True
+        for ep in black_pawns:
+            ep_file = chess.square_file(ep)
+            ep_rank = chess.square_rank(ep)
+            if abs(ep_file-file) <= 1 and ep_rank > rank:
+                is_passed = False
+                break
+        if is_passed:
+            score += PASSED_PAWN_BONUS[rank]
+
+    for sq in black_pawns:
+        file = chess.square_file(sq)
+        rank = chess.square_rank(sq)
+        is_passed = True
+        for ep in white_pawns:
+            ep_file = chess.square_file(ep)
+            ep_rank = chess.square_rank(ep)
+            if abs(ep_file-file) <= 1 and ep_rank < rank:
+                is_passed = False
+                break
+        if is_passed:
+            score -= PASSED_PAWN_BONUS[7-rank]
+    return score
+
+
+def eval_pawns(board: chess.Board) -> int:
+    score = 0
+
+    score += eval_doubled_pawns(board)
+    score += eval_isolated_pawns(board)
+    score += eval_passed_pawns(board)
 
     return score
 
-def count_pawn_chains(board, color) -> int:
-    # Megszámolja a gyalogláncokat
+def eval_rook_open_files(board: chess.Board) -> int:
+    score = 0
 
-    direction = 1 if color == chess.WHITE else -1
-    chains = 0
+    for color in (chess.WHITE, chess.BLACK):
+        sign = 1 if color == chess.WHITE else -1
+        pawns = board.pieces(chess.PAWN, color)
+        opp_pawns = board.pieces(chess.PAWN, not color)
+        pawn_files = {chess.square_file(sq) for sq in pawns}
+        opp_pawn_files = {chess.square_file(sq) for sq in opp_pawns}
 
-    for sq in board.pieces(chess.PAWN, color):
-        file = chess.square_file(sq)
-        rank = chess.square_rank(sq) + direction
+        for rook_sq in board.pieces(chess.ROOK, color):
+            f = chess.square_file(rook_sq)
+            if f not in pawn_files and f not in opp_pawn_files:
+                score += sign * 20
+            elif f not in pawn_files:
+                score += sign * 10
+    return score
 
-        for df in (-1, 1):
-            f = file + df
-            if 0 <= f <= 7 and 0 <= rank <= 7:
-                target = chess.square(f, rank)
-                piece = board.piece_at(target)
-                if piece and piece.piece_type == chess.PAWN and piece.color == color:
-                    chains += 1
+def eval_bishop_pair(board) -> int:
+    score = 0
+    base = 25
+    OPEN_BONUS = 10
 
-    return chains
+    total_pawns = len(board.pieces(chess.PAWN, chess.WHITE)) + \
+                  len(board.pieces(chess.PAWN, chess.BLACK))
 
-def count_passed_pawns(board, color) -> int:
-    # Megszámolja a szabad gyalogokat
+    open_factor = OPEN_BONUS if total_pawns <= 10 else 0
 
-    passed = 0
-    direction = 1 if color == chess.WHITE else -1
-    enemy_pawns = board.pieces(chess.PAWN, not color)
 
-    for sq in board.pieces(chess.PAWN, color):
-        file = chess.square_file(sq)
-        rank = chess.square_rank(sq)
+    if len(board.pieces(chess.BISHOP, chess.WHITE)) >= 2:
+        score += base + open_factor
+    if len(board.pieces(chess.BISHOP, chess.BLACK)) >= 2:
+        score -= base + open_factor
+    return score
 
-        blocked = False
-        for ep in enemy_pawns:
-            ef, er = chess.square_file(ep), chess.square_rank(ep)
+def evaluate(board: chess.Board):
+    mate_score = 1_000_000
+    if board.is_checkmate():
+        return -mate_score if board.turn else mate_score
+    if board.is_stalemate() or board.is_insufficient_material():
+        return 0
 
-            if abs(ef - file) <= 1 and (er - rank) * direction > 0:
-                blocked = True
-                break
+    phase = game_phase(board)
+    w = tapered_weights[phase]
+    score = 0
+    score += eval_material(board)
+    score += eval_position_values(board, phase)
+    score += eval_mobility(board) * w["mobility"]
+    score += eval_king_safety(board) * w["king_safety"]
+    score += eval_pawns(board) * w["pawn_structure"]
+    score += eval_rook_open_files(board) * w["rook_files"]
+    score += eval_bishop_pair(board) * w["bishop_pair"]
 
-        if not blocked:
-            passed += 1
+    return score
 
-    return passed
+def test_startpos():
+    assert abs(evaluate(chess.Board())) < 5
+
+def test_symmetry(fen):
+    b = chess.Board(fen)
+    s1 = evaluate(b)
+    b.apply_mirror()
+    s2 = evaluate(b)
+    print(f"DEBUG: s1: {s1}, s2: {s2}")
+    assert abs(s1 + s2) < 5
+
+test_startpos()
+#print(evaluate(chess.Board("r1b2r1k/1pp3pp/2n5/p1Q1p1q1/8/2NP2P1/PP2PPBP/R4RK1 b - - 0 13")))
+
+test_symmetry("r1b2r1k/1pp3pp/2n5/p1Q1p1q1/8/2NP2P1/PP2PPBP/R4RK1 b - - 0 13")

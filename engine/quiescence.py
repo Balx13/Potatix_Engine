@@ -6,7 +6,7 @@ Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.tx
 
 import chess
 from move_ordering import order_moves
-from evulate import evaluate_board
+from evulate import evaluate
 from config import PIECE_VALUES
 from stop_event import stop_event
 
@@ -46,11 +46,10 @@ def see(board, move):
     return result
 
 
-def quiescence(board: chess.Board, maximizing_player: bool, alpha: float, beta: float, datas_for_evulate) -> float:
+def quiescence(board: chess.Board, maximizing_player: bool, alpha: float, beta: float) -> float:
     # Addig mélyíti a keresést, amíg csndes állás nem lesz(nincs ütés és sakk adás lehetősége)
 
-    stand_pat = evaluate_board(board, with_muster=False, adaptive_mode=datas_for_evulate[2],
-        engine_white=datas_for_evulate[1], opponent_sytle=datas_for_evulate[0])
+    stand_pat = evaluate(board)
 
     if maximizing_player:
         if stand_pat >= beta:
@@ -63,7 +62,7 @@ def quiescence(board: chess.Board, maximizing_player: bool, alpha: float, beta: 
         if stand_pat < beta:
             beta = stand_pat
 
-    for move, _ in order_moves(board, board.legal_moves,depth=None, datas_for_evulate=datas_for_evulate):
+    for move, _ in order_moves(board, board.legal_moves,depth=None):
 
         if stop_event.is_set():
             return 0
@@ -73,7 +72,7 @@ def quiescence(board: chess.Board, maximizing_player: bool, alpha: float, beta: 
 
         if board.is_capture(move):
             board.push(move)
-            score = quiescence(board, not maximizing_player, alpha, beta, datas_for_evulate)
+            score = quiescence(board, not maximizing_player, alpha, beta)
             board.pop()
 
             if maximizing_player:
