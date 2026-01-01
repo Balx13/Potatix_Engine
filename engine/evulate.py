@@ -1,6 +1,6 @@
 """
 This file is part of Potatix Engine
-Copyright (C) 2025 Balázs André
+Copyright (C) 2025-2026 Balázs André
 Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.txt)
 """
 
@@ -255,7 +255,7 @@ def test_symmetry(fen):
     print(f"DEBUG: s1: {s1}, s2: {s2}")
     assert abs(s1 + s2) < 5
 
-test_startpos()
+#test_startpos()
 #print(evaluate(chess.Board("r1b2r1k/1pp3pp/2n5/p1Q1p1q1/8/2NP2P1/PP2PPBP/R4RK1 b - - 0 13")))
 
-test_symmetry("r1b2r1k/1pp3pp/2n5/p1Q1p1q1/8/2NP2P1/PP2PPBP/R4RK1 b - - 0 13")
+#test_symmetry("r1b2r1k/1pp3pp/2n5/p1Q1p1q1/8/2NP2P1/PP2PPBP/R4RK1 b - - 0 13")

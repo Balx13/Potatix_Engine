@@ -1,9 +1,9 @@
 """
 This file is part of Potatix Engine
-Copyright (C) 2025 Balázs André
+Copyright (C) 2025-2026 Balázs André
 Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.txt)
 """
-from evulate import count_attacks_on_king
+from evulate import eval_king_safety
 import chess
 from config import PIECE_VALUES
 
@@ -48,7 +48,7 @@ def estimate_time_for_move(board: chess.Board, base_time: float, increment: floa
     complexity_factor = 1.0
     if abs(material_balance) <= 2:  # kiegyenlített pozíció
         complexity_factor += 0.05
-    if count_attacks_on_king(board, chess.WHITE) > 1 or count_attacks_on_king(board, chess.BLACK) > 1:
+    if eval_king_safety(board) > 5:
         complexity_factor += 0.2  # sakk / támadás
 
     if moves_to_go is None:
