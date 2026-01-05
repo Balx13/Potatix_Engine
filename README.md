@@ -7,10 +7,7 @@
 <p align="center"><em>English version</em></p>
 
 ## About the project
-### Hungarian-developed free and open source adaptive chess engine 🇭🇺
-
-This chess engine is adaptive, which means it looks for the best move based on your opponent's playing style. \
-This adaptive style is built into most NNUEs, but my engine still uses a manual evaluator, so it takes much more "lifelike" steps.
+### Hungarian-developed free and open source chess engine 🇭🇺
 
 > This engine is still in the alpha stage and is written in Python, so it is quite slow. Future plans include rewriting it in Rust to improve performance. \
 > Currently, it is a hobby project, but I plan to turn it into a competitive engine in the future.
@@ -66,10 +63,7 @@ The 'Potatix Engine' should not be confused with 'Potato Engine' or 'Potatix'.
 </div>
 
 ## A porjektről
-### Magyar fejlesztésű ingyenes és nyílt forráskódú adaptív sakkmotor 🇭🇺
-
-Ez a sakkmotor adaptív, ami azt jelenti, hogy az ellenfele játékstílusához igazodva keresi a legjobb lépést. \
-Ez az adaptív stílus a legtöbb NNUE-be be van tanítva, de az én motorom még kézi értékelőt használ, így sokkal "élethűbb" lépéseket lép.
+### Magyar fejlesztésű ingyenes és nyílt forráskódú sakkmotor 🇭🇺
 
 > Ez a motor még alfa fázisban van Pythonban, így nagyon lassú. A jövőbeli tervek között szerepel, hogy átírom Rust nyelvbe a motor felgyorsítása érdekében. \
 > Jelenleg hobbi projekt, de a jövőben tervezem, hogy versenymotorrá alakítom.
