@@ -118,7 +118,7 @@ Disputes shall fall under the exclusive jurisdiction of the competent Hungarian 
 9.4 The official and controlling language of this License is English. In case of translation discrepancies, this version prevails.
 
 ------------------------------------------------------------
-Copyright © 2025 Balázs André
+Copyright © 2025-2026 Balázs André
 All rights reserved.
 Contact the Author for commercial licensing inquiries.
 ------------------------------------------------------------
