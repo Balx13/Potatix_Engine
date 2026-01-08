@@ -9,13 +9,9 @@ Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.tx
 
 import chess
 
-# Kezdőállás
-board = chess.Board(chess.STARTING_FEN)
-
-MAX_DEPTH = 100_000
-
+MAX_DEPTH = 100
+adaptive_mode = True
 killer_moves = [[] for _ in range(MAX_DEPTH)]
-
 history_heuristic = [[[0 for _ in range(64)] for _ in range(64)] for _ in range(6)]
 
 PIECE_VALUES = {
@@ -25,6 +21,13 @@ PIECE_VALUES = {
     chess.ROOK:   500,
     chess.QUEEN:  900,
     chess.KING:   0
+}
+adaptive_style_oppoment_profile = {
+    "king_safety": 1.0,
+    "mobility": 1.0,
+    "trading": 1.0, # trading = mobility + material
+    "pawns": 1.0,
+    "rook_op_files": 1.0
 }
 
 CENTER_SQUARES = [chess.D4, chess.D5, chess.E4, chess.E5]
@@ -153,81 +156,4 @@ tapered_weights = {
         "rook_files": 1.2,
         "bishop_pair": 1.1
     }
-}
-
-styles = {
-    "attacker": {
-        "material":        0.85,
-        "king_safety":     0.7,
-        "mobility":        1.4,
-        "center_control":  1.1,
-        "pawn_chains":     0.9,
-        "rook_open_files": 1.3,
-        "attacks_on_king": 1.6,
-        "passed_pawns":    0.8,
-        "weak_squares":    0.7
-    },
-    "defensive": {
-        "material":        1.2,
-        "king_safety":     1.6,
-        "mobility":        0.8,
-        "center_control":  1.3,
-        "pawn_chains":     1.4,
-        "rook_open_files": 0.6,
-        "attacks_on_king": 0.4,
-        "passed_pawns":    1.0,
-        "weak_squares":    0.9
-    },
-    "positional": {
-        "material":        1.0,
-        "king_safety":     1.2,
-        "mobility":        1.0,
-        "center_control":  1.5,
-        "pawn_chains":     1.3,
-        "rook_open_files": 0.9,
-        "attacks_on_king": 0.7,
-        "passed_pawns":    1.0,
-        "weak_squares":    0.6
-    },
-    "tactical": {
-        "material":        0.9,
-        "king_safety":     0.8,
-        "mobility":        1.5,
-        "center_control":  1.0,
-        "pawn_chains":     0.8,
-        "rook_open_files": 1.4,
-        "attacks_on_king": 1.5,
-        "passed_pawns":    0.9,
-        "weak_squares":    0.8
-    },
-    "endgame": {
-        "material":        1.0,
-        "king_safety":     1.0,
-        "mobility":        0.8,
-        "center_control":  1.1,
-        "pawn_chains":     1.3,
-        "rook_open_files": 0.8,
-        "attacks_on_king": 0.6,
-        "passed_pawns":    1.5,
-        "weak_squares":    0.9
-    },
-    "balanced": {
-        "material":        1.0,
-        "king_safety":     1.0,
-        "mobility":        1.0,
-        "center_control":  1.0,
-        "pawn_chains":     1.0,
-        "rook_open_files": 1.0,
-        "attacks_on_king": 1.0,
-        "passed_pawns":    1.0,
-        "weak_squares":    1.0
-    },
-}
-counter_styles = {
-    "attacker"  : "defensive",
-    "defensive" : "tactical",
-    "positional": "attacker",
-    "tactical"  : "positional",
-    "endgame"   : "attacker",
-    "balanced"  : "tactical"
 }

@@ -5,8 +5,7 @@ Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.tx
 """
 
 import chess
-from config import position_values, PIECE_VALUES, CENTER_SQUARES, styles, counter_styles, tapered_weights
-import adaptive_style
+from config import position_values, PIECE_VALUES, tapered_weights, adaptive_style_oppoment_profile
 
 def game_phase(board: chess.Board) -> str:
     # Azt próbálja megmondani, hogy megnyitásban, középjátékban, vagy végjátékban vagyunk
@@ -22,8 +21,7 @@ def game_phase(board: chess.Board) -> str:
         return "opening"
     elif material < 6 or king_distance_from_starting > 2:
         return "endgame"
-    else:
-        return "middlegame"
+    return "middlegame"
 
 
 def position_value_get(piece_type, sq, phase) -> int:
@@ -61,24 +59,34 @@ def eval_position_values(board: chess.Board, phase) -> int:
     return score
 
 
-def eval_material(board: chess.Board) -> int:
+def eval_material(board: chess.Board, color_param=None) -> int:
+    # A color_param paraméter akkor használatos, hogyha csak az egyik felet akarjuk mérni
     score = 0
     for piece, value in PIECE_VALUES.items():
-        score += len(board.pieces(piece, chess.WHITE)) * value
-        score -= len(board.pieces(piece, chess.BLACK)) * value
+        if color_param:
+            score += len(board.pieces(piece, color_param)) * value
+        else:
+            score += len(board.pieces(piece, chess.WHITE)) * value
+            score -= len(board.pieces(piece, chess.BLACK)) * value
     return score
 
-def eval_mobility(board: chess.Board) -> int:
-    def mobility(color):
-        b = board.copy(stack=False)
-        b.turn = color
-        return b.legal_moves.count()
-    mobility_score = (mobility(chess.WHITE) - mobility(chess.BLACK))
+def eval_mobility(board: chess.Board, color=None) -> int:
+    # A color_param paraméter akkor használatos, hogyha csak az egyik felet akarjuk mérni
+    def mobility(colorr):
+        old_turn = board.turn
+        board.turn = colorr
+        data = board.legal_moves.count()
+        board.turn = old_turn
+        return data
+    if color:
+        mobility_score = mobility(color)
+    else:
+        mobility_score = (mobility(chess.WHITE) - mobility(chess.BLACK))
     return mobility_score * 2
 
-def eval_king_safety(board: chess.Board) -> int:
+def eval_king_safety(board: chess.Board, color_param=None) -> int:
+    # A color_param paraméter akkor használatos, hogyha csak az egyik felet akarjuk mérni
     score = 0
-    raw_count = 0
 
     ATTACK_WEIGHTS = {
         chess.PAWN: 1,
@@ -87,8 +95,11 @@ def eval_king_safety(board: chess.Board) -> int:
         chess.ROOK: 3,
         chess.QUEEN: 4
     }
-
-    for color in (chess.WHITE, chess.BLACK):
+    if color_param:
+        colors = (color_param,)
+    else:
+        colors = (chess.WHITE, chess.BLACK)
+    for color in colors:
         king_sq = board.king(color)
         if king_sq is None:
             continue
@@ -101,7 +112,6 @@ def eval_king_safety(board: chess.Board) -> int:
             for sq in board.pieces(piece_type, not color):
                 attacks = board.attacks(sq)
                 danger += weight * len(attacks & zone)
-                raw_count += 1
 
         # Gyalogpajzs
         file = chess.square_file(king_sq)
@@ -118,9 +128,14 @@ def eval_king_safety(board: chess.Board) -> int:
         score -= sign * danger * 20
     return score
 
-def eval_doubled_pawns(board) -> int:
+def eval_doubled_pawns(board: chess.Board, color_param=None) -> int:
+    # A color_param paraméter akkor használatos, hogyha csak az egyik felet akarjuk mérni
     score = 0
-    for color in (chess.WHITE, chess.BLACK):
+    if color_param:
+        colors = (color_param,)
+    else:
+        colors = (chess.WHITE, chess.BLACK)
+    for color in colors:
         pawns = board.pieces(chess.PAWN, color)
         sign = -1 if color == chess.WHITE else 1
         files_count = [0]*8
@@ -131,9 +146,14 @@ def eval_doubled_pawns(board) -> int:
     return score
 
 
-def eval_isolated_pawns(board: chess.Board) -> int:
+def eval_isolated_pawns(board: chess.Board, color_param=None) -> int:
+    # A color_param paraméter akkor használatos, hogyha csak az egyik felet akarjuk mérni
     score = 0
-    for color in (chess.WHITE, chess.BLACK):
+    if color_param:
+        colors = (color_param,)
+    else:
+        colors = (chess.WHITE, chess.BLACK)
+    for color in colors:
         pawns = board.pieces(chess.PAWN, color)
         files = [chess.square_file(sq) for sq in pawns]
         sign = -1 if color == chess.WHITE else 1
@@ -145,7 +165,7 @@ def eval_isolated_pawns(board: chess.Board) -> int:
     return score
 
 
-def eval_passed_pawns(board) -> int:
+def eval_passed_pawns(board: chess.Board) -> int:
     score = 0
     PASSED_PAWN_BONUS = [0, 0, 10, 20, 35, 60, 90, 0]
 
@@ -189,10 +209,15 @@ def eval_pawns(board: chess.Board) -> int:
 
     return score
 
-def eval_rook_open_files(board: chess.Board) -> int:
+def eval_rook_open_files(board: chess.Board, color_param=None) -> int:
+    # A color_param paraméter akkor használatos, hogyha csak az egyik felet akarjuk mérni
     score = 0
+    if color_param:
+        colors = (color_param,)
+    else:
+        colors = (chess.WHITE, chess.BLACK)
 
-    for color in (chess.WHITE, chess.BLACK):
+    for color in colors:
         sign = 1 if color == chess.WHITE else -1
         pawns = board.pieces(chess.PAWN, color)
         opp_pawns = board.pieces(chess.PAWN, not color)
@@ -224,7 +249,7 @@ def eval_bishop_pair(board) -> int:
         score -= base + open_factor
     return score
 
-def evaluate(board: chess.Board):
+def evaluate(board: chess.Board) -> float:
     mate_score = 1_000_000
     if board.is_checkmate():
         return -mate_score if board.turn else mate_score
@@ -234,13 +259,13 @@ def evaluate(board: chess.Board):
     phase = game_phase(board)
     w = tapered_weights[phase]
     score = 0
-    score += eval_material(board)
     score += eval_position_values(board, phase)
-    score += eval_mobility(board) * w["mobility"]
-    score += eval_king_safety(board) * w["king_safety"]
-    score += eval_pawns(board) * w["pawn_structure"]
-    score += eval_rook_open_files(board) * w["rook_files"]
     score += eval_bishop_pair(board) * w["bishop_pair"]
+    score += eval_material(board) * adaptive_style_oppoment_profile["rook_op_files"]
+    score += eval_mobility(board) * w["mobility"] * (2.0-adaptive_style_oppoment_profile["king_safety"])
+    score += eval_king_safety(board) * w["king_safety"] * adaptive_style_oppoment_profile["mobility"]
+    score += eval_pawns(board) * w["pawn_structure"] * (2.0-adaptive_style_oppoment_profile["trading"])
+    score += eval_rook_open_files(board) * w["rook_files"] * (2.0-adaptive_style_oppoment_profile["pawns"])
 
     return score
 

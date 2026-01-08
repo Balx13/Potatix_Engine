@@ -8,8 +8,8 @@ import json
 import random
 import chess
 import sys
+import evulate
 import transposition_table as tt
-from evulate import game_phase
 from search import alphabeta
 import config
 import threading
@@ -17,17 +17,11 @@ import time
 from pathlib import Path
 from time_manager import estimate_time_for_move
 from stop_event import stop_event
-from adaptive_style import playing_style_recognition
-from evulate import evaluate
+import adaptive_style
 
-board = config.board
-MAX_DEPTH = config.MAX_DEPTH
-killer_moves = config.killer_moves
-history_heuristic = config.history_heuristic
+board = chess.Board(chess.STARTING_FEN)
 search_thread = threading.Thread()
 
-transposition_table_ = tt.transposition_table
-Max_tt_size = tt.Max_tt_size
 
 def is_in_opening_book(board_fen):
     if getattr(sys, 'frozen', False):
@@ -60,14 +54,14 @@ def timer_worker(time_limit_sec):
 def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movestogo=None, forced_child=False):
     # Ez indítja el és kezeli a keresést
 
-    if game_phase(board) == "opening":
+    if evulate.game_phase(board) == "opening":
         # Csak megnyitásban keres megnyitási könyvet (így végjátékban nem néz át 25 000 állást)
         opening_move = is_in_opening_book(board.fen())
         if opening_move is not None:
             print(f"bestmove {opening_move}", flush=True)
             return
 
-    transposition_table_.clear()
+    tt.transposition_table.clear()
     stop_event.clear()
     best_move = None
 
@@ -84,12 +78,6 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
         timer_thread.start()
 
     start_board = chess.Board(chess.STARTING_FEN)
-    diff_count = sum(1 for sq in chess.SQUARES if start_board.piece_at(sq) != board.piece_at(sq))
-
-    if diff_count >= 20:
-        adaptive_mode = True
-    else:
-        adaptive_mode = False
 
     best_eval_instability = 0.0
     danger_score = 0.0
@@ -186,15 +174,15 @@ def send_cmd(args=None):
 
 def UCI(args):
     # Ez kezeli az UCI protokollt
-
-    global search_thread, killer_moves, board, Max_tt_size, MAX_DEPTH
+    global search_thread, board
     try:
         if args[0] == "uci":
             print("id name Potatix Engine", flush=True)
             print("id author Balazs Andre", flush=True)
 
-            print("option name MaxDepth type spin default 50 min 1 max 100", flush=True)
+            print("option name MaxDepth type spin default 100 min 1 max 100000", flush=True)
             print("option name TTSize type spin default 1000000 min 1 max 100000000", flush=True)
+            print("option name AdaptiveMode type check default true", flush=True)
 
             print("uciok", flush=True)
         elif args[0] == "isready":
@@ -206,15 +194,17 @@ def UCI(args):
             stop_event.clear()
 
             board = chess.Board()
-            transposition_table_.clear()
+            tt.transposition_table.clear()
+            for key in config.adaptive_style_oppoment_profile.keys():
+                config.adaptive_style_oppoment_profile[key] = 1.0
 
-            for km in killer_moves:
+            for km in config.killer_moves:
                 km.clear()
 
             for piece_type in range(6):
                 for from_sq in range(64):
                     for to_sq in range(64):
-                        history_heuristic[piece_type][from_sq][to_sq] = 0
+                        config.history_heuristic[piece_type][from_sq][to_sq] = 0
 
         elif args[0] == "quit":
             if search_thread and search_thread.is_alive():
@@ -225,12 +215,24 @@ def UCI(args):
             return "quit"
 
         elif args[0] == "position":
-            if  args[1] == "startpos":
+            if args[1] == "startpos":
                 board = chess.Board(chess.STARTING_FEN)
                 if len(args) > 2:
+                    if config.adaptive_mode:
+                        if len(args[3:]) > 4: # Ha van elég lépés
+                            adaptive_style.update_oppoment_style(args)
+                            # Azért kell törölni, mert az adaptív mód eltorzítja az értékeket,
+                            # így a tt a régebbi torzítások eredményeit is tárolhatja
+                            tt.transposition_table.clear()
+                    else:
+                        adaptive_style.reset_adaptive_values()
                     for move in args[3:]:
                         board.push_uci(move)
             elif args[1] == "fen":
+                if config.adaptive_mode:
+                    print("info string Error: Adaptive mode is enabled, \
+                    but the position was not set up as expected. Adaptive mode has been disabled.")
+                    adaptive_style.reset_adaptive_values()
                 if "moves" in args:
                     moves_index = args.index("moves")
                     board = chess.Board(" ".join(args[2:moves_index]))
@@ -246,7 +248,7 @@ def UCI(args):
             stop_event.clear()
 
             if len(args) == 1:
-                search_thread = threading.Thread(target=search_worker, args=(MAX_DEPTH,))
+                search_thread = threading.Thread(target=search_worker, args=(config.MAX_DEPTH,))
                 search_thread.start()
             elif len(args) == 3 and args[1] == "depth":
                 search_thread = threading.Thread(target=search_worker, args=(int(args[2]),), kwargs={"forced_child": True})
@@ -254,7 +256,7 @@ def UCI(args):
             elif len(args) == 3 and args[1] == "movetime":
                 movetime_index = args.index("movetime")
                 movetime = float(args[movetime_index+1]) / 1000
-                search_thread = threading.Thread(target=search_worker, args=(MAX_DEPTH, movetime, movetime, 0, 0, 1))
+                search_thread = threading.Thread(target=search_worker, args=(config.MAX_DEPTH, movetime, movetime, 0, 0, 1))
                 search_thread.start()
             elif len(args) > 4:
                 if "wtime" in args: # ha már van wtime, akkor biztos, hogy kapunk időt
@@ -276,20 +278,34 @@ def UCI(args):
                             moves_to_go = float(args[moves_to_go_index+1])
                     search_thread = threading.Thread(
                         target=search_worker,
-                        args=(MAX_DEPTH, wtime, btime, winc, binc, moves_to_go)
+                        args=(config.MAX_DEPTH, wtime, btime, winc, binc, moves_to_go)
                     )
                     search_thread.start()
         elif args[0] == "setoption":
             name_index = args.index("name")
             value_index = args.index("value")
             if args[name_index+1] == "MaxDepth":
-                MAX_DEPTH = int(args[value_index+1])
-                killer_moves = [[] for _ in range(MAX_DEPTH)]
+                value = value_index+1
+                if 1 <= value <= 100_000:
+                    config.MAX_DEPTH = int(args[value_index+1])
+                    config.killer_moves = [[] for _ in range(config.MAX_DEPTH)]
+                else:
+                    print("info string Error: the value is too large or too small", flush=True)
             elif args[name_index+1] == "TTSize":
-                value_num= int(args[value_index+1])
-                if 1 <= value_num <= 100_000_000:
-                    Max_tt_size *= 0
-                    Max_tt_size += value_num
+                value= int(args[value_index+1])
+                if 1 <= value <= 100_000_000:
+                    tt.Max_tt_size = value
+                else:
+                    print("info string Error: the value is too large or too small", flush=True)
+            elif args[name_index+1] == "AdaptiveMode":
+                value = str(args[value_index+1])
+                if value.lower() == "true":
+                    config.adaptive_mode = True
+                elif value.lower() == "false":
+                    config.adaptive_mode = False
+                else:
+                    print("info string Error: the value is not true or false", flush=True)
+
 
         elif args[0] == "stop":
             stop_event.set()

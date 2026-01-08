@@ -7,10 +7,40 @@
 <p align="center"><em>English version</em></p>
 
 ## About the project
-### Hungarian-developed free and open source chess engine 🇭🇺
+### Hungarian-developed free and open source adaptive chess engine 🇭🇺
 
 > This engine is still in the alpha stage and is written in Python, so it is quite slow. Future plans include rewriting it in Rust to improve performance. \
 > Currently, it is a hobby project, but I plan to turn it into a competitive engine in the future.
+
+## Current Features:
+- Minimax algorithm with Alpha-Beta pruning
+- Late Move Pruning and Late Move Reductions
+- Null move pruning
+- Transposition table
+- Move ordering
+- Quicksense
+- UCI communication
+- Basic evaluation
+- Killer moves
+- History heuristic
+
+## Custom Developments:
+1. **Adaptive Mode**
+
+
+Most chess engines search for the best move against an assumed perfect opponent.
+In contrast, the Potatix Engine plays by exploiting the opponent’s weaknesses.
+For example, if the opponent weakens their king safety in the middlegame, the Potatix Engine starts attacking.
+- Status: Stable, but still under development.
+- For proper operation, the position must be provided using the `position startpos moves ...` command.
+
+2. **Danger Score**
+
+
+The engine calculates a danger_score value; the higher it is, the more dangerous the position.
+This value is used to regulate when the alpha-beta algorithm is allowed to prune a branch
+(in order to avoid the horizon effect).
+- Status: Stable, but it only slightly influences the search.
 
 ## Files
 ### The file distribution for the current version of the Potatix Engine is as follows:
@@ -24,7 +54,7 @@
 ### 1.) How to build
 1. Install [Git](https://git-scm.com)
 2. Install [Python](https://www.python.org)
-3. Clone this repository with this command: `https://github.com/Balx13/Potatix_Engine.git`
+3. Clone this repository with this command: `git clone https://github.com/Balx13/Potatix_Engine.git`
 4. Install Pyinstaller and python-chess with this command: `pip install pyinstaller chess`
 5. Run this command:
 * Linux/MacOS: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "engine:engine" engine/main.py`
@@ -63,13 +93,43 @@ The 'Potatix Engine' should not be confused with 'Potato Engine' or 'Potatix'.
 </div>
 
 ## A porjektről
-### Magyar fejlesztésű ingyenes és nyílt forráskódú sakkmotor 🇭🇺
+### Magyar fejlesztésű ingyenes és nyílt forráskódú adaptív sakkmotor 🇭🇺
 
 > Ez a motor még alfa fázisban van Pythonban, így nagyon lassú. A jövőbeli tervek között szerepel, hogy átírom Rust nyelvbe a motor felgyorsítása érdekében. \
 > Jelenleg hobbi projekt, de a jövőben tervezem, hogy versenymotorrá alakítom.
 
+## Jelenlegi Funkciók:
+- Minimax algoritmus AlphaBeta vágással
+- Late Move Pruning és Late Move Reductions
+- Null move pruning
+- Tranzpozíciós tábla
+- Move ordering
+- Quicksense
+- UCI kommunikáció
+- Kezdetleges értékelő
+- Killer moves
+- History heuristic
+
+## Egyedi feljesztések:
+1. **Adaptív mód**
+
+
+A legtöbb sakkmotor egy feltételezett, tökéletes ellenfél ellen keresi a logjobb lépést.
+Ezzel szemben a Potatix Engine az ellenfele gyengeségeit kihasználva játszik.
+Például, ha az ellenfél középjátékban legyengíti a király védelmét, a Potatix Engine elkezd támadni.
+- Állapota: Stabil, de még fejlesztés alatt áll.
+- A megfeleő működéséhez az állást a `position startpos moves ...` paranccsal kell átadni.
+
+2. **Danger Score**
+
+
+A motor kiszámol egy danger_score értéket, ami minél magasabb, annál veszélyesebb az állás.
+Ezt az értéket arra használja, hogy szabályozza vele azt, hogy az alfabéta algoritmus mikor vághat le egy ágat(Horizon effektus elkerülése végett)
+- Állapota: Stabil, viszont csak enyhén befolyásolja a keresést
+
+
 ## Fájlok
-### A Potatix ​​Engine jelenlegi verziójának fájlelosztása a következő:
+### A Potatix Engine jelenlegi verziójának fájlelosztása a következő:
  * README.md - Ezt a féjlt olvasod most
  * LICENCE.txt - A Potatix Engine licencfeltételei
  * google571f1ff7b4dfe5a2.html - Ez a fájl azért van, hogy a Google keresőmotor, a Microsoft Bing és más keresőmotorok ki tudják indexelni ezt a repository-t.
@@ -80,7 +140,7 @@ The 'Potatix Engine' should not be confused with 'Potato Engine' or 'Potatix'.
 ### 1.) Hogyan buildeld
 1. Telepítsd a [Git](https://git-scm.com)-et
 2. Telepítsd a [Python](https://www.python.org)-t
-3. Klónozd ezt a repository-t ezzel a paranccsal: `https://github.com/Balx13/Potatix_Engine.git`
+3. Klónozd ezt a repository-t ezzel a paranccsal: `git clone https://github.com/Balx13/Potatix_Engine.git`
 4. Telepítsd a Pyinstaller-t és a python-chess-t ezzel a paranccsal: `pip install pyinstaller chess`
 5. Futtasd ezt a parancsot:
 * Linux/MacOS: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "engine:engine" engine/main.py`
