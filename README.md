@@ -31,7 +31,7 @@
 Most chess engines search for the best move against an assumed perfect opponent.
 In contrast, the Potatix Engine plays by exploiting the opponent’s weaknesses.
 For example, if the opponent weakens their king safety in the middlegame, the Potatix Engine starts attacking.
-- Status: Stable, but still under development.
+- Status: Alpha
 - For proper operation, the position must be provided using the `position startpos moves ...` command.
 
 2. **Danger Score**
@@ -117,7 +117,7 @@ The 'Potatix Engine' should not be confused with 'Potato Engine' or 'Potatix'.
 A legtöbb sakkmotor egy feltételezett, tökéletes ellenfél ellen keresi a logjobb lépést.
 Ezzel szemben a Potatix Engine az ellenfele gyengeségeit kihasználva játszik.
 Például, ha az ellenfél középjátékban legyengíti a király védelmét, a Potatix Engine elkezd támadni.
-- Állapota: Stabil, de még fejlesztés alatt áll.
+- Állapota: Alfa
 - A megfeleő működéséhez az állást a `position startpos moves ...` paranccsal kell átadni.
 
 2. **Danger Score**
