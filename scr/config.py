@@ -11,8 +11,10 @@ import chess
 
 MAX_DEPTH = 100
 adaptive_mode = True
-killer_moves = [[] for _ in range(MAX_DEPTH)]
+killer_moves = [[] for _ in range(MAX_DEPTH+1)]
 history_heuristic = [[[0 for _ in range(64)] for _ in range(64)] for _ in range(6)]
+
+engine_turn = True
 
 PIECE_VALUES = {
     chess.PAWN:   100,
@@ -30,6 +32,27 @@ adaptive_style_oppoment_profile = {
     "rook_op_files": 1.0
 }
 
+multipliers = {
+    "engine": {
+        "mobility": 1.0,
+        "rook_op_files": 1.0,
+        "king_safety": 1.0,
+        "pawns": 1.0,
+        "position_values": 1.0,
+        "material":  1.0,
+        "bishop_pairs": 1.0
+    },
+    "oppoment": {
+        "mobility": 1.0,
+        "rook_op_files": 1.0,
+        "king_safety": 1.0,
+        "pawns": 1.0,
+        "position_values": 1.0,
+        "material":  1.0,
+        "bishop_pairs": 1.0
+    }
+}
+
 CENTER_SQUARES = [chess.D4, chess.D5, chess.E4, chess.E5]
 
 
@@ -40,7 +63,7 @@ position_values = {
         10, 10, 20, 30, 30, 20, 10, 10,
          5,  5, 10, 25, 25, 10,  5,  5,
          0,  0,  0, 20, 20,  0,  0,  0,
-         5, -5,-10,  0,  0,-10, -5,  5,
+         5, 10,-10,  0,  0,-10, 10,  5,
          5, 10, 10,-20,-20, 10, 10,  5,
          0,  0,  0,  0,  0,  0,  0,  0
     ),

@@ -8,7 +8,7 @@ import json
 import random
 import chess
 import sys
-import evulate
+import evaluate
 import transposition_table as tt
 from search import alphabeta
 import config
@@ -54,7 +54,7 @@ def timer_worker(time_limit_sec):
 def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movestogo=None, forced_child=False):
     # Ez indítja el és kezeli a keresést
 
-    if evulate.game_phase(board) == "opening":
+    if evaluate.game_phase(board) == "opening":
         # Csak megnyitásban keres megnyitási könyvet (így végjátékban nem néz át 25 000 állást)
         opening_move = is_in_opening_book(board.fen())
         if opening_move is not None:
@@ -64,6 +64,7 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
     tt.transposition_table.clear()
     stop_event.clear()
     best_move = None
+    best_eval = 0.0
 
     if board.turn and wtime_ is not None:
         time_limit_sec = estimate_time_for_move(board, wtime_, winc_, movestogo)
@@ -76,17 +77,7 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
     if time_limit_sec is not None:
         timer_thread = threading.Thread(target=timer_worker, args=(time_limit_sec,))
         timer_thread.start()
-
-    start_board = chess.Board(chess.STARTING_FEN)
-
-    best_eval_instability = 0.0
-    danger_score = 0.0
-    second_best_eval = None
-
-    """
-    A danger_score egy veszélyességi pontszám: minnél nagyobb, annál kevesebb cutoff
-    a horizon-effektus elkerülése végett
-    """
+    config.engine_turn = board.turn
 
     for depth in range(1, max_depth_ + 1):
         if stop_event.is_set():
@@ -99,12 +90,10 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
                 board.push(move)
                 eval_score_, _ = alphabeta(
                     board=board,
-                    maximizing_player=board.turn,
                     depth=depth-1,
                     alpha=float('-inf'),
                     beta=float('inf'),
-                    previous_null_move=False,
-                    danger_score=danger_score)
+                    previous_null_move=False)
                 board.pop()
                 if (board.turn and eval_score_ > best_eval_local) or \
                (not board.turn and eval_score_ < best_eval_local):
@@ -114,27 +103,16 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
         else:
             eval_score_, current_best_move = alphabeta(
                 board=board,
-                maximizing_player=board.turn,
                 depth=depth,
                 alpha=float('-inf'),
                 beta=float('inf'),
-                previous_null_move=False,
-                danger_score=danger_score)
+                previous_null_move=False)
 
         if current_best_move:
             best_move = current_best_move
             best_eval = eval_score_
-            if second_best_eval is not None:
-                best_eval_instability = abs(best_eval-second_best_eval)
 
-                # A 20.5 az az ingadozás, ami a páratlan-páros depth-eknél jön ki,
-                # ezért a danger_score stabilizálása érdekében levonjuk
-                best_eval_instability = min(50, best_eval_instability/4)-20.5
-            second_best_eval = eval_score_
-
-        danger_score = best_eval_instability
-
-        print(f"info depth {depth} score cp {eval_score_} pv {best_move}", flush=True)
+        print(f"info depth {depth} score cp {best_eval} pv {best_move}", flush=True)
 
     if timer_thread is not None:
         timer_thread.join()
@@ -157,8 +135,6 @@ def read_cmd():
         args = line.split()
         return args
     except EOFError:
-        return args
-    except:
         return args
 
 def send_cmd(args=None):
@@ -193,6 +169,7 @@ def UCI(args):
                 search_thread.join()
             stop_event.clear()
 
+            adaptive_style.reset_adaptive_values()
             board = chess.Board()
             tt.transposition_table.clear()
             for key in config.adaptive_style_oppoment_profile.keys():

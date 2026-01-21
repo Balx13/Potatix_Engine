@@ -25,22 +25,22 @@ def store_tt_entry(board, value, depth, flag):
             return
         del transposition_table[key]
     if len(transposition_table) >= Max_tt_size:
-        del transposition_table[next(iter(transposition_table))]
+        transposition_table.popitem()
     transposition_table[key] = TTEntry(value, depth, flag)
 
 
 def probe_tt(board, depth, alpha, beta):
-    # Lekéri a TT-t
-    
     key = chess.polyglot.zobrist_hash(board)
     entry = transposition_table.get(key)
+
     if entry is None or entry.depth < depth:
         return None
     if entry.flag == 'EXACT':
         return entry.value
-    elif entry.flag == 'LOWER' and entry.value >= beta:
+    if entry.flag == 'LOWER' and entry.value >= beta:
         return entry.value
-    elif entry.flag == 'UPPER' and entry.value <= alpha:
+    if entry.flag == 'UPPER' and entry.value <= alpha:
         return entry.value
+
     return None
 

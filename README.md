@@ -13,7 +13,7 @@
 > Currently, it is a hobby project, but I plan to turn it into a competitive engine in the future.
 
 ## Current Features:
-- Minimax algorithm with Alpha-Beta pruning
+- Negamax algorithm with Alpha-Beta pruning
 - Late Move Pruning and Late Move Reductions
 - Null move pruning
 - Transposition table
@@ -23,32 +23,32 @@
 - Basic evaluation
 - Killer moves
 - History heuristic
+- Adaptive mode
+
+## Limitations:
+### Does not use...
+- NNUE
+- MTD(f) or PVS search algorithms
+- multi-core parallelization
 
 ## Custom Developments:
 1. **Adaptive Mode**
 
 
-Most chess engines search for the best move against an assumed perfect opponent.
-In contrast, the Potatix Engine plays by exploiting the opponent’s weaknesses.
-For example, if the opponent weakens their king safety in the middlegame, the Potatix Engine starts attacking.
+Most chess engines search for the best move assuming an ideal opponent.
+The Potatix Engine, however, tries to exploit weaknesses in the opponent’s play.
+For example, if the opponent weakens their king’s safety in the middlegame, Potatix Engine will start attacking.
+
 - Status: Stable, but still under development.
-- For proper operation, the position must be provided using the `position startpos moves ...` command.
-
-2. **Danger Score**
-
-
-The engine calculates a danger_score value; the higher it is, the more dangerous the position.
-This value is used to regulate when the alpha-beta algorithm is allowed to prune a branch
-(in order to avoid the horizon effect).
-- Status: Stable, but it only slightly influences the search.
+- To work correctly, the position must be set using the `position startpos moves ...` command.
 
 ## Files
 ### The file distribution for the current version of the Potatix Engine is as follows:
  * README.md - The file you are reading now
- * LICENCE.txt - Potatix ​​Engine License Terms.
+ * LICENCE.txt - Potatix Engine License Terms.
  * google571f1ff7b4dfe5a2.html - This file is there so that the Google search engine, Microsoft Bing and other search engines can index this repository.
  * /logo - The logo of the Potatix Engine in different resolutions
- * /engine - This folder contains the chess engine source code.
+ * /scr - This folder contains the chess engine source code.
 
 ## Usage
 ### 1.) How to build
@@ -57,8 +57,8 @@ This value is used to regulate when the alpha-beta algorithm is allowed to prune
 3. Clone this repository with this command: `git clone https://github.com/Balx13/Potatix_Engine.git`
 4. Install Pyinstaller and python-chess with this command: `pip install pyinstaller chess`
 5. Run this command:
-* Linux/MacOS: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "engine:engine" engine/main.py`
-* Windows: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "engine;engine" engine/main.py`
+* Linux/MacOS: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "scr:scr" scr/main.py`
+* Windows: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "scr;scr" scr/main.py`
 7. The build will appear in the *dist* folder!
 
 ### 2.) How to use with GUI
@@ -109,24 +109,25 @@ The 'Potatix Engine' should not be confused with 'Potato Engine' or 'Potatix'.
 - Kezdetleges értékelő
 - Killer moves
 - History heuristic
+- Adaptív mód
+
+## Korlátok:
+### Nem használ...
+- NNUE-t
+- MTD(f) vagy PVS keresést
+- multi-core párhuzamosítást
+- bitboardokat
 
 ## Egyedi feljesztések:
 1. **Adaptív mód**
 
 
-A legtöbb sakkmotor egy feltételezett, tökéletes ellenfél ellen keresi a logjobb lépést.
-Ezzel szemben a Potatix Engine az ellenfele gyengeségeit kihasználva játszik.
-Például, ha az ellenfél középjátékban legyengíti a király védelmét, a Potatix Engine elkezd támadni.
+A legtöbb sakkmotor úgy működik, hogy egy elméleti, tökéletes ellenfél ellen keresi a legjobb lépést.
+A Potatix Engine ezzel szemben az ellenfél gyengeségeit próbálja kihasználni.
+Például, ha az ellenfél a középjátékban gyengíti a király védelmét, a Potatix Engine támadásba lendül.
+
 - Állapota: Stabil, de még fejlesztés alatt áll.
-- A megfeleő működéséhez az állást a `position startpos moves ...` paranccsal kell átadni.
-
-2. **Danger Score**
-
-
-A motor kiszámol egy danger_score értéket, ami minél magasabb, annál veszélyesebb az állás.
-Ezt az értéket arra használja, hogy szabályozza vele azt, hogy az alfabéta algoritmus mikor vághat le egy ágat(Horizon effektus elkerülése végett)
-- Állapota: Stabil, viszont csak enyhén befolyásolja a keresést
-
+- A megfelelő működéshez a pozíciót a `position startpos moves ...` paranccsal kell átadni.
 
 ## Fájlok
 ### A Potatix Engine jelenlegi verziójának fájlelosztása a következő:
@@ -134,7 +135,7 @@ Ezt az értéket arra használja, hogy szabályozza vele azt, hogy az alfabéta 
  * LICENCE.txt - A Potatix Engine licencfeltételei
  * google571f1ff7b4dfe5a2.html - Ez a fájl azért van, hogy a Google keresőmotor, a Microsoft Bing és más keresőmotorok ki tudják indexelni ezt a repository-t.
  * logo - A Potatix Engine logója különböző felbontásban
- * /engine - Ez a mappa tartalmazza a sakkmotor forráskódját.
+ * /scr - Ez a mappa tartalmazza a sakkmotor forráskódját.
 
 ## Használat
 ### 1.) Hogyan buildeld
@@ -143,8 +144,8 @@ Ezt az értéket arra használja, hogy szabályozza vele azt, hogy az alfabéta 
 3. Klónozd ezt a repository-t ezzel a paranccsal: `git clone https://github.com/Balx13/Potatix_Engine.git`
 4. Telepítsd a Pyinstaller-t és a python-chess-t ezzel a paranccsal: `pip install pyinstaller chess`
 5. Futtasd ezt a parancsot:
-* Linux/MacOS: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "engine:engine" engine/main.py`
-* Windows: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "engine;engine" engine/main.py`
+* Linux/MacOS: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "scr:scr" scr/main.py`
+* Windows: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "scr;scr" scr/main.py`
 7. A build ezután megjelenik a  *dist* mappában!
 
 ### 2.) Hogyan használd GUI-val:

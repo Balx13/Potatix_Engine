@@ -2,15 +2,14 @@
 /.idea/
 /.venv/
 # Egyéb
-/AI_alap/
+/Other_files
 list_files.py
 # Build
-main.spec
-PotatixEngine.spec
 /build
 /dist
-profil_result.prof
 # Bármilyen UCI sakkmotorral helyettesíthető
 /scripts/opening_book/stockfish_17.1.exe
+# Az opening book elérhető az scr/data mappában
 /scripts/opening_book/opening_book.jsonl
+# Lichess Elite Database
 /scripts/opening_book/lichess_elite_database_2021-10.pgn

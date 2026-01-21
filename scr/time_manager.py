@@ -3,8 +3,8 @@ This file is part of Potatix Engine
 Copyright (C) 2025-2026 Balázs André
 Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.txt)
 """
-from evulate import eval_king_safety
 import chess
+from evaluate import eval_king_safety
 from config import PIECE_VALUES
 
 

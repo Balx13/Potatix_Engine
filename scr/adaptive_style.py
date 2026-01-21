@@ -3,11 +3,11 @@ This file is part of Potatix Engine
 Copyright (C) 2025-2026 Balázs André
 Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.txt)
 """
-from cmath import phase
 
 import chess
-import evulate
+import evaluate
 from config import adaptive_style_oppoment_profile
+import config
 
 
 delta_multipliers = {
@@ -17,13 +17,61 @@ delta_multipliers = {
 }
 
 
+def calculate_adaptive_multipliers() -> None:
+    # Nem használ minden értéket a kód, de csak úgy van, hátha kell majd
+    multipliers = {
+        "engine": {
+                "mobility": max(1, 2-adaptive_style_oppoment_profile["king_safety"]),
+                "rook_op_files": 2 - adaptive_style_oppoment_profile["king_safety"],
+                "king_safety": adaptive_style_oppoment_profile["mobility"],
+                "pawns": 2-adaptive_style_oppoment_profile["trading"],
+                "position_values": max(1, 2-adaptive_style_oppoment_profile["trading"]), #} Csak 1.0-tól, mert érzékeny
+                "material": max(1, adaptive_style_oppoment_profile["rook_op_files"]),    #}
+                "bishop_pairs": 2-adaptive_style_oppoment_profile["pawns"]
+        },
+        "oppoment": {
+                "mobility":  max(1.0, adaptive_style_oppoment_profile["mobility"]),
+                "rook_op_files": adaptive_style_oppoment_profile["rook_op_files"],
+                "king_safety": adaptive_style_oppoment_profile["king_safety"],
+                "pawns": adaptive_style_oppoment_profile["pawns"],
+                "position_values": 1.0, # Itt nincs konkrétum
+                "material": max(1, adaptive_style_oppoment_profile["trading"]), #} Csak 1.0-tól, mert érzékeny
+                "bishop_pairs": 1.0 # Itt sincs konkrétum
+        }
+    }
+    config.multipliers = multipliers
+    return
+
+def reset_multipliers() -> None:
+    config.multipliers = {
+    "engine": {
+        "mobility": 1.0,
+        "rook_op_files": 1.0,
+        "king_safety": 1.0,
+        "pawns": 1.0,
+        "position_values": 1.0,
+        "material":  1.0,
+        "bishop_pairs": 1.0
+    },
+    "oppoment": {
+        "mobility": 1.0,
+        "rook_op_files": 1.0,
+        "king_safety": 1.0,
+        "pawns": 1.0,
+        "position_values": 1.0,
+        "material":  1.0,
+        "bishop_pairs": 1.0
+    }
+}
+    return
+
 def update_oppoment_style(args) -> None:
     board_local = chess.Board()
     for move in args[3:]:
         board_local.push_uci(move)
     engine_turn = board_local.turn
     last_fen = board_local.fen()
-    gp = evulate.game_phase(board_local)
+    gp = evaluate.game_phase(board_local)
 
     # Visszalépünk kettőt
     board_local.pop()
@@ -35,13 +83,13 @@ def update_oppoment_style(args) -> None:
         oppoment_turn = not engine_turn
         oppoment_color = chess.WHITE if oppoment_turn else chess.BLACK
         board__ = chess.Board(fen)
-        king_safety = evulate.eval_king_safety(board__, oppoment_color)
-        mobility = evulate.eval_mobility(board__, oppoment_color)
-        trading = evulate.eval_material(board__, oppoment_color) + mobility # Feszültség = anyag + ütési lehetőségek
-        pawns = evulate.eval_doubled_pawns(board__, oppoment_color) + \
-                evulate.eval_isolated_pawns(board__, oppoment_color) + \
-                evulate.eval_passed_pawns(board__) # Itt nincs konkrét color-mód, de meglátszik a változás
-        rook_op_files = evulate.eval_rook_open_files(board__, oppoment_color)
+        king_safety = evaluate.eval_king_safety(board__, oppoment_color)
+        mobility = evaluate.eval_mobility(board__, oppoment_color)
+        trading =  evaluate.eval_material(board__, oppoment_color) + mobility # Feszültség = anyag + ütési lehetőségek
+        pawns = evaluate.eval_doubled_pawns(board__, oppoment_color) + \
+                evaluate.eval_isolated_pawns(board__, oppoment_color) + \
+                evaluate.eval_passed_pawns(board__) # Itt nincs konkrét color-mód, de meglátszik a változás
+        rook_op_files = evaluate.eval_rook_open_files(board__, oppoment_color)
         return_dict = {
             "king_safety": abs(king_safety),
             "mobility": abs(mobility),
@@ -83,8 +131,8 @@ def update_oppoment_style(args) -> None:
     # Képlet: delta / súly * fázis_szorzó * tanulási_ráta
 
     updates = {
-        "king_safety": (ks_delta / 20) * delta_multipliers[gp]["king_safety"] * 0.02,
-        "mobility": (mb_delta / 2) * delta_multipliers[gp]["mobility"] * 0.02,
+        "king_safety": (ks_delta / 10) * delta_multipliers[gp]["king_safety"] * 0.02,
+        "mobility": (mb_delta / 1.1) * delta_multipliers[gp]["mobility"] * 0.02,
         "trading": (tr_delta / 800) * delta_multipliers[gp]["trading"] * 0.02,
         "pawns": (pw_delta / 40) * delta_multipliers[gp]["pawns"] * 0.02,
         "rook_op_files": (rp_delta / 20) * delta_multipliers[gp]["rook_op_files"] * 0.02
@@ -92,9 +140,13 @@ def update_oppoment_style(args) -> None:
     for key, change in updates.items():
         limited_change = max(-max_update, min(max_update, change))
         new_value = adaptive_style_oppoment_profile[key] + limited_change
-        adaptive_style_oppoment_profile[key] = max(0.5, min(1.5, new_value))
+        adaptive_style_oppoment_profile[key] = max(0.7, min(1.3, new_value))
+
+    calculate_adaptive_multipliers()
     return
 
 def reset_adaptive_values():
     for key in adaptive_style_oppoment_profile.keys():
         adaptive_style_oppoment_profile[key] = 1.0
+    reset_multipliers()
+    return

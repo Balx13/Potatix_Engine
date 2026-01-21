@@ -5,7 +5,13 @@ Potatix Engine is licensed under a CUSTOM REDISTRIBUTION LICENSE (see LICENCE.tx
 """
 
 import chess
-from config import position_values, PIECE_VALUES, tapered_weights, adaptive_style_oppoment_profile
+import config
+import math
+
+def truncate(x: float) -> float:
+    factor = 10**4  # 4 tizedesjegy megtartása
+    return math.trunc(x * factor) / factor
+
 
 def game_phase(board: chess.Board) -> str:
     # Azt próbálja megmondani, hogy megnyitásban, középjátékban, vagy végjátékban vagyunk
@@ -24,34 +30,35 @@ def game_phase(board: chess.Board) -> str:
     return "middlegame"
 
 
-def position_value_get(piece_type, sq, phase) -> int:
+def position_value_get(piece_type, sq_, phase) -> float:
+    sq = chess.square_mirror(sq_)
     if piece_type == chess.PAWN:
-        return position_values["pawn"][sq]
+        return config.position_values["pawn"][sq]
     elif piece_type == chess.KNIGHT:
-        return position_values["knight"][sq]
+        return config.position_values["knight"][sq]
     elif piece_type == chess.BISHOP:
         if phase == "endgame":
-            return position_values["bishop_eg"][sq]
+            return config.position_values["bishop_eg"][sq]
         else:
-            return position_values["bishop_mg"][sq]
+            return config.position_values["bishop_mg"][sq]
     elif piece_type == chess.ROOK:
-        return position_values["rook"][sq]
+        return config.position_values["rook"][sq]
     elif piece_type == chess.QUEEN:
         if phase == "opening":
-            return position_values["queen_op"][sq]
+            return config.position_values["queen_op"][sq]
         else:
-            return position_values["queen_op"][sq]
+            return config.position_values["queen_mg"][sq]
     elif piece_type == chess.KING:
         if phase == "endgame":
-            return position_values["king_eg"][sq]
+            return config.position_values["king_eg"][sq]
         else:
-            return position_values["king_mg"][sq]
+            return config.position_values["king_mg"][sq]
     return 0
 
 
-def eval_position_values(board: chess.Board, phase) -> int:
+def eval_position_values(board: chess.Board, phase) -> float:
     score = 0
-    for piece_type in PIECE_VALUES.keys():
+    for piece_type in config.PIECE_VALUES.keys():
         for sq in board.pieces(piece_type, chess.WHITE):
             score += position_value_get(piece_type, sq, phase)
         for sq in board.pieces(piece_type, chess.BLACK):
@@ -59,18 +66,18 @@ def eval_position_values(board: chess.Board, phase) -> int:
     return score
 
 
-def eval_material(board: chess.Board, color_param=None) -> int:
+def eval_material(board: chess.Board, color_param=None) -> float:
     # A color_param paraméter akkor használatos, hogyha csak az egyik felet akarjuk mérni
     score = 0
-    for piece, value in PIECE_VALUES.items():
-        if color_param:
+    for piece, value in config.PIECE_VALUES.items():
+        if color_param is not None:
             score += len(board.pieces(piece, color_param)) * value
         else:
             score += len(board.pieces(piece, chess.WHITE)) * value
             score -= len(board.pieces(piece, chess.BLACK)) * value
     return score
 
-def eval_mobility(board: chess.Board, color=None) -> int:
+def eval_mobility(board: chess.Board, color_param=None) -> float:
     # A color_param paraméter akkor használatos, hogyha csak az egyik felet akarjuk mérni
     def mobility(colorr):
         old_turn = board.turn
@@ -78,13 +85,13 @@ def eval_mobility(board: chess.Board, color=None) -> int:
         data = board.legal_moves.count()
         board.turn = old_turn
         return data
-    if color:
-        mobility_score = mobility(color)
+    if color_param is not None:
+        mobility_score = mobility(color_param)
     else:
         mobility_score = (mobility(chess.WHITE) - mobility(chess.BLACK))
-    return mobility_score * 2
+    return mobility_score * 1.1
 
-def eval_king_safety(board: chess.Board, color_param=None) -> int:
+def eval_king_safety(board: chess.Board, color_param=None) -> float:
     # A color_param paraméter akkor használatos, hogyha csak az egyik felet akarjuk mérni
     score = 0
 
@@ -95,7 +102,7 @@ def eval_king_safety(board: chess.Board, color_param=None) -> int:
         chess.ROOK: 3,
         chess.QUEEN: 4
     }
-    if color_param:
+    if color_param is not None:
         colors = (color_param,)
     else:
         colors = (chess.WHITE, chess.BLACK)
@@ -117,21 +124,34 @@ def eval_king_safety(board: chess.Board, color_param=None) -> int:
         file = chess.square_file(king_sq)
         rank = chess.square_rank(king_sq)
         shield_rank = rank + 1 if color == chess.WHITE else rank - 1
+        is_castled_side = file <= 2 or file >= 5
         if 0 <= shield_rank <= 7:
             for df in (-1, 0, 1):
                 f = file+df
                 if 0 <= f <= 7:
                     shield_sq = chess.square(f, shield_rank)
                     if board.piece_at(shield_sq) != chess.Piece(chess.PAWN, color):
-                        danger += 2
+                        fianchetto_rank = shield_rank + (1 if color == chess.WHITE else -1)
+                        if 0 <= fianchetto_rank <= 7:
+                            fianchetto_sq = chess.square(f, fianchetto_rank)
+                            if board.piece_at(fianchetto_sq) == chess.Piece(chess.PAWN, color):
+                                if is_castled_side:
+                                    danger += 0.5
+                                else:
+                                    danger += 0.25
+                            else:
+                                if is_castled_side:
+                                    danger += 2
+                                else:
+                                    danger += 1
 
-        score -= sign * danger * 20
+        score -= sign * danger * 10
     return score
 
-def eval_doubled_pawns(board: chess.Board, color_param=None) -> int:
+def eval_doubled_pawns(board: chess.Board, color_param=None) -> float:
     # A color_param paraméter akkor használatos, hogyha csak az egyik felet akarjuk mérni
     score = 0
-    if color_param:
+    if color_param is not None:
         colors = (color_param,)
     else:
         colors = (chess.WHITE, chess.BLACK)
@@ -146,10 +166,10 @@ def eval_doubled_pawns(board: chess.Board, color_param=None) -> int:
     return score
 
 
-def eval_isolated_pawns(board: chess.Board, color_param=None) -> int:
+def eval_isolated_pawns(board: chess.Board, color_param=None) -> float:
     # A color_param paraméter akkor használatos, hogyha csak az egyik felet akarjuk mérni
     score = 0
-    if color_param:
+    if color_param is not None:
         colors = (color_param,)
     else:
         colors = (chess.WHITE, chess.BLACK)
@@ -165,7 +185,7 @@ def eval_isolated_pawns(board: chess.Board, color_param=None) -> int:
     return score
 
 
-def eval_passed_pawns(board: chess.Board) -> int:
+def eval_passed_pawns(board: chess.Board) -> float:
     score = 0
     PASSED_PAWN_BONUS = [0, 0, 10, 20, 35, 60, 90, 0]
 
@@ -200,7 +220,7 @@ def eval_passed_pawns(board: chess.Board) -> int:
     return score
 
 
-def eval_pawns(board: chess.Board) -> int:
+def eval_pawns(board: chess.Board) -> float:
     score = 0
 
     score += eval_doubled_pawns(board)
@@ -209,10 +229,10 @@ def eval_pawns(board: chess.Board) -> int:
 
     return score
 
-def eval_rook_open_files(board: chess.Board, color_param=None) -> int:
+def eval_rook_open_files(board: chess.Board, color_param=None) -> float:
     # A color_param paraméter akkor használatos, hogyha csak az egyik felet akarjuk mérni
     score = 0
-    if color_param:
+    if color_param is not None:
         colors = (color_param,)
     else:
         colors = (chess.WHITE, chess.BLACK)
@@ -232,7 +252,7 @@ def eval_rook_open_files(board: chess.Board, color_param=None) -> int:
                 score += sign * 10
     return score
 
-def eval_bishop_pair(board) -> int:
+def eval_bishop_pair(board) -> float:
     score = 0
     base = 25
     OPEN_BONUS = 10
@@ -249,25 +269,39 @@ def eval_bishop_pair(board) -> int:
         score -= base + open_factor
     return score
 
-def evaluate(board: chess.Board) -> float:
+def evaluate(board: chess.Board, ply) -> float:
+    ######################
+    # Objektív értékelés #
+    ######################
+
     mate_score = 1_000_000
     if board.is_checkmate():
-        return -mate_score if board.turn else mate_score
+        return -mate_score+ply if board.turn else mate_score-ply
     if board.is_stalemate() or board.is_insufficient_material():
         return 0
 
     phase = game_phase(board)
-    w = tapered_weights[phase]
+    w = config.tapered_weights[phase]
     score = 0
-    score += eval_position_values(board, phase)
-    score += eval_bishop_pair(board) * w["bishop_pair"]
-    score += eval_material(board) * adaptive_style_oppoment_profile["rook_op_files"]
-    score += eval_mobility(board) * w["mobility"] * (2.0-adaptive_style_oppoment_profile["king_safety"])
-    score += eval_king_safety(board) * w["king_safety"] * adaptive_style_oppoment_profile["mobility"]
-    score += eval_pawns(board) * w["pawn_structure"] * (2.0-adaptive_style_oppoment_profile["trading"])
-    score += eval_rook_open_files(board) * w["rook_files"] * (2.0-adaptive_style_oppoment_profile["pawns"])
+    position_values_score = eval_position_values(board, phase)
+    bishop_pair_score = eval_bishop_pair(board) * w["bishop_pair"]
+    material_score = eval_material(board)
+    mobility_score = eval_mobility(board) * w["mobility"]
+    king_safety_score = eval_king_safety(board) * w["king_safety"]
+    pawns_score = eval_pawns(board) * w["pawn_structure"]
+    rook_open_files_score = eval_rook_open_files(board) * w["rook_files"]
 
-    return score
+    #############
+    # Összeadás #
+    #############
+    score += position_values_score
+    score += bishop_pair_score
+    score += material_score
+    score += mobility_score
+    score += king_safety_score
+    score += pawns_score
+    score += rook_open_files_score
+    return truncate(score)
 
 def test_startpos():
     assert abs(evaluate(chess.Board())) < 5
@@ -284,3 +318,4 @@ def test_symmetry(fen):
 #print(evaluate(chess.Board("r1b2r1k/1pp3pp/2n5/p1Q1p1q1/8/2NP2P1/PP2PPBP/R4RK1 b - - 0 13")))
 
 #test_symmetry("r1b2r1k/1pp3pp/2n5/p1Q1p1q1/8/2NP2P1/PP2PPBP/R4RK1 b - - 0 13")
+#test_symmetry("rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq - 0 1")
