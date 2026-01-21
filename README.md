@@ -30,6 +30,7 @@
 - NNUE
 - MTD(f) or PVS search algorithms
 - multi-core parallelization
+- bitboards
 
 ## Custom Developments:
 1. **Adaptive Mode**
