@@ -18,7 +18,7 @@
 - Null move pruning
 - Transposition table
 - Move ordering
-- Quicksense
+- Quiescence
 - UCI communication
 - Basic evaluation
 - Killer moves
@@ -105,7 +105,7 @@ The 'Potatix Engine' should not be confused with 'Potato Engine' or 'Potatix'.
 - Null move pruning
 - Tranzpozíciós tábla
 - Move ordering
-- Quicksense
+- Quiescence
 - UCI kommunikáció
 - Kezdetleges értékelő
 - Killer moves
