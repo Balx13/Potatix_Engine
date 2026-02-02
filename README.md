@@ -87,11 +87,9 @@ The 'Potatix Engine' should not be confused with 'Potato Engine' or 'Potatix'.
 **Author:** Balázs André
 > Future plans: Once a larger community has formed, I plan to relicense the engine under GPL-3 to allow broader usage while protecting the source code.
 
-<div align="center">
-  
-<p align="center"><em>Magyar verzió</em></p>
 
-</div>
+<details>
+<summary> Magyar verzió 🇭🇺</summary>
 
 ## A porjektről
 ### Magyar fejlesztésű ingyenes és nyílt forráskódú adaptív sakkmotor 🇭🇺
@@ -173,3 +171,5 @@ A "Potatix Engine" név nem összekeverendő a "Potato Engine"-vel vagy a "Potat
 
 **Szerző:** Balázs André
 > Jövőbeli terv: Amint nagyobb közösség alakul, a motor GPL-3 licencre váltását tervezem, hogy szélesebb körben lehessen használni, miközben a forráskód védve marad.
+
+</details>
