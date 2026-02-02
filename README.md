@@ -52,23 +52,6 @@ For example, if the opponent weakens their king’s safety in the middlegame, Po
  * /logo - The logo of the Potatix Engine in different resolutions
  * /scr - This folder contains the chess engine source code.
 
-## Usage
-### 1.) How to build
-1. Install [Git](https://git-scm.com)
-2. Install [Python](https://www.python.org)
-3. Clone this repository with this command: `git clone https://github.com/Balx13/Potatix_Engine.git`
-4. Install Pyinstaller and python-chess with this command: `pip install pyinstaller chess`
-5. Run this command:
-* Linux/MacOS: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "scr:scr" scr/main.py`
-* Windows: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "scr;scr" scr/main.py`
-7. The build will appear in the *dist* folder!
-
-### 2.) How to use with GUI
-> This process is different for each GUI, in this example we will use a GUI called arena
-1. Go to *engines -> install new engine...*
-2. Browse engine build
-3. Click the **"open"** button
-4. In the pop-up menu, click *"ok"* or *"yes"*
 
 ### Opening Book Generation
 
@@ -137,23 +120,6 @@ Például, ha az ellenfél a középjátékban gyengíti a király védelmét, a
  * logo - A Potatix Engine logója különböző felbontásban
  * /scr - Ez a mappa tartalmazza a sakkmotor forráskódját.
 
-## Használat
-### 1.) Hogyan buildeld
-1. Telepítsd a [Git](https://git-scm.com)-et
-2. Telepítsd a [Python](https://www.python.org)-t
-3. Klónozd ezt a repository-t ezzel a paranccsal: `git clone https://github.com/Balx13/Potatix_Engine.git`
-4. Telepítsd a Pyinstaller-t és a python-chess-t ezzel a paranccsal: `pip install pyinstaller chess`
-5. Futtasd ezt a parancsot:
-* Linux/MacOS: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "scr:scr" scr/main.py`
-* Windows: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "scr;scr" scr/main.py`
-7. A build ezután megjelenik a  *dist* mappában!
-
-### 2.) Hogyan használd GUI-val:
-> Ez a folyamat minden GUI  esetében más, ebben a példában az arena nevű GUI-t fogjuk használni.
-1. Menj az  *engines -> install new engine...* fülre
-2. Tallózd a motor buildjét
-3. Kattints az **"open"** gombra
-4. A megjelenő menüben kattints az *"ok"* vagy *"yes"* gombra
 
 ### Megnyitási könyv létrehozása
 
