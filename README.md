@@ -82,7 +82,7 @@ The 'Potatix Engine' should not be confused with 'Potato Engine' or 'Potatix'.
 > Jelenleg hobbi projekt, de a jövőben tervezem, hogy versenymotorrá alakítom.
 
 ## Jelenlegi Funkciók:
-- Minimax algoritmus AlphaBeta vágással
+- Negamax algoritmus AlphaBeta vágással
 - Late Move Pruning és Late Move Reductions
 - Null move pruning
 - Tranzpozíciós tábla
