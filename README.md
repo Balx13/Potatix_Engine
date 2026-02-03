@@ -33,6 +33,10 @@
 - multi-core parallelization
 - bitboards
 
+## Licenses:
+- Everything about Potatix ​​Engine — the source code, the source code, the logo, the name, and the documentation — is licensed under the GPLv3. \
+You are free to use, copy, and modify it under the terms of the GPL. (see: LICENCE.txt)
+
 ## Custom Developments:
 1. **Adaptive Mode**
 
@@ -48,7 +52,6 @@ For example, if the opponent weakens their king’s safety in the middlegame, Po
 ### The file distribution for the current version of the Potatix Engine is as follows:
  * README.md - The file you are reading now
  * LICENCE.txt - Potatix Engine License Terms.
- * google571f1ff7b4dfe5a2.html - This file is there so that the Google search engine, Microsoft Bing and other search engines can index this repository.
  * /logo - The logo of the Potatix Engine in different resolutions
  * /scr - This folder contains the chess engine source code.
 
@@ -60,7 +63,6 @@ The opening book used in this project was generated using:
 - [**Lichess Elite Database**](https://database.nikonoel.fr), which contains high-level games used for training and reference.
 - [**Stockfish 17.1**](https://github.com/official-stockfish/Stockfish) chess engine, used to evaluate positions and assign move scores.
 
-**License:** The resulting opening book is released under the [CC BY-NC-SA 4.0 license](https://creativecommons.org/licenses/by-nc-sa/4.0/), allowing non-commercial use with attribution and share-alike requirements.
 
 ## Contributing
 If you would like to contribute to the project or have found a bug, please open a **Pull request** or an **Issue**. \
@@ -69,7 +71,6 @@ If you would like to contribute to the project or have found a bug, please open 
 The 'Potatix Engine' should not be confused with 'Potato Engine' or 'Potatix'.
 
 **Author:** Balázs André
-> Future plans: Once a larger community has formed, I plan to relicense the engine under GPL-3 to allow broader usage while protecting the source code.
 
 
 <details>
@@ -101,6 +102,10 @@ The 'Potatix Engine' should not be confused with 'Potato Engine' or 'Potatix'.
 - multi-core párhuzamosítást
 - bitboardokat
 
+## Licencek:
+- Minden, ami a Potatix Engine-hez tartozik — a forráskód, a brinális kód, a logó, a név és a dokumentáció — a GPLv3 alatt van. \
+Szabadon használhatod, másolhatod és módosíthatod a GPL feltételei szerint. (lásd: LICENCE.txt)
+
 ## Egyedi feljesztések:
 1. **Adaptív mód**
 
@@ -116,7 +121,6 @@ Például, ha az ellenfél a középjátékban gyengíti a király védelmét, a
 ### A Potatix Engine jelenlegi verziójának fájlelosztása a következő:
  * README.md - Ezt a féjlt olvasod most
  * LICENCE.txt - A Potatix Engine licencfeltételei
- * google571f1ff7b4dfe5a2.html - Ez a fájl azért van, hogy a Google keresőmotor, a Microsoft Bing és más keresőmotorok ki tudják indexelni ezt a repository-t.
  * logo - A Potatix Engine logója különböző felbontásban
  * /scr - Ez a mappa tartalmazza a sakkmotor forráskódját.
 
@@ -128,7 +132,6 @@ A projektben használt megnyitási könyvet a következő források felhasznál�
 - [**Lichess Elite Database**](https://database.nikonoel.fr), amely magas szintű játszmákat tartalmaz a tanuláshoz és referenciaként.
 - [**Stockfish 17.1**](https://github.com/official-stockfish/Stockfish) sakkmotor, amelyet a pozíciók értékelésére és a lépések pontozására használtam.
 
-**Licenc:** A megnyitási könyv a [CC BY-NC-SA 4.0 licenc](https://creativecommons.org/licenses/by-nc-sa/4.0) alatt került kiadásra, amely lehetővé teszi a nem kereskedelmi célú felhasználást, megköveteli a szerző feltüntetését és a share-alike szabályok betartását.
 
 ## Hozzájárulás
 Ha szeretnél hozzájárulni a projekthez, kérlek nyiss egy **Pull request**-et vagy egy **Issue**-t. \
@@ -137,6 +140,5 @@ Ha szeretnél hozzájárulni a projekthez, kérlek nyiss egy **Pull request**-et
 A "Potatix Engine" név nem összekeverendő a "Potato Engine"-vel vagy a "Potatix"-xal.
 
 **Szerző:** Balázs André
-> Jövőbeli terv: Amint nagyobb közösség alakul, a motor GPL-3 licencre váltását tervezem, hogy szélesebb körben lehessen használni, miközben a forráskód védve marad.
 
 </details>
