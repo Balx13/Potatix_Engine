@@ -7,7 +7,8 @@
 <p align="center"><em>English version</em></p>
 
 ## About the project
-### Hungarian-developed free and open source adaptive chess engine 🇭🇺
+### Free and open-source chess engine that adaptively adjusts to the opponent and tailors its search accordingly.
+
 
 > This engine is still in the alpha stage and is written in Python, so it is quite slow. Future plans include rewriting it in Rust to improve performance. \
 > Currently, it is a hobby project, but I plan to turn it into a competitive engine in the future.
@@ -18,7 +19,7 @@
 - Null move pruning
 - Transposition table
 - Move ordering
-- Quicksense
+- Quiescence
 - UCI communication
 - Basic evaluation
 - Killer moves
@@ -30,6 +31,7 @@
 - NNUE
 - MTD(f) or PVS search algorithms
 - multi-core parallelization
+- bitboards
 
 ## Custom Developments:
 1. **Adaptive Mode**
@@ -50,23 +52,6 @@ For example, if the opponent weakens their king’s safety in the middlegame, Po
  * /logo - The logo of the Potatix Engine in different resolutions
  * /scr - This folder contains the chess engine source code.
 
-## Usage
-### 1.) How to build
-1. Install [Git](https://git-scm.com)
-2. Install [Python](https://www.python.org)
-3. Clone this repository with this command: `git clone https://github.com/Balx13/Potatix_Engine.git`
-4. Install Pyinstaller and python-chess with this command: `pip install pyinstaller chess`
-5. Run this command:
-* Linux/MacOS: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "scr:scr" scr/main.py`
-* Windows: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "scr;scr" scr/main.py`
-7. The build will appear in the *dist* folder!
-
-### 2.) How to use with GUI
-> This process is different for each GUI, in this example we will use a GUI called arena
-1. Go to *engines -> install new engine...*
-2. Browse engine build
-3. Click the **"open"** button
-4. In the pop-up menu, click *"ok"* or *"yes"*
 
 ### Opening Book Generation
 
@@ -86,25 +71,23 @@ The 'Potatix Engine' should not be confused with 'Potato Engine' or 'Potatix'.
 **Author:** Balázs André
 > Future plans: Once a larger community has formed, I plan to relicense the engine under GPL-3 to allow broader usage while protecting the source code.
 
-<div align="center">
-  
-<p align="center"><em>Magyar verzió</em></p>
 
-</div>
+<details>
+<summary> Magyar verzió 🇭🇺</summary>
 
 ## A porjektről
-### Magyar fejlesztésű ingyenes és nyílt forráskódú adaptív sakkmotor 🇭🇺
+### Ingyenes és nyílt forráskódú sakkmotor, ami adaptívan alkalmazkodik az ellenfeléhez, és ahhoz igazítja a keresést.
 
 > Ez a motor még alfa fázisban van Pythonban, így nagyon lassú. A jövőbeli tervek között szerepel, hogy átírom Rust nyelvbe a motor felgyorsítása érdekében. \
 > Jelenleg hobbi projekt, de a jövőben tervezem, hogy versenymotorrá alakítom.
 
 ## Jelenlegi Funkciók:
-- Minimax algoritmus AlphaBeta vágással
+- Negamax algoritmus AlphaBeta vágással
 - Late Move Pruning és Late Move Reductions
 - Null move pruning
 - Tranzpozíciós tábla
 - Move ordering
-- Quicksense
+- Quiescence
 - UCI kommunikáció
 - Kezdetleges értékelő
 - Killer moves
@@ -137,23 +120,6 @@ Például, ha az ellenfél a középjátékban gyengíti a király védelmét, a
  * logo - A Potatix Engine logója különböző felbontásban
  * /scr - Ez a mappa tartalmazza a sakkmotor forráskódját.
 
-## Használat
-### 1.) Hogyan buildeld
-1. Telepítsd a [Git](https://git-scm.com)-et
-2. Telepítsd a [Python](https://www.python.org)-t
-3. Klónozd ezt a repository-t ezzel a paranccsal: `git clone https://github.com/Balx13/Potatix_Engine.git`
-4. Telepítsd a Pyinstaller-t és a python-chess-t ezzel a paranccsal: `pip install pyinstaller chess`
-5. Futtasd ezt a parancsot:
-* Linux/MacOS: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "scr:scr" scr/main.py`
-* Windows: `pyinstaller --onefile --name PotatixEngine --icon=logo/PotatixEngine_logo128px.png --add-data "scr;scr" scr/main.py`
-7. A build ezután megjelenik a  *dist* mappában!
-
-### 2.) Hogyan használd GUI-val:
-> Ez a folyamat minden GUI  esetében más, ebben a példában az arena nevű GUI-t fogjuk használni.
-1. Menj az  *engines -> install new engine...* fülre
-2. Tallózd a motor buildjét
-3. Kattints az **"open"** gombra
-4. A megjelenő menüben kattints az *"ok"* vagy *"yes"* gombra
 
 ### Megnyitási könyv létrehozása
 
@@ -172,3 +138,5 @@ A "Potatix Engine" név nem összekeverendő a "Potato Engine"-vel vagy a "Potat
 
 **Szerző:** Balázs André
 > Jövőbeli terv: Amint nagyobb közösség alakul, a motor GPL-3 licencre váltását tervezem, hogy szélesebb körben lehessen használni, miközben a forráskód védve marad.
+
+</details>
