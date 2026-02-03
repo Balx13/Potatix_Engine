@@ -282,7 +282,7 @@ def evaluate(board: chess.Board, ply) -> float:
 
     phase = game_phase(board)
     w = config.tapered_weights[phase]
-    score = 0
+    score = 0.0
     position_values_score = eval_position_values(board, phase)
     bishop_pair_score = eval_bishop_pair(board) * w["bishop_pair"]
     material_score = eval_material(board)
@@ -301,7 +301,10 @@ def evaluate(board: chess.Board, ply) -> float:
     score += king_safety_score
     score += pawns_score
     score += rook_open_files_score
-    return truncate(score)
+    score = truncate(score)
+    if score == -0.0:
+        return 0.0
+    return score
 
 def test_startpos():
     assert abs(evaluate(chess.Board())) < 5

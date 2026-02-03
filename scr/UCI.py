@@ -207,8 +207,7 @@ def UCI(args):
                         board.push_uci(move)
             elif args[1] == "fen":
                 if config.adaptive_mode:
-                    print("info string Error: Adaptive mode is enabled, \
-                    but the position was not set up as expected. Adaptive mode has been disabled.")
+                    print("info string Warning: Adaptive mode disabled (non-startpos position).")
                     adaptive_style.reset_adaptive_values()
                 if "moves" in args:
                     moves_index = args.index("moves")

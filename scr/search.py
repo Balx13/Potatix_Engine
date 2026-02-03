@@ -108,6 +108,8 @@ def alphabeta(
             previous_null_move=True
         )
         eval_score = -score
+        if eval_score == -0.0:
+            eval_score = 0.0
         board.pop()
         if eval_score >= beta:
             return eval_score, None
@@ -137,6 +139,8 @@ def alphabeta(
             previous_null_move=True
         )
         eval_score = -score
+        if eval_score == -0.0:
+            eval_score = 0.0
 
         if current_lmr and eval_score > alpha:
             score, _ = alphabeta(
@@ -148,6 +152,8 @@ def alphabeta(
                 previous_null_move=True
             )
             eval_score = -score
+            if eval_score == -0.0:
+                eval_score = 0.0
         board.pop()
 
         if (ply == 0
