@@ -24,6 +24,7 @@
 - Basic evaluation
 - Killer moves
 - History heuristic
+- Optening book
 - Adaptive mode
 
 ## Limitations:
@@ -93,6 +94,7 @@ The 'Potatix Engine' should not be confused with 'Potato Engine' or 'Potatix'.
 - Kezdetleges értékelő
 - Killer moves
 - History heuristic
+- Megnyitási könyv
 - Adaptív mód
 
 ## Korlátok:
