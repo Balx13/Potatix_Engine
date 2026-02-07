@@ -36,7 +36,6 @@ def see(board: chess.Board, move: chess.Move) -> int:
     if captured is None or attacker is None:
         return 0
 
-    # Leütött figura értéke
     gain = [PIECE_VALUES[captured.piece_type]]
 
     board.push(move)
@@ -49,7 +48,7 @@ def see(board: chess.Board, move: chess.Move) -> int:
 
         if not attackers:
             break
-        # legolcsóbb támadó
+
         least_sq = min(
             attackers,
             key=lambda sq: PIECE_VALUES[board.piece_at(sq).piece_type]
@@ -66,11 +65,10 @@ def see(board: chess.Board, move: chess.Move) -> int:
         depth += 1
         side = not side
 
-    # visszaterjesztés
     for i in range(len(gain) - 2, -1, -1):
         gain[i] = max(gain[i], -gain[i + 1])
 
-    board.pop() # az első move
+    board.pop()
     for _ in range(depth):
         board.pop()
 
