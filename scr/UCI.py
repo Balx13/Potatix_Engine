@@ -160,6 +160,132 @@ def send_cmd(args=None):
             return "quit"
     return None
 
+def setoption(args) -> None:
+    name_index = args.index("name")
+    value_index = args.index("value")
+    if args[name_index + 1] == "MaxDepth":
+        value = value_index + 1
+        if 1 <= value <= 100_000:
+            config.MAX_DEPTH = int(args[value_index + 1])
+            config.killer_moves = [[] for _ in range(config.MAX_DEPTH)]
+        else:
+            print("info string Error: the value is too large or too small", flush=True)
+    elif args[name_index + 1] == "TTSize":
+        value = int(args[value_index + 1])
+        if 1 <= value <= 100_000_000:
+            tt.Max_tt_size = value
+        else:
+            print("info string Error: the value is too large or too small", flush=True)
+    elif args[name_index + 1] == "AdaptiveMode":
+        value = str(args[value_index + 1])
+        if value.lower() == "true":
+            config.adaptive_mode = True
+        elif value.lower() == "false":
+            config.adaptive_mode = False
+        else:
+            print("info string Error: the value is not true or false", flush=True)
+
+def go(args) -> None:
+    global search_thread
+    if search_thread and search_thread.is_alive():
+        stop_event.set()
+        search_thread.join()
+    stop_event.clear()
+
+    if len(args) == 1:
+        search_thread = threading.Thread(target=search_worker, args=(config.MAX_DEPTH,))
+        search_thread.start()
+    elif len(args) == 3 and args[1] == "depth":
+        search_thread = threading.Thread(target=search_worker, args=(int(args[2]),), kwargs={"forced_child": True})
+        search_thread.start()
+    elif len(args) == 3 and args[1] == "movetime":
+        movetime_index = args.index("movetime")
+        movetime = float(args[movetime_index + 1]) / 1000
+        search_thread = threading.Thread(target=search_worker, args=(config.MAX_DEPTH, movetime, movetime, 0, 0, 1))
+        search_thread.start()
+    elif len(args) > 4:
+        if "wtime" in args:  # ha már van wtime, akkor biztos, hogy kapunk időt
+            wtime_index = args.index("wtime")
+            btime_index = args.index("btime")
+            wtime = float(args[wtime_index + 1]) / 1000
+            btime = float(args[btime_index + 1]) / 1000
+
+            winc = 0
+            binc = 0
+            moves_to_go = None
+            if "winc" in args:
+                winc_index = args.index("winc")
+                binc_index = args.index("binc")
+                winc = float(args[winc_index + 1]) / 1000
+                binc = float(args[binc_index + 1]) / 1000
+                if "moves_to_go" in args:
+                    moves_to_go_index = args.index("moves_to_go")
+                    moves_to_go = float(args[moves_to_go_index + 1])
+            search_thread = threading.Thread(
+                target=search_worker,
+                args=(config.MAX_DEPTH, wtime, btime, winc, binc, moves_to_go)
+            )
+            search_thread.start()
+
+def position(args) -> None:
+    global board
+    if args[1] == "startpos":
+        board = chess.Board(chess.STARTING_FEN)
+        if "moves" in args:
+            if config.adaptive_mode:
+                if len(args[3:]) > 4:
+                    adaptive_style.update_oppoment_style(args)
+            else:
+                adaptive_style.reset_adaptive_values()
+            for move in args[3:]:
+                board.push_uci(move)
+    elif args[1] == "fen":
+        if config.adaptive_mode:
+            adaptive_style.reset_adaptive_values()
+        if "moves" in args:
+            moves_index = args.index("moves")
+            board = chess.Board(" ".join(args[2:moves_index]))
+
+            if config.adaptive_mode:
+                if len(args[3:]) > 4:
+                    adaptive_style.update_oppoment_style(args)
+            else:
+                adaptive_style.reset_adaptive_values()
+
+            for move in args[moves_index + 1:]:
+                board.push_uci(move)
+        else:
+            board = chess.Board(" ".join(args[2:]))
+
+def quit_cmd() -> str:
+    if search_thread and search_thread.is_alive():
+        stop_event.set()
+        search_thread.join()
+
+    stop_event.clear()
+    return "quit"
+
+def reset() -> None:
+    global board
+    if search_thread and search_thread.is_alive():  # leállítjuk a keresést, ha a GUI nem tette meg
+        stop_event.set()
+        search_thread.join()
+    stop_event.clear()
+
+    adaptive_style.reset_adaptive_values()
+    board = chess.Board()
+    tt.transposition_table.clear()
+    for key in config.adaptive_style_oppoment_profile.keys():
+        config.adaptive_style_oppoment_profile[key] = 1.0
+
+    for km in config.killer_moves:
+        km.clear()
+
+    for piece_type in range(6):
+        for from_sq in range(64):
+            for to_sq in range(64):
+                config.history_heuristic[piece_type][from_sq][to_sq] = 0
+
 def UCI(args):
     # Ez kezeli az UCI protokollt
     global search_thread, board
@@ -176,128 +302,17 @@ def UCI(args):
         elif args[0] == "isready":
             print("readyok", flush=True)
         elif args[0] == "ucinewgame":
-            if search_thread and search_thread.is_alive(): # leállítjuk a keresést, ha a GUI nem tette meg
-                stop_event.set()
-                search_thread.join()
-            stop_event.clear()
-
-            adaptive_style.reset_adaptive_values()
-            board = chess.Board()
-            tt.transposition_table.clear()
-            for key in config.adaptive_style_oppoment_profile.keys():
-                config.adaptive_style_oppoment_profile[key] = 1.0
-
-            for km in config.killer_moves:
-                km.clear()
-
-            for piece_type in range(6):
-                for from_sq in range(64):
-                    for to_sq in range(64):
-                        config.history_heuristic[piece_type][from_sq][to_sq] = 0
-
+            reset()
         elif args[0] == "quit":
-            if search_thread and search_thread.is_alive():
-                stop_event.set()
-                search_thread.join()
-
-            stop_event.clear()
-            return "quit"
-
+            return quit_cmd()
         elif args[0] == "position":
-            if args[1] == "startpos":
-                board = chess.Board(chess.STARTING_FEN)
-                if len(args) > 2:
-                    if config.adaptive_mode:
-                        if len(args[3:]) > 4: # Ha van elég lépés
-                            adaptive_style.update_oppoment_style(args)
-                            # Azért kell törölni, mert az adaptív mód eltorzítja az értékeket,
-                            # így a tt a régebbi torzítások eredményeit is tárolhatja
-                            tt.transposition_table.clear()
-                    else:
-                        adaptive_style.reset_adaptive_values()
-                    for move in args[3:]:
-                        board.push_uci(move)
-            elif args[1] == "fen":
-                if config.adaptive_mode:
-                    print("info string Warning: Adaptive mode disabled (non-startpos position).")
-                    adaptive_style.reset_adaptive_values()
-                if "moves" in args:
-                    moves_index = args.index("moves")
-                    board = chess.Board(" ".join(args[2:moves_index]))
-                    for move in args[moves_index+1:]:
-                        board.push_uci(move)
-                else:
-                    board = chess.Board(" ".join(args[2:]))
-
+            position(args)
         elif args[0] == "go":
-            if search_thread and search_thread.is_alive():
-                stop_event.set()
-                search_thread.join()
-            stop_event.clear()
-
-            if len(args) == 1:
-                search_thread = threading.Thread(target=search_worker, args=(config.MAX_DEPTH,))
-                search_thread.start()
-            elif len(args) == 3 and args[1] == "depth":
-                search_thread = threading.Thread(target=search_worker, args=(int(args[2]),), kwargs={"forced_child": True})
-                search_thread.start()
-            elif len(args) == 3 and args[1] == "movetime":
-                movetime_index = args.index("movetime")
-                movetime = float(args[movetime_index+1]) / 1000
-                search_thread = threading.Thread(target=search_worker, args=(config.MAX_DEPTH, movetime, movetime, 0, 0, 1))
-                search_thread.start()
-            elif len(args) > 4:
-                if "wtime" in args: # ha már van wtime, akkor biztos, hogy kapunk időt
-                    wtime_index = args.index("wtime")
-                    btime_index = args.index("btime")
-                    wtime = float(args[wtime_index+1]) / 1000
-                    btime = float(args[btime_index + 1]) / 1000
-
-                    winc = 0
-                    binc = 0
-                    moves_to_go = None
-                    if "winc" in args:
-                        winc_index = args.index("winc")
-                        binc_index = args.index("binc")
-                        winc = float(args[winc_index+1]) / 1000
-                        binc = float(args[binc_index + 1]) / 1000
-                        if "moves_to_go" in args:
-                            moves_to_go_index = args.index("moves_to_go")
-                            moves_to_go = float(args[moves_to_go_index+1])
-                    search_thread = threading.Thread(
-                        target=search_worker,
-                        args=(config.MAX_DEPTH, wtime, btime, winc, binc, moves_to_go)
-                    )
-                    search_thread.start()
+            go(args)
         elif args[0] == "setoption":
-            name_index = args.index("name")
-            value_index = args.index("value")
-            if args[name_index+1] == "MaxDepth":
-                value = value_index+1
-                if 1 <= value <= 100_000:
-                    config.MAX_DEPTH = int(args[value_index+1])
-                    config.killer_moves = [[] for _ in range(config.MAX_DEPTH)]
-                else:
-                    print("info string Error: the value is too large or too small", flush=True)
-            elif args[name_index+1] == "TTSize":
-                value= int(args[value_index+1])
-                if 1 <= value <= 100_000_000:
-                    tt.Max_tt_size = value
-                else:
-                    print("info string Error: the value is too large or too small", flush=True)
-            elif args[name_index+1] == "AdaptiveMode":
-                value = str(args[value_index+1])
-                if value.lower() == "true":
-                    config.adaptive_mode = True
-                elif value.lower() == "false":
-                    config.adaptive_mode = False
-                else:
-                    print("info string Error: the value is not true or false", flush=True)
-
-
+            setoption(args)
         elif args[0] == "stop":
             stop_event.set()
-
         else:
             print(f"info string Error: unknown command \"{' '.join(args)}\"", flush=True)
 
