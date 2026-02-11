@@ -133,7 +133,7 @@ def alphabeta(
         if stop_event.is_set():
             return 0, None
 
-        if  evaluate.game_phase(board) != "opening" and not board.is_check() \
+        if evaluate.game_phase(board) != "opening" and not board.is_check() \
                 and not board.is_capture(move) and not board.is_castling(move) and depth <= 3:
             if moves_score < 20 and best_move is not None and depth <= 2: # LMP
                 continue

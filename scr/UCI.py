@@ -154,11 +154,7 @@ def send_cmd(args=None):
     if args is None:
         args = read_cmd()
     if args != [""]:
-        info_ = UCI(args)
-
-        if info_ == "quit":
-            return "quit"
-    return None
+        UCI(args)
 
 def setoption(args) -> None:
     name_index = args.index("name")
@@ -304,7 +300,7 @@ def UCI(args):
         elif args[0] == "ucinewgame":
             reset()
         elif args[0] == "quit":
-            return quit_cmd()
+            sys.exit()
         elif args[0] == "position":
             position(args)
         elif args[0] == "go":

@@ -20,9 +20,7 @@ import UCI
 
 def main():
     while True:
-        info = UCI.send_cmd()
-        if info == "quit":
-            return
+        UCI.send_cmd()
 
 if __name__ == "__main__":
     main()
