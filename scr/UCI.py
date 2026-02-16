@@ -38,11 +38,11 @@ search_thread = threading.Thread()
 def is_in_opening_book(board_fen):
     if getattr(sys, 'frozen', False):
         # PyInstaller futás közben
-        BASE_DIR = Path(sys._MEIPASS) / "engine"
+        BASE_DIR = Path(sys._MEIPASS) / "scr"
     else:
         # normál futás
         BASE_DIR = Path(__file__).parent
-    file_path = BASE_DIR / "data" / "opening_book.jsonl"
+    file_path = BASE_DIR / "scr" / "opening_book.jsonl"
     with open(file_path, "r", encoding="utf-8") as f:
         for position in f:
             data = json.loads(position)
