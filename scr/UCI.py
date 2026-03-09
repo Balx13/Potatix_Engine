@@ -311,7 +311,6 @@ def UCI(args):
             stop_event.set()
         else:
             print(f"info string Error: unknown command \"{' '.join(args)}\"", flush=True)
-
     except IndexError:
         return None
     except Exception as e:
