@@ -253,14 +253,6 @@ def position(args) -> None:
         else:
             board = chess.Board(" ".join(args[2:]))
 
-def quit_cmd() -> str:
-    if search_thread and search_thread.is_alive():
-        stop_event.set()
-        search_thread.join()
-
-    stop_event.clear()
-    return "quit"
-
 def reset() -> None:
     global board
     if search_thread and search_thread.is_alive():  # leállítjuk a keresést, ha a GUI nem tette meg
