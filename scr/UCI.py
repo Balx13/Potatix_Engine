@@ -316,4 +316,3 @@ def UCI(args):
     except Exception as e:
         print(f"info string Error: \"{e}\"", flush=True)
         return None
-
