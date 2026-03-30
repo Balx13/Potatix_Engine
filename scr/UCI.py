@@ -36,20 +36,23 @@ search_thread = threading.Thread()
 
 
 def is_in_opening_book(board_fen):
-    if getattr(sys, 'frozen', False):
-        # PyInstaller futás közben
-        BASE_DIR = Path(sys._MEIPASS) / "scr"
-    else:
-        # normál futás
-        BASE_DIR = Path(__file__).parent
-    file_path = BASE_DIR / "data" / "opening_book.jsonl"
-    with open(file_path, "r", encoding="utf-8") as f:
-        for position in f:
-            data = json.loads(position)
-            fen = data["fen"]
-            moves = [m["move"] for m in data["top_moves"]]
-            if fen == board_fen:
-                return random.choice(moves)
+    try:
+        if getattr(sys, 'frozen', False):
+            # PyInstaller futás közben
+            BASE_DIR = Path(sys._MEIPASS) / "scr"
+        else:
+            # normál futás
+            BASE_DIR = Path(__file__).parent
+        file_path = BASE_DIR / "data" / "opening_book.jsonl"
+        with open(file_path, "r", encoding="utf-8") as f:
+            for position in f:
+                data = json.loads(position)
+                fen = data["fen"]
+                moves = [m["move"] for m in data["top_moves"]]
+                if fen == board_fen:
+                    return random.choice(moves)
+            return None
+    except:
         return None
 
 def timer_worker(time_limit_sec):
@@ -301,6 +304,8 @@ def UCI(args):
             setoption(args)
         elif args[0] == "stop":
             stop_event.set()
+        elif args[0].lower() == "ping":
+            print("Pong!", flush=True)
         else:
             print(f"info string Error: unknown command \"{' '.join(args)}\"", flush=True)
     except IndexError:
