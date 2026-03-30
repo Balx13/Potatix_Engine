@@ -1,6 +1,8 @@
 # Pycarm mappái
 /.idea/
 /.venv/
+/.qudo
+
 # Egyéb
 /Other_files
 list_files.py

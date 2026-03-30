@@ -148,7 +148,7 @@ def alphabeta(
             alpha=-beta,
             beta=-alpha,
             ply=ply + 1,
-            previous_null_move=True
+            previous_null_move=False
         )
         eval_score = -score
         if eval_score == -0.0:
@@ -161,7 +161,7 @@ def alphabeta(
                 alpha=-beta,
                 beta=-alpha,
                 ply=ply + 1,
-                previous_null_move=True
+                previous_null_move=False
             )
             eval_score = -score
             if eval_score == -0.0:
@@ -212,8 +212,9 @@ def alphabeta(
                 piece_type = piece.piece_type
                 history_index = config.history_heuristic[piece_type-1]\
                 [best_move.from_square][best_move.to_square]
-
-                history_index += depth * depth
+                history_index = min(100, history_index + depth**2)
+                config.history_heuristic[piece_type - 1] \
+                    [best_move.from_square][best_move.to_square] = history_index
                 if history_index > 100:
                     history_index = 100
                     config.history_heuristic[piece_type-1]\

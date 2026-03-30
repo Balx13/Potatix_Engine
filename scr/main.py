@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+# Beimportáljuk az összes fáljt, hogy könnyebb legyen a build
+import adaptive_style, config, evaluate, \
+    move_ordering, quiescence, search, stop_event, time_manager, transposition_table
 import UCI
 
 def main():

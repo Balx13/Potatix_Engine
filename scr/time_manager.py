@@ -45,7 +45,7 @@ def estimate_time_for_move(board: chess.Board, base_time: float, increment: floa
 
     move_number = board.fullmove_number
     if move_number < 15:
-        phase_factor = 0.85
+        phase_factor = 0.70
     elif move_number < 40:
         phase_factor = 1.0
     else:

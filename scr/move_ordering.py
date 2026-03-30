@@ -118,9 +118,11 @@ def order_moves(board, moves, depth) -> list:
                 if move in legal_moves_list:
                     killer_moves_ordered.append((move, 10_000+history_score(board, move)))
     if len(killer_moves_ordered) >= 2: # Ha van legalább két lépés, akkor rangsoroljuk
-        km = sorted_moves_with_value(killer_moves_ordered, board)
+        killer_moves_only = [move_ for move_, _ in killer_moves_ordered]
+        km = sorted_moves_with_value(killer_moves_only, board)
         killer_moves_ordered = [(move_, 10_000+history_score(board, move_)) for move_, _ in km]
 
-    remaining_moves = [m for m in moves if m not in killer_moves_ordered]
+    killer_moves_only = [move_ for move_, _ in killer_moves_ordered]
+    remaining_moves = [m for m in moves if m not in killer_moves_only]
 
     return killer_moves_ordered + sorted_moves_with_value(remaining_moves, board)

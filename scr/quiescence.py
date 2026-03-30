@@ -76,8 +76,7 @@ def see(board: chess.Board, move: chess.Move) -> int:
 
 
 def quiescence(board: chess.Board, alpha: float, beta: float, ply) -> float:
-    color = 1 if board.turn == chess.WHITE else -1
-    stand_pat = evaluate(board, ply) * color
+    stand_pat = evaluate(board, ply)
 
     if stand_pat >= beta:
         return beta

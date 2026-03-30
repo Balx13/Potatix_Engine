@@ -42,8 +42,8 @@ def game_phase(board: chess.Board) -> str:
     return "middlegame"
 
 
-def position_value_get(piece_type, sq_, phase) -> float:
-    sq = chess.square_mirror(sq_)
+def position_value_get(piece_type, sq_, phase, color) -> float:
+    sq = chess.square_mirror(sq_) if color == chess.WHITE else sq_
     if piece_type == chess.PAWN:
         return config.position_values["pawn"][sq]
     elif piece_type == chess.KNIGHT:
@@ -72,9 +72,9 @@ def eval_position_values(board: chess.Board, phase) -> float:
     score = 0
     for piece_type in config.PIECE_VALUES.keys():
         for sq in board.pieces(piece_type, chess.WHITE):
-            score += position_value_get(piece_type, sq, phase)
+            score += position_value_get(piece_type, sq, phase, chess.WHITE)
         for sq in board.pieces(piece_type, chess.BLACK):
-            score -= position_value_get(piece_type, chess.square_mirror(sq), phase)
+            score -= position_value_get(piece_type, sq, phase, chess.BLACK)
     return score
 
 
@@ -93,10 +93,11 @@ def eval_mobility(board: chess.Board, color_param=None) -> float:
     # A color_param paraméter akkor használatos, hogyha csak az egyik felet akarjuk mérni
     def mobility(colorr):
         old_turn = board.turn
-        board.turn = colorr
-        data = board.legal_moves.count()
-        board.turn = old_turn
-        return data
+        try:
+            board.turn = colorr
+            return board.legal_moves.count()
+        finally:
+            board.turn = old_turn
     if color_param is not None:
         mobility_score = mobility(color_param)
     else:
