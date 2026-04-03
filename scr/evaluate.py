@@ -316,22 +316,22 @@ def evaluate(board: chess.Board, ply) -> float:
     score += rook_open_files_score
     score = truncate(score)
     if score == -0.0:
-        return 0.0
+        return 0
     return score
 
 def test_startpos():
-    assert abs(evaluate(chess.Board())) < 5
+    assert abs(evaluate(chess.Board(), 10)) < 5
 
 def test_symmetry(fen):
     b = chess.Board(fen)
-    s1 = evaluate(b)
+    s1 = evaluate(b, 10)
     b.apply_mirror()
-    s2 = evaluate(b)
+    s2 = evaluate(b, 10)
     print(f"DEBUG: s1: {s1}, s2: {s2}")
     assert abs(s1 + s2) < 5
 
 #test_startpos()
 #print(evaluate(chess.Board("r1b2r1k/1pp3pp/2n5/p1Q1p1q1/8/2NP2P1/PP2PPBP/R4RK1 b - - 0 13")))
 
-#test_symmetry("r1b2r1k/1pp3pp/2n5/p1Q1p1q1/8/2NP2P1/PP2PPBP/R4RK1 b - - 0 13")
+#test_symmetry("r1b3k1/p1pp1ppp/1p1n1q2/8/8/8/PPPP1PPP/R1B1QBK1 w - - 0 14")
 #test_symmetry("rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq - 0 1")

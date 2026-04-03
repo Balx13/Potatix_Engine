@@ -17,80 +17,94 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import chess
-from move_ordering import order_moves
 from evaluate import evaluate
-from config import PIECE_VALUES
 from stop_event import stop_event
+import config
+
+def mini_local_ordering(board, legal_moves):
+    def score(move_):
+        piece = board.piece_at(move_.from_square)
+        if board.is_capture(move_): # Ütés
+            victim = board.piece_at(move_.to_square)
+            attacker = piece # piece = board.piece_at(move_.from_square)
+            victim_value = config.PIECE_VALUES[victim.piece_type] if victim else 0
+            attacker_value = config.PIECE_VALUES[attacker.piece_type] if attacker else 0
+            return 1000 + 10 * victim_value - attacker_value
+        elif board.is_check(): # Ha nem ütés, akkor sakkban vagyunk, így ez ellen-sakk
+            return 10
+        return 0
+    return sorted(legal_moves, key=score, reverse=True)
+
+
+def get_smallest_attacker(board, square, color, occupied):
+    attackers_mask = board.attackers_mask(color, square, occupied)
+    if not attackers_mask:
+        return None
+    for piece_type in (chess.PAWN, chess.KNIGHT, chess.BISHOP, chess.ROOK, chess.QUEEN, chess.KING):
+        type_mask = int(board.pieces_mask(piece_type, color)) & occupied
+        subset = attackers_mask & type_mask
+        if subset:
+            return (subset & -subset).bit_length() - 1
+    return None
+
 
 def see(board: chess.Board, move: chess.Move) -> int:
-
-    if not board.is_capture(move):
-        return 0
-
     to_sq = move.to_square
     from_sq = move.from_square
+    def get_val(p_type):
+        return config.PIECE_VALUES.get(p_type, 0)
 
-    captured = board.piece_at(to_sq)
-    attacker = board.piece_at(from_sq)
-
-    if captured is None or attacker is None:
-        return 0
-
-    gain = [PIECE_VALUES[captured.piece_type]]
-
-    board.push(move)
-
-    side = not attacker.color
+    captured_piece = board.piece_at(to_sq)
+    gain = [0] * 33
+    gain[0] = get_val(captured_piece.piece_type) if captured_piece else 0
+    attacker_type = board.piece_at(from_sq).piece_type
+    occupied = board.occupied
+    occupied &= ~(1 << from_sq)
+    current_color = not board.turn
     depth = 0
 
     while True:
-        attackers = board.attackers(side, to_sq)
-
-        if not attackers:
-            break
-
-        least_sq = min(
-            attackers,
-            key=lambda sq: PIECE_VALUES[board.piece_at(sq).piece_type]
-        )
-
-        piece = board.piece_at(least_sq)
-        gain.append(
-            PIECE_VALUES[piece.piece_type] - gain[depth]
-        )
-
-        reply = chess.Move(least_sq, to_sq)
-        board.push(reply)
-
         depth += 1
-        side = not side
-
-    for i in range(len(gain) - 2, -1, -1):
-        gain[i] = max(gain[i], -gain[i + 1])
-
-    board.pop()
-    for _ in range(depth):
-        board.pop()
-
+        attacker_sq = get_smallest_attacker(board, to_sq, current_color, occupied)
+        if attacker_sq is None:
+            break
+        gain[depth] = get_val(attacker_type) - gain[depth - 1]
+        attacker_type = board.piece_at(attacker_sq).piece_type
+        occupied &= ~(1 << attacker_sq)  # Ő is elhagyja a helyét
+        current_color = not current_color
+    while depth > 0:
+        gain[depth - 1] = -max(-gain[depth - 1], gain[depth])
+        depth -= 1
     return gain[0]
 
 
-def quiescence(board: chess.Board, alpha: float, beta: float, ply) -> float:
-    stand_pat = evaluate(board, ply)
+def quiescence(board: chess.Board, alpha: float, beta: float, ply: int, local_ply=0) -> float:
+    if stop_event.is_set():
+        return 0
+    is_check = board.is_check()
+    if not is_check or local_ply > 3:
+        stand_pat = evaluate(board, ply)
+        if stand_pat >= beta:
+            return beta
+        if alpha < stand_pat:
+            alpha = stand_pat
+        legal_moves = board.generate_legal_captures()
+    else:
+        legal_moves = board.generate_legal_moves() # Ha sakk van, akkor az összes legális lépés védi
 
-    if stand_pat >= beta:
-        return beta
-    if alpha < stand_pat:
-        alpha = stand_pat
-    for move, _ in order_moves(board, board.legal_moves, depth=0):
+    if board.is_repetition(2) or board.halfmove_clock >= 100 or board.is_stalemate():
+        return 0
+    elif board.is_game_over():
+        return evaluate(board, ply)
+
+    for move in mini_local_ordering(board, legal_moves):
         if stop_event.is_set():
             return 0
-        if not board.is_capture(move):
-            continue
-        if see(board, move) < 0:
-            continue
+        if not is_check: # Sakknál nincs see
+            if see(board, move) < 0: # See megfogta
+                continue
         board.push(move)
-        score = -quiescence(board, -beta, -alpha, ply+1)
+        score = -quiescence(board, -beta, -alpha, ply+1, local_ply+1)
         board.pop()
         if score >= beta:
             return beta
