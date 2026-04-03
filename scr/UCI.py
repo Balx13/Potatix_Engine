@@ -66,7 +66,7 @@ def timer_worker(time_limit_sec):
             break
         time.sleep(0.001)  # kis várakozás, hogy ne terhelje a CPU-t
 
-def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movestogo=None, forced_child=False):
+def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movestogo=None, multipv=1, all_root=False):
     # Ez indítja el és kezeli a keresést
 
     if evaluate.game_phase(board) == "opening":
@@ -76,6 +76,7 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
             print(f"bestmove {opening_move}", flush=True)
             return
 
+    root_turn = board.turn
     tt.transposition_table.clear()
     stop_event.clear()
     best_move = None
@@ -97,25 +98,45 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
     for depth in range(1, max_depth_ + 1):
         if stop_event.is_set():
             break
-
-        if forced_child:
+        if all_root: # Go depth X
             best_eval_local = float('-inf') if board.turn else float('inf')
             best_move_local = None
             for move in board.legal_moves:
                 board.push(move)
                 eval_score_, _ = alphabeta(
                     board=board,
-                    depth=depth-1,
+                    depth=depth - 1,
                     alpha=float('-inf'),
                     beta=float('inf'),
                     previous_null_move=False)
                 board.pop()
                 if (board.turn and eval_score_ > best_eval_local) or \
-               (not board.turn and eval_score_ < best_eval_local):
+                        (not board.turn and eval_score_ < best_eval_local):
                     best_eval_local = eval_score_
                     best_move_local = move
             eval_score_, current_best_move = best_eval_local, best_move_local
-        else:
+        elif multipv > 1: # MuptiPV
+            move_scores = []
+            for move in board.legal_moves:
+                board.push(move)
+                eval_score, _ = alphabeta(
+                    board=board,
+                    depth=depth - 1,
+                    alpha=float('-inf'),
+                    beta=float('inf'),
+                    previous_null_move=False
+                )
+                board.pop()
+                move_scores.append((eval_score, move))
+            move_scores.sort(reverse=not root_turn, key=lambda x: x[0])
+            num_legal = len(list(board.legal_moves))
+            effective_multipv = min(multipv, num_legal)
+            top_moves = move_scores[:effective_multipv]
+            for idx, (score, move) in enumerate(top_moves):
+                print(f"info depth {depth} score cp {score} multipv {idx + 1} pv {move}", flush=True)
+            current_best_move = top_moves[0][1]
+            eval_score_ = top_moves[0][0]
+        else: # Normál
             eval_score_, current_best_move = alphabeta(
                 board=board,
                 depth=depth,
@@ -127,7 +148,17 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
             best_move = current_best_move
             best_eval = eval_score_
 
-        print(f"info depth {depth} score cp {best_eval} pv {best_move}", flush=True)
+
+        if multipv <= 1: # Ha nincs MultiPV
+            if abs(best_eval) > 100_000: # Van matt
+                mate_in_plies = max(0, 1_000_000 - abs(best_eval))
+                mate_in_moves = (mate_in_plies + 1) // 2
+                if best_eval > 0:
+                    print(f"info depth {depth} score mate {mate_in_moves} pv {best_move}", flush=True)
+                else:
+                    print(f"info depth {depth} score mate {-mate_in_moves} pv {best_move}", flush=True)
+            else: # Nincs matt
+                print(f"info depth {depth} score cp {best_eval} pv {best_move}", flush=True)
 
     if timer_thread is not None:
         timer_thread.join()
@@ -183,6 +214,12 @@ def setoption(args) -> None:
             config.adaptive_mode = False
         else:
             print("info string Error: the value is not true or false", flush=True)
+    elif args[name_index+1] == "MultiPV":
+        value = int(args[value_index + 1])
+        if 1 <= value <= 64:
+            config.multipv = value
+        else:
+            print("info string Error: the value is too large or too small", flush=True)
 
 def go(args) -> None:
     global search_thread
@@ -192,15 +229,24 @@ def go(args) -> None:
     stop_event.clear()
 
     if len(args) == 1:
-        search_thread = threading.Thread(target=search_worker, args=(config.MAX_DEPTH,))
+        search_thread = threading.Thread(
+            target=search_worker,
+            args=(config.MAX_DEPTH,),
+            kwargs={"multipv": config.multipv})
         search_thread.start()
     elif len(args) == 3 and args[1] == "depth":
-        search_thread = threading.Thread(target=search_worker, args=(int(args[2]),), kwargs={"forced_child": True})
+        search_thread = threading.Thread(
+            target=search_worker,
+            args=(int(args[2]),),
+            kwargs={"all_root": True, "multipv": config.multipv})
         search_thread.start()
     elif len(args) == 3 and args[1] == "movetime":
         movetime_index = args.index("movetime")
         movetime = float(args[movetime_index + 1]) / 1000
-        search_thread = threading.Thread(target=search_worker, args=(config.MAX_DEPTH, movetime, movetime, 0, 0, 1))
+        search_thread = threading.Thread(
+            target=search_worker,
+            args=(config.MAX_DEPTH, movetime, movetime, 0, 0, 1),
+            kwargs={"multipv": config.multipv})
         search_thread.start()
     elif len(args) > 4:
         if "wtime" in args:  # ha már van wtime, akkor biztos, hogy kapunk időt
@@ -222,7 +268,8 @@ def go(args) -> None:
                     moves_to_go = float(args[moves_to_go_index + 1])
             search_thread = threading.Thread(
                 target=search_worker,
-                args=(config.MAX_DEPTH, wtime, btime, winc, binc, moves_to_go)
+                args=(config.MAX_DEPTH, wtime, btime, winc, binc, moves_to_go),
+                kwargs = {"multipv": config.multipv}
             )
             search_thread.start()
 
@@ -285,6 +332,7 @@ def UCI(args):
             print("id name Potatix Engine", flush=True)
             print("id author Balazs Andre", flush=True)
 
+            print("option name MultiPV type spin default 1 min 1 max 64", flush=True)
             print("option name MaxDepth type spin default 100 min 1 max 100000", flush=True)
             print("option name TTSize type spin default 1000000 min 1 max 100000000", flush=True)
             print("option name AdaptiveMode type check default true", flush=True)
