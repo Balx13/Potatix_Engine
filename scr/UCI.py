@@ -21,6 +21,7 @@ import random
 import chess
 import sys
 import evaluate
+import math
 import transposition_table as tt
 from search import alphabeta
 import config
@@ -81,6 +82,7 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
     stop_event.clear()
     best_move = None
     best_eval = 0.0
+    top_moves = []
 
     if board.turn and wtime_ is not None:
         time_limit_sec = estimate_time_for_move(board, wtime_, winc_, movestogo)
@@ -98,6 +100,7 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
     for depth in range(1, max_depth_ + 1):
         if stop_event.is_set():
             break
+        start_tm = time.time()
         if all_root: # Go depth X
             best_eval_local = float('-inf') if board.turn else float('inf')
             best_move_local = None
@@ -132,8 +135,6 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
             num_legal = len(list(board.legal_moves))
             effective_multipv = min(multipv, num_legal)
             top_moves = move_scores[:effective_multipv]
-            for idx, (score, move) in enumerate(top_moves):
-                print(f"info depth {depth} score cp {score} multipv {idx + 1} pv {move}", flush=True)
             current_best_move = top_moves[0][1]
             eval_score_ = top_moves[0][0]
         else: # Normál
@@ -144,6 +145,12 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
                 beta=float('inf'),
                 previous_null_move=False)
 
+        end_tm = time.time()
+        elasped_tm = end_tm - start_tm
+        nps = config.nodes / elasped_tm if elasped_tm > 0 else 0
+        nps = math.trunc(nps)
+        elasped_tm = math.trunc(elasped_tm * 10**4) /10**4
+
         if current_best_move:
             best_move = current_best_move
             best_eval = eval_score_
@@ -153,12 +160,26 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
             if abs(best_eval) > 100_000: # Van matt
                 mate_in_plies = max(0, 1_000_000 - abs(best_eval))
                 mate_in_moves = (mate_in_plies + 1) // 2
-                if best_eval > 0:
-                    print(f"info depth {depth} score mate {mate_in_moves} pv {best_move}", flush=True)
-                else:
-                    print(f"info depth {depth} score mate {-mate_in_moves} pv {best_move}", flush=True)
+                print(
+        f"info depth {depth} score mate {mate_in_moves} nodes {config.nodes} time {elasped_tm} nps {nps} pv {best_move}"
+                )
             else: # Nincs matt
-                print(f"info depth {depth} score cp {best_eval} pv {best_move}", flush=True)
+                print(
+        f"info depth {depth} score cp {best_eval} nodes {config.nodes} time {elasped_tm} nps {nps} pv {best_move}"
+                )
+        else: # Van MultiPV
+            for idx, (score, move) in enumerate(top_moves):
+                if abs(score) > 100_000:
+                    mate_in_plies = max(0, 1_000_000 - abs(score))
+                    mate_in_moves = (mate_in_plies + 1) // 2
+                    print(
+f"info depth {depth} score mate {mate_in_moves} multipv {idx+1} nodes {config.nodes} time {elasped_tm} nps {nps} pv {move}"
+                    )
+                else:
+                    print(
+        f"info depth {depth} score cp {score} multipv {idx+1} nodes {config.nodes} time {elasped_tm} nps {nps} pv {move}"
+                    )
+        config.nodes = 0 # Reset
 
     if timer_thread is not None:
         timer_thread.join()

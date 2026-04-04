@@ -91,6 +91,8 @@ def alphabeta(
 
     # A fő kereső függvény
 
+    config.nodes += 1
+
     if board.is_repetition(2) or board.halfmove_clock >= 100 or board.is_stalemate():
         return 0, None  # Döntetlen értékelése
     if depth <= 0 or board.is_game_over():

@@ -26,6 +26,7 @@ adaptive_mode = True
 killer_moves = [[] for _ in range(MAX_DEPTH+1)]
 history_heuristic = [[[0 for _ in range(64)] for _ in range(64)] for _ in range(6)]
 multipv = 1
+nodes = 0
 engine_turn = True
 
 PIECE_VALUES = {
