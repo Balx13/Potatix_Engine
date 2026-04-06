@@ -43,29 +43,8 @@ def game_phase(board: chess.Board) -> str:
 
 
 def position_value_get(piece_type, sq_, phase, color) -> float:
-    sq = chess.square_mirror(sq_) if color == chess.BLACK else sq_
-    if piece_type == chess.PAWN:
-        return config.position_values["pawn"][sq]
-    elif piece_type == chess.KNIGHT:
-        return config.position_values["knight"][sq]
-    elif piece_type == chess.BISHOP:
-        if phase == "endgame":
-            return config.position_values["bishop_eg"][sq]
-        else:
-            return config.position_values["bishop_mg"][sq]
-    elif piece_type == chess.ROOK:
-        return config.position_values["rook"][sq]
-    elif piece_type == chess.QUEEN:
-        if phase == "opening":
-            return config.position_values["queen_op"][sq]
-        else:
-            return config.position_values["queen_mg"][sq]
-    elif piece_type == chess.KING:
-        if phase == "endgame":
-            return config.position_values["king_eg"][sq]
-        else:
-            return config.position_values["king_mg"][sq]
-    return 0
+    sq = chess.square_mirror(sq_) if color == chess.WHITE else sq_
+    return config.position_values[piece_type][phase][sq]
 
 
 def eval_position_values(board: chess.Board, phase) -> float:
