@@ -78,11 +78,12 @@ def see(board: chess.Board, move: chess.Move) -> int:
     return gain[0]
 
 
-def quiescence(board: chess.Board, alpha: float, beta: float, ply: int, local_ply=0) -> float:
+def quiescence(board: chess.Board, alpha: float, beta: float, ply: int) -> float:
+
     if stop_event.is_set():
         return 0
     is_check = board.is_check()
-    if not is_check or local_ply > 3:
+    if not is_check:
         stand_pat = evaluate(board, ply)
         if not board.turn:  # Sötét jön
             stand_pat = -stand_pat
@@ -94,8 +95,8 @@ def quiescence(board: chess.Board, alpha: float, beta: float, ply: int, local_pl
     else:
         legal_moves = board.generate_legal_moves() # Ha sakk van, akkor az összes legális lépés védi
 
-    if board.is_repetition(2) or board.halfmove_clock >= 100 or board.is_stalemate():
-        return 0
+    if board.is_fivefold_repetition() or board.is_seventyfive_moves() or board.is_stalemate() or board.can_claim_draw():
+        return 0  # Döntetlen
     elif board.is_game_over():
         return evaluate(board, ply)
 
@@ -106,7 +107,7 @@ def quiescence(board: chess.Board, alpha: float, beta: float, ply: int, local_pl
             if see(board, move) < 0: # See megfogta
                 continue
         board.push(move)
-        score = -quiescence(board, -beta, -alpha, ply+1, local_ply+1)
+        score = -quiescence(board, -beta, -alpha, ply+1)
         board.pop()
         if score >= beta:
             return beta

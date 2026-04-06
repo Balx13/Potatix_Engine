@@ -89,12 +89,15 @@ def alphabeta(
         ply: int=0,
         previous_null_move: bool=False):
 
-    # A fő kereső függvény
+    """
+    A fő kereső függvény.
+    Negamax-alapú keresés.
+    """
 
     config.nodes += 1
 
-    if board.is_repetition(2) or board.halfmove_clock >= 100 or board.is_stalemate():
-        return 0, None  # Döntetlen értékelése
+    if board.is_fivefold_repetition() or board.is_seventyfive_moves() or board.is_stalemate() or board.can_claim_draw():
+        return 0, None  # Döntetlen
     if depth <= 0 or board.is_game_over():
         return quiescence(board, alpha, beta, ply), None
 
