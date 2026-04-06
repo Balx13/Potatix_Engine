@@ -84,6 +84,8 @@ def quiescence(board: chess.Board, alpha: float, beta: float, ply: int, local_pl
     is_check = board.is_check()
     if not is_check or local_ply > 3:
         stand_pat = evaluate(board, ply)
+        if not board.turn:  # Sötét jön
+            stand_pat = -stand_pat
         if stand_pat >= beta:
             return beta
         if alpha < stand_pat:

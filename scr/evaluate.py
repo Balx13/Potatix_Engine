@@ -43,7 +43,7 @@ def game_phase(board: chess.Board) -> str:
 
 
 def position_value_get(piece_type, sq_, phase, color) -> float:
-    sq = chess.square_mirror(sq_) if color == chess.WHITE else sq_
+    sq = chess.square_mirror(sq_) if color == chess.BLACK else sq_
     if piece_type == chess.PAWN:
         return config.position_values["pawn"][sq]
     elif piece_type == chess.KNIGHT:
@@ -170,7 +170,7 @@ def eval_doubled_pawns(board: chess.Board, color_param=None) -> float:
         colors = (chess.WHITE, chess.BLACK)
     for color in colors:
         pawns = board.pieces(chess.PAWN, color)
-        sign = -1 if color == chess.WHITE else 1
+        sign = 1 if color == chess.WHITE else -1
         files_count = [0]*8
         for sq in pawns:
             files_count[chess.square_file(sq)] += 1
@@ -189,7 +189,7 @@ def eval_isolated_pawns(board: chess.Board, color_param=None) -> float:
     for color in colors:
         pawns = board.pieces(chess.PAWN, color)
         files = [chess.square_file(sq) for sq in pawns]
-        sign = -1 if color == chess.WHITE else 1
+        sign = 1 if color == chess.WHITE else -1
         isolated = 0
         for f in files:
             if (f-1 not in files) and (f+1 not in files):

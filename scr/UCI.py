@@ -311,14 +311,12 @@ def position(args) -> None:
             adaptive_style.reset_adaptive_values()
         if "moves" in args:
             moves_index = args.index("moves")
-            board = chess.Board(" ".join(args[2:moves_index]))
-
+            board.set_fen(" ".join(args[2:moves_index]))
             if config.adaptive_mode:
                 if len(args[3:]) > 4:
                     adaptive_style.update_oppoment_style(args)
             else:
                 adaptive_style.reset_adaptive_values()
-
             for move in args[moves_index + 1:]:
                 board.push_uci(move)
         else:

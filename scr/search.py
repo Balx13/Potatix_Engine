@@ -96,8 +96,7 @@ def alphabeta(
     if board.is_repetition(2) or board.halfmove_clock >= 100 or board.is_stalemate():
         return 0, None  # Döntetlen értékelése
     if depth <= 0 or board.is_game_over():
-        color = 1 if board.turn == chess.WHITE else -1
-        return color * quiescence(board, alpha, beta, ply), None
+        return quiescence(board, alpha, beta, ply), None
 
     if stop_event.is_set():
         return 0, None
