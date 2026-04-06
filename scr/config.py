@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import chess
 
 MAX_DEPTH = 100
-adaptive_mode = True
+adaptive_mode = False
 killer_moves = [[] for _ in range(MAX_DEPTH+1)]
 history_heuristic = [[[0 for _ in range(64)] for _ in range(64)] for _ in range(6)]
 multipv = 1
