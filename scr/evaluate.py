@@ -44,7 +44,7 @@ def game_phase(board: chess.Board) -> str:
 
 def position_value_get(piece_type, sq_, phase, color) -> float:
     sq = chess.square_mirror(sq_) if color == chess.WHITE else sq_
-    return config.position_values[piece_type][phase][sq]
+    return config.position_values[phase][piece_type][sq]
 
 
 def eval_position_values(board: chess.Board, phase) -> float:
