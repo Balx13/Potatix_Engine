@@ -10,17 +10,17 @@ pgn_file = "lichess_elite_database_2021-10.pgn" # Lichess elite database 2021/10
 engine_path = "stockfish_17.1.exe" # Stocckfish 17.1 https://github.com/official-stockfish/Stockfish
 output_file = "opening_book.jsonl"
 
-may_ply = 8                  # fél-lépések (8 = 4 teljes lépés)
-engine_time = 0.1
+may_ply = 16             # fél-lépések (16 = 8 teljes lépés)
+engine_time = 5
 multipy = 3
 
 # FEN szelekció szabályok
-max_total_fens = 25_000
+max_total_fens = 100_000
 min_frequency = 5            # ritka folytatások kidobása
 
 random_seed = 92401 # Tényleg csak random gépeltem (enyhe randomizálás)
 random.seed(random_seed)
-cp_tolerance = 50   # centipawn
+cp_tolerance = 10   # centipawn
 
 
 def top_n_for_ply(ply: int) -> int:
