@@ -46,8 +46,8 @@ def is_in_opening_book(board_fen):
             BASE_DIR = Path(__file__).parent
         file_path = BASE_DIR / "data" / "opening_book.jsonl"
         with open(file_path, "r", encoding="utf-8") as f:
-            for position in f:
-                data = json.loads(position)
+            for pst in f:
+                data = json.loads(pst)
                 fen = data["fen"]
                 moves = [m["move"] for m in data["top_moves"]]
                 if fen == board_fen:
@@ -160,6 +160,7 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
             if abs(best_eval) > 100_000: # Van matt
                 mate_in_plies = max(0, 1_000_000 - abs(best_eval))
                 mate_in_moves = (mate_in_plies + 1) // 2
+                mate_in_moves = -mate_in_moves if (config.engine_turn != (lambda x: x > 0)(best_eval)) else mate_in_moves
                 print(
         f"info depth {depth} score mate {mate_in_moves} nodes {config.nodes} time {elasped_tm} nps {nps} pv {best_move}"
                 )
@@ -172,6 +173,7 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
                 if abs(score) > 100_000:
                     mate_in_plies = max(0, 1_000_000 - abs(score))
                     mate_in_moves = (mate_in_plies + 1) // 2
+                    mate_in_moves = -mate_in_moves if (config.engine_turn != (lambda x: x > 0)(best_eval)) else mate_in_moves
                     print(
 f"info depth {depth} score mate {mate_in_moves} multipv {idx+1} nodes {config.nodes} time {elasped_tm} nps {nps} pv {move}"
                     )

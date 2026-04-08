@@ -99,7 +99,8 @@ def alphabeta(
     if board.is_fivefold_repetition() or board.is_seventyfive_moves() or board.is_stalemate() or board.can_claim_draw():
         return 0, None  # Döntetlen
     if depth <= 0 or board.is_game_over():
-        return quiescence(board, alpha, beta, ply), None
+        sign = 1 if board.turn else -1
+        return sign * quiescence(board, alpha, beta, ply), None
 
     if stop_event.is_set():
         return 0, None
