@@ -11,6 +11,7 @@ list_files.py
 /dist
 # Bármilyen UCI sakkmotorral helyettesíthető
 /scripts/opening_book/stockfish_17.1.exe
+/scripts/opening_book/stockfish.exe
 # Az opening book elérhető az scr/data mappában
 /scripts/opening_book/opening_book.jsonl
 # Lichess Elite Database
