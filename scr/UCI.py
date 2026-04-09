@@ -50,7 +50,7 @@ def is_in_opening_book(board_fen):
                 data = json.loads(pst)
                 fen = data["fen"]
                 moves = [m["move"] for m in data["top_moves"]]
-                if fen == board_fen:
+                if fen == " ".join(board_fen.split()[:4]):
                     return random.choice(moves)
             return None
     except:
@@ -65,7 +65,7 @@ def timer_worker(time_limit_sec):
         if elapsed >= time_limit_sec:
             stop_event.set()
             break
-        time.sleep(0.001)  # kis várakozás, hogy ne terhelje a CPU-t
+        time.sleep(0.001)  # kis várakozás, pontosan 1ms
 
 def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movestogo=None, multipv=1, all_root=False):
     # Ez indítja el és kezeli a keresést

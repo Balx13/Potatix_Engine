@@ -6,13 +6,21 @@
 # Egyéb
 /Other_files
 list_files.py
+
 # Build
 /build
 /dist
+
 # Bármilyen UCI sakkmotorral helyettesíthető
 /scripts/opening_book/stockfish_17.1.exe
 /scripts/opening_book/stockfish.exe
+
 # Az opening book elérhető az scr/data mappában
 /scripts/opening_book/opening_book.jsonl
+
+# Ugyna az, mint a maker.py, csak párhuzamosítással.
+# A kódja nem annyira átlátható, ezért nem szeretném verziókövetni.
+/scripts/opening_book/maker2.py
+
 # Lichess Elite Database
 /scripts/opening_book/lichess_elite_database_2021-10.pgn
