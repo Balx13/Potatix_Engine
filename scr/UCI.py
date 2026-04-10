@@ -360,7 +360,7 @@ def UCI(args):
             print("option name MultiPV type spin default 1 min 1 max 64", flush=True)
             print("option name MaxDepth type spin default 100 min 1 max 100000", flush=True)
             print("option name TTSize type spin default 1000000 min 1 max 100000000", flush=True)
-            print("option name AdaptiveMode type check default true", flush=True)
+            print("option name AdaptiveMode type check default false", flush=True)
 
             print("uciok", flush=True)
         elif args[0] == "isready":
