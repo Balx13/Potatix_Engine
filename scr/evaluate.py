@@ -154,7 +154,7 @@ def eval_doubled_pawns(board: chess.Board, color_param=None) -> float:
         for sq in pawns:
             files_count[chess.square_file(sq)] += 1
         double_pawns = sum(c-1 for c in files_count if c>1)
-        score += sign * 10 * double_pawns
+        score -= sign * 10 * double_pawns
     return score
 
 
@@ -173,7 +173,7 @@ def eval_isolated_pawns(board: chess.Board, color_param=None) -> float:
         for f in files:
             if (f-1 not in files) and (f+1 not in files):
                 isolated += 1
-        score += sign * isolated * 25
+        score -= sign * isolated * 25
     return score
 
 

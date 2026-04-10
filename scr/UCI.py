@@ -333,6 +333,10 @@ def reset() -> None:
 
     adaptive_style.reset_adaptive_values()
     board = chess.Board()
+    config.spare_time = None
+    config.nodes = 0
+    config.engine_turn = True
+
     tt.transposition_table.clear()
     for key in config.adaptive_style_oppoment_profile.keys():
         config.adaptive_style_oppoment_profile[key] = 1.0

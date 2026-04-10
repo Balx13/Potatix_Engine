@@ -96,9 +96,10 @@ def quiescence(board: chess.Board, alpha: float, beta: float, ply: int) -> float
         legal_moves = board.generate_legal_moves() # Ha sakk van, akkor az összes legális lépés védi
 
     if board.is_fivefold_repetition() or board.is_seventyfive_moves() or board.is_stalemate() or board.can_claim_draw():
-        return 0  # Döntetlen
+        return 0.0  # Döntetlen
     elif board.is_game_over():
-        return evaluate(board, ply)
+        ev = evaluate(board, ply)
+        return ev if board.turn else -ev
 
     for move in mini_local_ordering(board, legal_moves):
         if stop_event.is_set():

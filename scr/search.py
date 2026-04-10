@@ -52,7 +52,7 @@ def get_adaptive_bonus(board, move: chess.Move) -> float:
     bonus += calculate_component(rook_open_files_score, white_m["rook_op_files"], black_m["rook_op_files"])
     bonus += calculate_component(bishop_pair_score, white_m["bishop_pairs"], black_m["bishop_pairs"])
 
-    bonus = max(-60, min(60, bonus))
+    bonus = max(-20, min(20, bonus))
     board.pop()
     return bonus
     
@@ -99,8 +99,7 @@ def alphabeta(
     if board.is_fivefold_repetition() or board.is_seventyfive_moves() or board.is_stalemate() or board.can_claim_draw():
         return 0, None  # Döntetlen
     if depth <= 0 or board.is_game_over():
-        sign = 1 if board.turn else -1
-        return sign * quiescence(board, alpha, beta, ply), None
+        return quiescence(board, alpha, beta, ply), None
 
     if stop_event.is_set():
         return 0, None
@@ -205,9 +204,9 @@ def alphabeta(
         if cutoff_occurred:
             if depth < len(config.killer_moves):
                 if best_move not in config.killer_moves[depth]:
-                 if len(config.killer_moves[depth]) >= 3:
+                    if len(config.killer_moves[depth]) >= 3:
                         config.killer_moves[depth].pop(0)
-                config.killer_moves[depth].append(best_move)
+                    config.killer_moves[depth].append(best_move)
             board.push(best_move)
             is_check = board.is_check()
             board.pop()
@@ -220,9 +219,7 @@ def alphabeta(
                 history_index = min(100, history_index + depth**2)
                 config.history_heuristic[piece_type - 1] \
                     [best_move.from_square][best_move.to_square] = history_index
-                if history_index > 100:
-                    history_index = 100
-                    config.history_heuristic[piece_type-1]\
-                    [best_move.from_square][best_move.to_square] = history_index
+                config.history_heuristic[piece_type-1]\
+                [best_move.from_square][best_move.to_square] = history_index
 
     return max_eval, best_move

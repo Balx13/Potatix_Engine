@@ -29,6 +29,9 @@ multipv = 1
 nodes = 0
 engine_turn = True
 
+# Time
+spare_time = None
+
 PIECE_VALUES = {
     chess.PAWN:   100,
     chess.KNIGHT: 320,
