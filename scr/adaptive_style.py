@@ -81,7 +81,7 @@ def update_oppoment_style(args) -> None:
     board_local = chess.Board()
     for move in args[3:]:
         board_local.push_uci(move)
-    engine_turn = board_local.turn
+    engine_turn_l = board_local.turn
     last_fen = board_local.fen()
     gp = evaluate.game_phase(board_local)
 
@@ -92,22 +92,22 @@ def update_oppoment_style(args) -> None:
     board_local.set_fen(chess.STARTING_FEN)
 
     def get_statistics(fen) -> dict:
-        oppoment_turn = not engine_turn
+        oppoment_turn = not engine_turn_l
         oppoment_color = chess.WHITE if oppoment_turn else chess.BLACK
         board__ = chess.Board(fen)
-        king_safety = evaluate.eval_king_safety(board__, oppoment_color)
-        mobility = evaluate.eval_mobility(board__, oppoment_color)
-        trading =  evaluate.eval_material(board__, oppoment_color) + mobility # Feszültség = anyag + ütési lehetőségek
-        pawns = evaluate.eval_doubled_pawns(board__, oppoment_color) + \
+        king_safety_ = evaluate.eval_king_safety(board__, oppoment_color)
+        mobility_ = evaluate.eval_mobility(board__, oppoment_color)
+        trading_ =  evaluate.eval_material(board__, oppoment_color) + mobility_ # Feszültség = anyag + ütési lehetőségek
+        pawns_ = evaluate.eval_doubled_pawns(board__, oppoment_color) + \
                 evaluate.eval_isolated_pawns(board__, oppoment_color) + \
                 evaluate.eval_passed_pawns(board__) # Itt nincs konkrét color-mód, de meglátszik a változás
-        rook_op_files = evaluate.eval_rook_open_files(board__, oppoment_color)
+        rook_op_files_ = evaluate.eval_rook_open_files(board__, oppoment_color)
         return_dict = {
-            "king_safety": abs(king_safety),
-            "mobility": abs(mobility),
-            "trading": abs(trading),
-            "pawns": abs(pawns),
-            "rook_op_files": abs(rook_op_files)
+            "king_safety": abs(king_safety_),
+            "mobility": abs(mobility_),
+            "trading": abs(trading_),
+            "pawns": abs(pawns_),
+            "rook_op_files": abs(rook_op_files_)
         }
         return return_dict
 

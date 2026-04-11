@@ -296,14 +296,14 @@ def go(args) -> None:
             )
             search_thread.start()
 
-def position(args) -> None:
+def position(args: list) -> None:
     global board
     if args[1] == "startpos":
         board = chess.Board(chess.STARTING_FEN)
         if "moves" in args:
             if config.adaptive_mode:
                 if len(args[3:]) > 4:
-                    adaptive_style.update_oppoment_style(args)
+                    adaptive_style.update_oppoment_style(args.copy())
             else:
                 adaptive_style.reset_adaptive_values()
             for move in args[3:]:
@@ -316,7 +316,7 @@ def position(args) -> None:
             board.set_fen(" ".join(args[2:moves_index]))
             if config.adaptive_mode:
                 if len(args[3:]) > 4:
-                    adaptive_style.update_oppoment_style(args)
+                    adaptive_style.update_oppoment_style(args.copy())
             else:
                 adaptive_style.reset_adaptive_values()
             for move in args[moves_index + 1:]:

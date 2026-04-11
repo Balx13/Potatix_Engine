@@ -25,7 +25,7 @@ from quiescence import quiescence
 from transposition_table import store_tt_entry, probe_tt
 
 
-def get_adaptive_bonus(board, move: chess.Move) -> float:
+def get_adaptive_bonus(board: chess.Board, move: chess.Move) -> float:
     board.push(move)
     white_m = config.multipliers["engine"]
     black_m = config.multipliers["oppoment"]

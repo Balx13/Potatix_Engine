@@ -20,7 +20,7 @@ import chess
 import config
 
 
-def sorted_moves_with_value(moves, board) ->list:
+def sorted_moves_with_value(moves, board: chess.Board) ->list:
     # Olyan, mit a sorted() függvény, de azt is visszaadja, hogy az adott lépés hányas értékkel került az adott helyre
 
     sorted_moves = []
@@ -40,7 +40,7 @@ def sorted_moves_with_value(moves, board) ->list:
     return sorted_moves
 
 
-def history_score(board, move_):
+def history_score(board: chess.Board, move_):
     # Megmondja egy adott lépésnek a history table score-ját
     piece = board.piece_at(move_.from_square)
 
@@ -52,7 +52,7 @@ def history_score(board, move_):
         history_score_ = 0
     return history_score_
 
-def score(move_, board):
+def score(move_, board: chess.Board):
     # pontozza az adott lépést
     m = config.multipliers["engine"] if config.engine_turn else config.multipliers["oppoment"]
     piece = board.piece_at(move_.from_square)
@@ -83,7 +83,7 @@ def score(move_, board):
 
     return quiet_score
 
-def order_moves(board, moves, depth) -> list:
+def order_moves(board: chess.Board, moves, depth: int) -> list:
     """
 
     :param board: chess.Board

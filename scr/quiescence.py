@@ -21,7 +21,7 @@ from evaluate import evaluate
 from stop_event import stop_event
 import config
 
-def mini_local_ordering(board, legal_moves):
+def mini_local_ordering(board: chess.Board, legal_moves):
     def score(move_):
         piece = board.piece_at(move_.from_square)
         if board.is_capture(move_): # Ütés
@@ -36,7 +36,7 @@ def mini_local_ordering(board, legal_moves):
     return sorted(legal_moves, key=score, reverse=True)
 
 
-def get_smallest_attacker(board, square, color, occupied):
+def get_smallest_attacker(board: chess.Board, square, color, occupied):
     attackers_mask = board.attackers_mask(color, square, occupied)
     if not attackers_mask:
         return None
@@ -93,7 +93,7 @@ def quiescence(board: chess.Board, alpha: float, beta: float, ply: int) -> float
             alpha = stand_pat
         legal_moves = board.generate_legal_captures()
     else:
-        legal_moves = board.generate_legal_moves() # Ha sakk van, akkor az összes legális lépés védi
+        legal_moves = board.legal_moves # Ha sakk van, akkor az összes legális lépés védi
 
     if board.is_fivefold_repetition() or board.is_seventyfive_moves() or board.is_stalemate() or board.can_claim_draw():
         return 0.0  # Döntetlen

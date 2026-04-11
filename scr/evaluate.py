@@ -244,7 +244,7 @@ def eval_rook_open_files(board: chess.Board, color_param=None) -> float:
                 score += sign * 10
     return score
 
-def eval_bishop_pair(board) -> float:
+def eval_bishop_pair(board: chess.Board) -> float:
     score = 0
     base = 25
     OPEN_BONUS = 10
