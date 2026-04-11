@@ -353,34 +353,35 @@ def UCI(args):
     # Ez kezeli az UCI protokollt
     global search_thread, board
     try:
-        if args[0] == "uci":
-            print("id name Potatix Engine", flush=True)
-            print("id author Balazs Andre", flush=True)
+        match args[0]:
+            case "uci":
+                print("id name Potatix Engine", flush=True)
+                print("id author Balazs Andre", flush=True)
 
-            print("option name MultiPV type spin default 1 min 1 max 64", flush=True)
-            print("option name MaxDepth type spin default 100 min 1 max 100000", flush=True)
-            print("option name TTSize type spin default 1000000 min 1 max 100000000", flush=True)
-            print("option name AdaptiveMode type check default false", flush=True)
+                print("option name MultiPV type spin default 1 min 1 max 64", flush=True)
+                print("option name MaxDepth type spin default 100 min 1 max 100000", flush=True)
+                print("option name TTSize type spin default 1000000 min 1 max 100000000", flush=True)
+                print("option name AdaptiveMode type check default false", flush=True)
 
-            print("uciok", flush=True)
-        elif args[0] == "isready":
-            print("readyok", flush=True)
-        elif args[0] == "ucinewgame":
-            reset()
-        elif args[0] == "quit":
-            sys.exit()
-        elif args[0] == "position":
-            position(args)
-        elif args[0] == "go":
-            go(args)
-        elif args[0] == "setoption":
-            setoption(args)
-        elif args[0] == "stop":
-            stop_event.set()
-        elif args[0].lower() == "ping":
-            print("Pong!", flush=True)
-        else:
-            print(f"info string Error: unknown command \"{' '.join(args)}\"", flush=True)
+                print("uciok", flush=True)
+            case "isready":
+                print("readyok", flush=True)
+            case "ucinewgame":
+                reset()
+            case "quit":
+                sys.exit()
+            case "position":
+                position(args)
+            case "go":
+                go(args)
+            case "setoption":
+                setoption(args)
+            case "stop":
+                stop_event.set()
+            case "ping":
+                print("Pong!", flush=True)
+            case _:
+                print(f"info string Error: unknown command \"{' '.join(args)}\"", flush=True)
     except IndexError:
         return None
     except Exception as e:
