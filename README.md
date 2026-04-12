@@ -7,7 +7,7 @@
 <p align="center"><em>English version</em></p>
 
 ## About the project
-### Free and open-source chess engine that adaptively adjusts to the opponent and tailors its search accordingly.
+### Free and open-source chess engine
 
 
 > This engine is still in the alpha stage and is written in Python, so it is quite slow. Future plans include rewriting it in Rust to improve performance. \
@@ -35,7 +35,7 @@
 - bitboards
 
 ## Licenses:
-- Everything about Potatix ​​Engine — the source code, the source code, the logo, the name, and the documentation — is licensed under the GPLv3. \
+- Everything about Potatix Engine — the source code, the source code, the logo, the name, and the documentation — is licensed under the GPLv3. \
 You are free to use, copy, and modify it under the terms of the GPL. (see: LICENCE.txt)
 
 ## Custom Developments:
@@ -46,7 +46,8 @@ Most chess engines search for the best move assuming an ideal opponent.
 The Potatix Engine, however, tries to exploit weaknesses in the opponent’s play.
 For example, if the opponent weakens their king’s safety in the middlegame, Potatix Engine will start attacking.
 
-- Status: Stable, but still under development.
+- Status: Alpha
+- Adaptive mode is disabled by default
 - To work correctly, the position must be set using the `position startpos moves ...` command.
 
 ## Files
@@ -62,7 +63,7 @@ For example, if the opponent weakens their king’s safety in the middlegame, Po
 The opening book used in this project was generated using:
 
 - [**Lichess Elite Database**](https://database.nikonoel.fr), which contains high-level games used for training and reference.
-- [**Stockfish 17.1**](https://github.com/official-stockfish/Stockfish) chess engine, used to evaluate positions and assign move scores.
+- [**Stockfish**](https://github.com/official-stockfish/Stockfish) chess engine, used to evaluate positions and assign move scores.
 
 
 ## Contributing
@@ -78,7 +79,7 @@ The 'Potatix Engine' should not be confused with 'Potato Engine' or 'Potatix'.
 <summary> Magyar verzió 🇭🇺</summary>
 
 ## A porjektről
-### Ingyenes és nyílt forráskódú sakkmotor, ami adaptívan alkalmazkodik az ellenfeléhez, és ahhoz igazítja a keresést.
+### Ingyenes és nyílt forráskódú sakkmotor
 
 > Ez a motor még alfa fázisban van Pythonban, így nagyon lassú. A jövőbeli tervek között szerepel, hogy átírom Rust nyelvbe a motor felgyorsítása érdekében. \
 > Jelenleg hobbi projekt, de a jövőben tervezem, hogy versenymotorrá alakítom.
@@ -116,7 +117,8 @@ A legtöbb sakkmotor úgy működik, hogy egy elméleti, tökéletes ellenfél e
 A Potatix Engine ezzel szemben az ellenfél gyengeségeit próbálja kihasználni.
 Például, ha az ellenfél a középjátékban gyengíti a király védelmét, a Potatix Engine támadásba lendül.
 
-- Állapota: Stabil, de még fejlesztés alatt áll.
+- Állapota: Alfa
+- Az Adaptív mód alaértelmezetten le van tiltva.
 - A megfelelő működéshez a pozíciót a `position startpos moves ...` paranccsal kell átadni.
 
 ## Fájlok
@@ -132,7 +134,7 @@ Például, ha az ellenfél a középjátékban gyengíti a király védelmét, a
 A projektben használt megnyitási könyvet a következő források felhasználásával hoztam létre:
 
 - [**Lichess Elite Database**](https://database.nikonoel.fr), amely magas szintű játszmákat tartalmaz a tanuláshoz és referenciaként.
-- [**Stockfish 17.1**](https://github.com/official-stockfish/Stockfish) sakkmotor, amelyet a pozíciók értékelésére és a lépések pontozására használtam.
+- [**Stockfish**](https://github.com/official-stockfish/Stockfish) sakkmotor, amelyet a pozíciók értékelésére és a lépések pontozására használtam.
 
 
 ## Hozzájárulás
