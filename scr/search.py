@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import chess
 import config
 import evaluate
-from stop_event import stop_event
+from config import stop_event
 from move_ordering import order_moves
 from quiescence import quiescence
 from transposition_table import store_tt_entry, probe_tt

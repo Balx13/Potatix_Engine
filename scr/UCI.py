@@ -28,8 +28,8 @@ import config
 import threading
 import time
 from pathlib import Path
-from time_manager import estimate_time_for_move
-from stop_event import stop_event
+from time_manager import time_for_move
+from config import stop_event
 import adaptive_style
 
 board = chess.Board(chess.STARTING_FEN)
@@ -85,9 +85,9 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
     top_moves = []
 
     if board.turn and wtime_ is not None:
-        time_limit_sec = estimate_time_for_move(board, wtime_, winc_, movestogo)
+        time_limit_sec = time_for_move(board, wtime_, winc_, movestogo)
     elif not board.turn and btime_ is not None:
-        time_limit_sec = estimate_time_for_move(board, btime_, binc_, movestogo)
+        time_limit_sec = time_for_move(board, btime_, binc_, movestogo)
     else:
         time_limit_sec = None
 

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import chess
 from evaluate import evaluate
-from stop_event import stop_event
+from config import stop_event
 import config
 
 def mini_local_ordering(board: chess.Board, legal_moves):

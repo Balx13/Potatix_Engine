@@ -20,6 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # Ebben a fájlban vannak az adatok/mátrixok/változók nagyrésze
 
 import chess
+import threading
+
+stop_event = threading.Event()
 
 MAX_DEPTH = 100
 adaptive_mode = False
@@ -29,8 +32,6 @@ multipv = 1
 nodes = 0
 engine_turn = True
 
-# Time
-spare_time = None
 
 PIECE_VALUES = {
     chess.PAWN:   100,
