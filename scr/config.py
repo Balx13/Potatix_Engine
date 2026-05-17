@@ -22,10 +22,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import chess
 import threading
 
+
+adaptive_mode = False # DON'T TURN ON. Adaptive mode is (or will be) developed in a separate branch.#
+
 stop_event = threading.Event()
 
 MAX_DEPTH = 100
-adaptive_mode = False
 killer_moves = [[] for _ in range(MAX_DEPTH+1)]
 history_heuristic = [[[0 for _ in range(64)] for _ in range(64)] for _ in range(6)]
 multipv = 1
