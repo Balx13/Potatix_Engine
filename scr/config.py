@@ -23,8 +23,6 @@ import chess
 import threading
 
 
-adaptive_mode = False # DON'T TURN ON. Adaptive mode is (or will be) developed in a separate branch.#
-
 stop_event = threading.Event()
 
 MAX_DEPTH = 100
@@ -43,36 +41,37 @@ PIECE_VALUES = {
     chess.QUEEN:  900,
     chess.KING:   0
 }
-adaptive_style_oppoment_profile = {
-    "king_safety": 1.0,
-    "mobility": 1.0,
-    "trading": 1.0, # trading = mobility + material
-    "pawns": 1.0,
-    "rook_op_files": 1.0
-}
 
-multipliers = {
-    "engine": {
-        "mobility": 1.0,
-        "rook_op_files": 1.0,
-        "king_safety": 1.0,
-        "pawns": 1.0,
-        "position_values": 1.0,
-        "material":  1.0,
-        "bishop_pairs": 1.0
-    },
-    "oppoment": {
-        "mobility": 1.0,
-        "rook_op_files": 1.0,
-        "king_safety": 1.0,
-        "pawns": 1.0,
-        "position_values": 1.0,
-        "material":  1.0,
-        "bishop_pairs": 1.0
-    }
-}
 
 CENTER_SQUARES = [chess.D4, chess.D5, chess.E4, chess.E5]
+
+# (New) Adaptive mode
+
+adaptive_mode = False
+
+oppoment_profile = {
+    "king_safety":     0.0,
+    "pawn_strength":   0.0,
+    "mobility":        0.0,
+    "rook_activity":   0.0,
+    "piece_placament": 0.0
+}
+
+PROFILE_WEIGHTS = {
+    "king_safety":     1.5,
+    "pawn_strength":   1.0,
+    "mobility":        0.8,
+    "rook_activity":   0.7,
+    "piece_placement": 0.5
+}
+
+PROFILE_NORMALIZERS = {
+    "king_safety":    100.0,
+    "pawn_strength":   50.0,
+    "mobility":        20.0,
+    "rook_activity":   30.0,
+    "piece_placement": 30.0
+}
 
 
 position_values = {
