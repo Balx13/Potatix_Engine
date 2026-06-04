@@ -17,51 +17,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import chess
+
+import adaptive_style
 import config
 import evaluate
 from config import stop_event
 from move_ordering import order_moves
 from quiescence import quiescence
 from transposition_table import store_tt_entry, probe_tt
-
-
-def get_adaptive_bonus(board: chess.Board, move: chess.Move) -> float:
-    board.push(move)
-    white_m = config.multipliers["engine"]
-    black_m = config.multipliers["oppoment"]
-    if not config.engine_turn:
-        white_m, black_m = black_m, white_m
-
-    bonus = 0
-    phase = evaluate.game_phase(board)
-    w = config.tapered_weights[phase]
-    mobility_score = evaluate.eval_mobility(board) * w["mobility"]
-    king_safety_score = evaluate.eval_king_safety(board) * w["king_safety"]
-    bishop_pair_score = evaluate.eval_bishop_pair(board) * w["bishop_pair"]
-    rook_open_files_score = evaluate.eval_rook_open_files(board) * w["rook_files"]
-
-    def calculate_component(score, wm_val, bm_val):
-        if score == 0: return 0
-        m = wm_val if score > 0 else bm_val
-
-        return score * (m - 1.0)
-
-    # Alkalmazzuk a komponensekre
-    bonus += calculate_component(mobility_score, white_m["mobility"], black_m["mobility"])
-    bonus += calculate_component(king_safety_score, white_m["king_safety"], black_m["king_safety"])
-    bonus += calculate_component(rook_open_files_score, white_m["rook_op_files"], black_m["rook_op_files"])
-    bonus += calculate_component(bishop_pair_score, white_m["bishop_pairs"], black_m["bishop_pairs"])
-
-    bonus = max(-20, min(20, bonus))
-    board.pop()
-    return bonus
     
 
 
-def determine_R(depth) -> int:
-    # Meghatározza, hogy az LMR mennyivel sekélyebben keressen
-
-    return 1 + (depth // 5)
 
 def can_do_null_move(board: chess.Board, previous_null_move, depth, R):
     # Megmondja, hogy lehet egy Null Move Pruning-ot csinálni vagy nem
@@ -112,7 +78,7 @@ def alphabeta(
     alpha_orig = alpha
     cutoff_occurred = False
     max_eval = float('-inf')
-    R = determine_R(depth)
+    R = 1 + depth // 5
     if can_do_null_move(board, previous_null_move, depth, R):
         board.push(chess.Move.null())
         score, _ = alphabeta(
@@ -172,19 +138,16 @@ def alphabeta(
                 eval_score = 0.0
         board.pop()
 
-        if (ply == 0
-            and move is not None # Adaptív összehasonlítás csak a rootban
-            and best_move is not None # Ha van best_move
-            and config.adaptive_mode # Ha engedélyezett az adaptív mód
-        ):
-            adaptive_eval_score = eval_score + get_adaptive_bonus(board, move)
-            adaptive_max_eval = max_eval + get_adaptive_bonus(board, best_move)
-            if adaptive_eval_score > adaptive_max_eval:
+        if ply == 0 and best_move is not None and config.adaptive_mode:
+            opponent_color = not board.turn
+            biased_score = eval_score + adaptive_style.get_adaptive_bias(board, move, opponent_color)
+            biased_best = max_eval + adaptive_style.get_adaptive_bias(board, best_move, opponent_color)
+            if biased_score > biased_best:
                 max_eval = eval_score
                 best_move = move
         else:
             if eval_score > max_eval:
-                max_eval  = eval_score
+                max_eval = eval_score
                 best_move = move
         alpha = max(alpha, max_eval)
         if beta <= alpha:
