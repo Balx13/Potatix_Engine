@@ -45,11 +45,13 @@ PIECE_VALUES = {
 
 CENTER_SQUARES = [chess.D4, chess.D5, chess.E4, chess.E5]
 
-# (New) Adaptive mode
+# Adaptive mode
 
 adaptive_mode = False
 
-oppoment_profile = {
+PROFILE_ALPHA = 0.15
+
+opponent_profile = {
     "king_safety":     0.0,
     "pawn_strength":   0.0,
     "mobility":        0.0,
