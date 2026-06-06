@@ -358,10 +358,10 @@ def UCI(args):
                 print("id name Potatix Engine", flush=True)
                 print("id author Balazs Andre", flush=True)
 
-                print("option name MultiPV type spin default 1 min 1 max 64", flush=True)
-                print("option name MaxDepth type spin default 100 min 1 max 100000", flush=True)
-                print("option name TTSize type spin default 1000000 min 1 max 100000000", flush=True)
-                print("option name AdaptiveMode type check default false", flush=True)
+                print(f"option name MultiPV type spin default {config.multipv} min 1 max 64", flush=True)
+                print(f"option name MaxDepth type spin default {config.MAX_DEPTH} min 1 max 100000", flush=True)
+                print(f"option name TTSize type spin default {tt.Max_tt_size} min 1 max 100000000", flush=True)
+                print(f"option name AdaptiveMode type check default {str(config.adaptive_mode).lower()}", flush=True)
 
                 print("uciok", flush=True)
             case "isready":
