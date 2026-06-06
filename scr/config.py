@@ -47,9 +47,12 @@ CENTER_SQUARES = [chess.D4, chess.D5, chess.E4, chess.E5]
 
 # Adaptive mode
 
-adaptive_mode = False
+adaptive_mode = True
 
 PROFILE_ALPHA = 0.15
+
+MIN_PROFILE_MOVES = 5
+profile_move_count = 0
 
 opponent_profile = {
     "king_safety":     0.0,
@@ -68,11 +71,11 @@ PROFILE_WEIGHTS = {
 }
 
 PROFILE_NORMALIZERS = {
-    "king_safety":    100.0,
-    "pawn_strength":   50.0,
-    "mobility":        20.0,
-    "rook_activity":   30.0,
-    "piece_placement": 30.0
+    "king_safety":     100.0,
+    "pawn_strength":    50.0,
+    "mobility":         22.0,
+    "rook_activity":    15.0,
+    "piece_placement":  20.0
 }
 
 

@@ -36,13 +36,11 @@ board = chess.Board(chess.STARTING_FEN)
 search_thread = threading.Thread()
 
 
-def is_in_opening_book(board_fen):
+def is_in_opening_book(board_fen) -> chess.Move | None:
     try:
-        if getattr(sys, 'frozen', False):
-            # PyInstaller futás közben
+        if getattr(sys, 'frozen', False): # PyInstaller
             BASE_DIR = Path(sys._MEIPASS) / "scr"
-        else:
-            # normál futás
+        else: # CPython
             BASE_DIR = Path(__file__).parent
         file_path = BASE_DIR / "data" / "opening_book.jsonl"
         with open(file_path, "r", encoding="utf-8") as f:
@@ -56,7 +54,7 @@ def is_in_opening_book(board_fen):
     except:
         return None
 
-def timer_worker(time_limit_sec):
+def timer_worker(time_limit_sec) -> None:
     # Számolja az eltelt időt
 
     start = time.time()
@@ -71,7 +69,7 @@ def search_worker(max_depth_, wtime_=None, btime_=None, winc_=0, binc_=0, movest
     # Ez indítja el és kezeli a keresést
 
     if evaluate.game_phase(board) == "opening":
-        # Csak megnyitásban keres megnyitási könyvet (így végjátékban nem néz át 25 000 állást)
+        # Csak megnyitásban keres megnyitási könyvet (így végjátékban nem nézi át)
         opening_move = is_in_opening_book(board.fen())
         if opening_move is not None:
             print(f"bestmove {opening_move}", flush=True)
@@ -194,7 +192,6 @@ f"info depth {depth} score mate {mate_in_moves} multipv {idx+1} nodes {config.no
         fallback_move = legal_moves[0] if legal_moves else None
         print(f"bestmove {fallback_move}", flush=True)
 
-
 def read_cmd():
     # Kiolvassa a konzolból a parancsokat
 
@@ -217,10 +214,16 @@ def setoption(args) -> None:
     name_index = args.index("name")
     value_index = args.index("value")
     if args[name_index + 1] == "MaxDepth":
-        value = value_index + 1
+        # parse the provided value (the token after 'value')
+        try:
+            value = int(args[value_index + 1])
+        except (IndexError, ValueError):
+            print("info string Error: invalid value for MaxDepth", flush=True)
+            return
         if 1 <= value <= 100_000:
-            config.MAX_DEPTH = int(args[value_index + 1])
-            config.killer_moves = [[] for _ in range(config.MAX_DEPTH)]
+            config.MAX_DEPTH = value
+            # keep same shape as initial config (MAX_DEPTH + 1)
+            config.killer_moves = [[] for _ in range(config.MAX_DEPTH + 1)]
         else:
             print("info string Error: the value is too large or too small", flush=True)
     elif args[name_index + 1] == "TTSize":
@@ -280,18 +283,19 @@ def go(args) -> None:
 
             winc = 0
             binc = 0
-            moves_to_go = None
+            movestogo = None
             if "winc" in args:
                 winc_index = args.index("winc")
                 binc_index = args.index("binc")
                 winc = float(args[winc_index + 1]) / 1000
                 binc = float(args[binc_index + 1]) / 1000
-                if "moves_to_go" in args:
-                    moves_to_go_index = args.index("moves_to_go")
-                    moves_to_go = float(args[moves_to_go_index + 1])
+                # UCI uses 'movestogo' (no underscore)
+                if "movestogo" in args:
+                    movestogo_index = args.index("movestogo")
+                    movestogo = float(args[movestogo_index + 1])
             search_thread = threading.Thread(
                 target=search_worker,
-                args=(config.MAX_DEPTH, wtime, btime, winc, binc, moves_to_go),
+                args=(config.MAX_DEPTH, wtime, btime, winc, binc, movestogo),
                 kwargs = {"multipv": config.multipv}
             )
             search_thread.start()
@@ -301,28 +305,23 @@ def position(args: list) -> None:
     if args[1] == "startpos":
         board = chess.Board(chess.STARTING_FEN)
         if "moves" in args:
-            if config.adaptive_mode:
-                if len(args[3:]) > 4:
-                    adaptive_style.update_oppoment_style(args.copy())
-            else:
-                adaptive_style.reset_adaptive_values()
             for move in args[3:]:
                 board.push_uci(move)
+            if config.adaptive_mode and len(args[3:]) >= 1:
+                adaptive_style.update_profile(board, not board.turn)
     elif args[1] == "fen":
-        if config.adaptive_mode:
-            adaptive_style.reset_adaptive_values()
         if "moves" in args:
             moves_index = args.index("moves")
-            board.set_fen(" ".join(args[2:moves_index]))
-            if config.adaptive_mode:
-                if len(args[3:]) > 4:
-                    adaptive_style.update_oppoment_style(args.copy())
-            else:
-                adaptive_style.reset_adaptive_values()
+            board = chess.Board(" ".join(args[2:moves_index]))
             for move in args[moves_index + 1:]:
                 board.push_uci(move)
+            if config.adaptive_mode and len(args[moves_index + 1:]) >= 1:
+                adaptive_style.update_profile(board, not board.turn)
+            else:
+                adaptive_style.reset_profile()
         else:
             board = chess.Board(" ".join(args[2:]))
+            adaptive_style.reset_profile()
 
 def reset() -> None:
     global board
@@ -331,15 +330,13 @@ def reset() -> None:
         search_thread.join()
     stop_event.clear()
 
-    adaptive_style.reset_adaptive_values()
+    adaptive_style.reset_profile()
     board = chess.Board()
     config.spare_time = None
     config.nodes = 0
     config.engine_turn = True
 
     tt.transposition_table.clear()
-    for key in config.adaptive_style_oppoment_profile.keys():
-        config.adaptive_style_oppoment_profile[key] = 1.0
 
     for km in config.killer_moves:
         km.clear()

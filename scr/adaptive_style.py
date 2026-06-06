@@ -30,15 +30,20 @@ def measure_opponent(board: chess.Board, opponent_color: chess.Color) -> dict:
     }
 
 def update_profile(board: chess.Board, opponent_color: chess.Color) -> None:
-
+    if not config.adaptive_mode:
+        return
     measurements = measure_opponent(board, opponent_color)
     for key, value in measurements.items():
         config.opponent_profile[key] = (
             (1 - config.PROFILE_ALPHA) * config.opponent_profile[key]
             + config.PROFILE_ALPHA * value
         )
+    config.profile_move_count += 1
 
 def get_adaptive_bias(board: chess.Board, move: chess.Move, opponent_color: bool) -> float:
+    if config.profile_move_count < config.MIN_PROFILE_MOVES:
+        return 0.0
+
     board.push(move)
     after = measure_opponent(board, opponent_color)
     board.pop()
@@ -46,10 +51,19 @@ def get_adaptive_bias(board: chess.Board, move: chess.Move, opponent_color: bool
     bias = 0.0
     for key in config.opponent_profile:
         delta = config.opponent_profile[key] - after[key]
-        weakness_factor = max(1.0, 1.0 - config.opponent_profile[key] / config.PROFILE_NORMALIZERS[key])
+        p = config.opponent_profile[key]
+        n = config.PROFILE_NORMALIZERS[key]
+        if p > 0:
+            weakness_factor = max(1.0, n/p)
+        elif p < 0:
+            weakness_factor = max(1.0, 1.0 - p/n)
+        else:
+            weakness_factor = 1.0
         bias += delta * weakness_factor * config.PROFILE_WEIGHTS[key]
+
     return max(-20.0, min(20.0, bias))
 
 def reset_profile() -> None:
     for key in config.opponent_profile:
         config.opponent_profile[key] = 0.0
+    config.profile_move_count = 0
