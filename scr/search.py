@@ -79,6 +79,8 @@ def alphabeta(
     cutoff_occurred = False
     max_eval = float('-inf')
     R = 1 + depth // 5
+
+    best_move_bias = 0.0
     if can_do_null_move(board, previous_null_move, depth, R):
         board.push(chess.Move.null())
         score, _ = alphabeta(
@@ -139,12 +141,11 @@ def alphabeta(
         board.pop()
 
         if ply == 0 and best_move is not None and config.adaptive_mode:
-            opponent_color = not board.turn
-            biased_score = eval_score + adaptive_style.get_adaptive_bias(board, move, opponent_color)
-            biased_best = max_eval + adaptive_style.get_adaptive_bias(board, best_move, opponent_color)
-            if biased_score > biased_best:
+            current_bias = adaptive_style.get_adaptive_bias(board, move, not board.turn)
+            if eval_score + current_bias > max_eval + best_move_bias:
                 max_eval = eval_score
                 best_move = move
+                best_move_bias = current_bias
         else:
             if eval_score > max_eval:
                 max_eval = eval_score

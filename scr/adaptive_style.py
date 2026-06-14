@@ -1,7 +1,8 @@
 import chess
 import evaluate
 import config
-
+import json
+from pathlib import Path
 
 def eval_piece_placement(board: chess.Board, color: chess.Color, phase: str) -> float:
     score = 0.0
@@ -36,8 +37,7 @@ def update_profile(board: chess.Board, opponent_color: chess.Color) -> None:
     for key, value in measurements.items():
         config.opponent_profile[key] = (
             (1 - config.PROFILE_ALPHA) * config.opponent_profile[key]
-            + config.PROFILE_ALPHA * value
-        )
+            + config.PROFILE_ALPHA * value)
     config.profile_move_count += 1
 
 def get_adaptive_bias(board: chess.Board, move: chess.Move, opponent_color: bool) -> float:
@@ -53,12 +53,7 @@ def get_adaptive_bias(board: chess.Board, move: chess.Move, opponent_color: bool
         delta = config.opponent_profile[key] - after[key]
         p = config.opponent_profile[key]
         n = config.PROFILE_NORMALIZERS[key]
-        if p > 0:
-            weakness_factor = max(1.0, n/p)
-        elif p < 0:
-            weakness_factor = max(1.0, 1.0 - p/n)
-        else:
-            weakness_factor = 1.0
+        weakness_factor = min(3.0, max(1.0, 2.0 - p / n))
         bias += delta * weakness_factor * config.PROFILE_WEIGHTS[key]
 
     return max(-20.0, min(20.0, bias))
