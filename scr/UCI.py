@@ -375,8 +375,6 @@ def UCI(args):
                 setoption(args)
             case "stop":
                 stop_event.set()
-            case "ping":
-                print("Pong!", flush=True)
             case _:
                 print(f"info string Error: unknown command \"{' '.join(args)}\"", flush=True)
     except IndexError:

@@ -47,7 +47,7 @@ CENTER_SQUARES = [chess.D4, chess.D5, chess.E4, chess.E5]
 
 # Adaptive mode
 
-adaptive_mode = True
+adaptive_mode = False
 
 PROFILE_ALPHA = 0.15
 
@@ -59,7 +59,7 @@ opponent_profile = {
     "pawn_strength":   0.0,
     "mobility":        0.0,
     "rook_activity":   0.0,
-    "piece_placament": 0.0
+    "piece_placement": 0.0
 }
 
 PROFILE_WEIGHTS = {
