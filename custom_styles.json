@@ -1,0 +1,29 @@
+{
+  "__comment0__": "Custom Game Styles",
+  "__comment1__": "This file is under GPL-v3 or later licence",
+  "__comment2__": "The Chess Engine is ignores __comment{X}__",
+  "__comment3__": "You can add as many style profiles as you want to the file.",
+  "__comment4__": "You can give custom names to profiles. Spaces are not allowed.",
+  "__comment5__": "It is highly recommended to enter values between 0.7 and 1.4, but you can enter any number between 0 and 4294967296",
+  "__comment6__": "Templates and Examples:",
+
+
+  "template": {
+    "enabled": false,
+    "king_safety": 1.00,
+    "mobility": 1.00,
+    "pawn_structure": 1.00,
+    "rook_files": 1.00,
+    "bishop_pair": 1.00,
+    "piece_placement": 1.00
+  },
+  "example": {
+    "enabled": false,
+    "king_safety": 1.25,
+    "mobility": 1.13,
+    "pawn_structure": 0.76,
+    "rook_files": 1.40,
+    "bishop_pair": 1.34,
+    "piece_placement": 1.11
+  }
+}

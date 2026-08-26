@@ -16,16 +16,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Beimportáljuk az összes fáljt, hogy könnyebb legyen a build
-import adaptive_style, config, evaluate, \
-    move_ordering, quiescence, search, time_manager, transposition_table
+import config
+import evaluate
+import move_ordering
+import quiescence
+import search
+import time_manager
+import transposition_table
 import UCI
 
 def main():
     while True:
-        UCI.send_cmd()
+        UCI.send_command()
 
 if __name__ == "__main__":
     main()
 else:
-    print("Info string Error: The engine did not start. Start the engine as a child process.", flush=True)
+    print("Info string Warning: The engine did not start. Start the engine as a child process.", flush=True)

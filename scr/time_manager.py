@@ -25,7 +25,11 @@ def get_moves_to_go(board: chess.Board) -> int:
     return estimated_moves_to_go
 
 
-def time_for_move(board: chess.Board, time_left: float, increment: float, moves_to_go=None) -> float:
+def time_for_move(board, time_left, increment, moves_to_go) -> float:
     if moves_to_go is None:
         moves_to_go = get_moves_to_go(board)
-    return max(0.05, max(time_left / moves_to_go + increment, time_left / 2))
+    safety_buffer = min(0.5, time_left * 0.05)
+    usable = max(0.0, time_left - safety_buffer)
+    base = usable / moves_to_go + increment
+    hard_cap = usable * 0.25
+    return max(0.05, min(base, hard_cap))

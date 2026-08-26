@@ -20,13 +20,19 @@ import chess
 import chess.polyglot
 from collections import namedtuple
 
+import config
 
 TTEntry = namedtuple("TTEntry", ["value", "depth", "flag"])
 transposition_table = {}
 Max_tt_size = 1_000_000
+mate_threshold = config.mate_score * 0.9
 
-def store_tt_entry(board, value, depth, flag):
-    # Elmenti az állást a TT-be
+
+def store_tt_entry(board, value, depth, flag, ply):
+    if value > mate_threshold:
+        value += ply
+    elif value < -mate_threshold:
+        value -= ply
 
     key = chess.polyglot.zobrist_hash(board)
     if key in transposition_table:
@@ -41,18 +47,23 @@ def store_tt_entry(board, value, depth, flag):
     transposition_table[key] = TTEntry(value, depth, flag)
 
 
-def probe_tt(board, depth, alpha, beta):
+def probe_tt(board, depth, alpha, beta, ply):
     key = chess.polyglot.zobrist_hash(board)
     entry = transposition_table.get(key)
 
     if entry is None or entry.depth < depth:
         return None
-    if entry.flag == 'EXACT':
-        return entry.value
-    if entry.flag == 'LOWER' and entry.value >= beta:
-        return entry.value
-    if entry.flag == 'UPPER' and entry.value <= alpha:
-        return entry.value
+    value = entry.value
+    if value > mate_threshold:
+        value -= ply
+    elif value < -mate_threshold:
+        value += ply
 
+    if entry.flag == 'EXACT':
+        return value
+    if entry.flag == 'LOWER' and value >= beta:
+        return value
+    if entry.flag == 'UPPER' and value <= alpha:
+        return value
     return None
 

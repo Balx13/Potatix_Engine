@@ -17,21 +17,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import chess
-
-import adaptive_style
 import config
 import evaluate
 from config import stop_event
 from move_ordering import order_moves
 from quiescence import quiescence
 from transposition_table import store_tt_entry, probe_tt
-    
-
 
 
 def can_do_null_move(board: chess.Board, previous_null_move, depth, R):
-    # Megmondja, hogy lehet egy Null Move Pruning-ot csinálni vagy nem
-
     if board.is_check():
         return False
 
@@ -55,22 +49,17 @@ def alphabeta(
         ply: int=0,
         previous_null_move: bool=False):
 
-    """
-    A fő kereső függvény.
-    Negamax-alapú keresés.
-    """
-
     config.nodes += 1
 
     if board.is_fivefold_repetition() or board.is_seventyfive_moves() or board.is_stalemate() or board.can_claim_draw():
-        return 0, None  # Döntetlen
+        return 0, None
     if depth <= 0 or board.is_game_over():
         return quiescence(board, alpha, beta, ply), None
 
     if stop_event.is_set():
         return 0, None
 
-    tt_val = probe_tt(board, depth, alpha, beta)
+    tt_val = probe_tt(board, depth, alpha, beta, ply)
     if tt_val is not None:
         return tt_val, None
 
@@ -80,7 +69,6 @@ def alphabeta(
     max_eval = float('-inf')
     R = 1 + depth // 5
 
-    best_move_bias = 0.0
     if can_do_null_move(board, previous_null_move, depth, R):
         board.push(chess.Move.null())
         score, _ = alphabeta(
@@ -140,16 +128,10 @@ def alphabeta(
                 eval_score = 0.0
         board.pop()
 
-        if ply == 0 and best_move is not None and config.adaptive_mode:
-            current_bias = adaptive_style.get_adaptive_bias(board, move, not board.turn)
-            if eval_score + current_bias > max_eval + best_move_bias:
-                max_eval = eval_score
-                best_move = move
-                best_move_bias = current_bias
-        else:
-            if eval_score > max_eval:
-                max_eval = eval_score
-                best_move = move
+
+        if eval_score > max_eval:
+            max_eval = eval_score
+            best_move = move
         alpha = max(alpha, max_eval)
         if beta <= alpha:
             cutoff_occurred = True
@@ -163,7 +145,7 @@ def alphabeta(
             flag = 'LOWER'
         else:
             flag = 'EXACT'
-        store_tt_entry(board, max_eval, depth, flag)
+        store_tt_entry(board, max_eval, depth, flag, ply)
 
         if cutoff_occurred:
             if depth < len(config.killer_moves):

@@ -13,11 +13,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-
-
-# Ebben a fájlban vannak az adatok/mátrixok/változók nagyrésze
 
 import chess
 import threading
@@ -31,7 +28,7 @@ history_heuristic = [[[0 for _ in range(64)] for _ in range(64)] for _ in range(
 multipv = 1
 nodes = 0
 engine_turn = True
-
+mate_score = 1_000_000
 
 PIECE_VALUES = {
     chess.PAWN:   100,
@@ -45,38 +42,87 @@ PIECE_VALUES = {
 
 CENTER_SQUARES = [chess.D4, chess.D5, chess.E4, chess.E5]
 
-# Adaptive mode
+chosen_style = "None" # None, Attacker, Defender, Positional_player, Dynamic_player, Solid_player,
+                     # Endgame_oriented, Counter_attacker, Custom_
 
-adaptive_mode = False
+styles_path = "custom_styles.json"
 
-PROFILE_ALPHA = 0.15
+styles = {
+    "Attacker": {
+        "king_safety": 0.8,
+        "mobility": 1.30,
+        "pawn_structure": 1,
+        "rook_files": 1.05,
+        "bishop_pair": 1.15,
+        "piece_placement": 1.25,
+    },
 
-MIN_PROFILE_MOVES = 5
-profile_move_count = 0
+    "Defender": {
+        "king_safety": 1.3,
+        "mobility": 0.85,
+        "pawn_structure": 1.2,
+        "rook_files": 0.9,
+        "bishop_pair": 0.9,
+        "piece_placement": 1.1,
+    },
 
-opponent_profile = {
-    "king_safety":     0.0,
-    "pawn_strength":   0.0,
-    "mobility":        0.0,
-    "rook_activity":   0.0,
-    "piece_placement": 0.0
+    "Positional_player": {
+        "king_safety": 1.2,
+        "mobility": 1,
+        "pawn_structure": 1.3,
+        "rook_files": 1,
+        "bishop_pair": 1.1,
+        "piece_placement": 1.3,
+    },
+
+    "Dynamic_player": {
+        "king_safety": 0.9,
+        "mobility": 1.3,
+        "pawn_structure": 0.9,
+        "rook_files": 1.1,
+        "bishop_pair": 1.15,
+        "piece_placement": 1.25,
+    },
+
+    "Solid_player": {
+        "king_safety": 1.3,
+        "mobility": 0.9,
+        "pawn_structure": 1.3,
+        "rook_files": 0.95,
+        "bishop_pair": 0.9,
+        "piece_placement": 1.1,
+    },
+
+    "Endgame_oriented": {
+        "king_safety": 1.,
+        "mobility": 1.15,
+        "pawn_structure": 1.25,
+        "rook_files": 1.25,
+        "bishop_pair": 1.05,
+        "piece_placement": 1.2,
+    },
+
+    "Counter_attacker": {
+        "king_safety": 1.1,
+        "mobility": 1.25,
+        "pawn_structure": 1.0,
+        "rook_files": 1.15,
+        "bishop_pair": 1.15,
+        "piece_placement": 1.25,
+    },
+
+    "None": {
+        "king_safety": 1.0,
+        "mobility": 1.0,
+        "pawn_structure": 1.0,
+        "rook_files": 1.0,
+        "bishop_pair": 1.0,
+        "piece_placement": 1.0,
+    }
 }
 
-PROFILE_WEIGHTS = {
-    "king_safety":     1.5,
-    "pawn_strength":   1.0,
-    "mobility":        0.8,
-    "rook_activity":   0.7,
-    "piece_placement": 0.5
-}
-
-PROFILE_NORMALIZERS = {
-    "king_safety":     100.0,
-    "pawn_strength":    50.0,
-    "mobility":         22.0,
-    "rook_activity":    15.0,
-    "piece_placement":  20.0
-}
+from styles import import_custom_styles
+import_custom_styles()
 
 
 position_values = {

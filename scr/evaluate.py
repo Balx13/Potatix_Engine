@@ -16,24 +16,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import chess
-import config
-import math
+import chess, config, math, styles
 
 def truncate(x: float) -> float:
-    factor = 10**4  # 4 tizedesjegy megtartása
+    factor = 10**4
     return math.trunc(x * factor) / factor
 
 
 def game_phase(board: chess.Board) -> str:
-    # Azt próbálja megmondani, hogy megnyitásban, középjátékban, vagy végjátékban vagyunk
-
     material = sum(len(board.pieces(pt, chess.WHITE)) + len(board.pieces(pt, chess.BLACK))
                    for pt in [chess.QUEEN, chess.ROOK, chess.BISHOP, chess.KNIGHT])
 
     white_king_rank = chess.square_rank(board.king(chess.WHITE))
     black_king_rank = chess.square_rank(board.king(chess.BLACK))
-    king_distance_from_starting = max(white_king_rank, abs(black_king_rank-7))  # Melyik soron van a király
+    king_distance_from_starting = max(white_king_rank, abs(black_king_rank-7))
 
     if material > 12 and king_distance_from_starting <= 1:
         return "opening"
@@ -58,7 +54,6 @@ def eval_position_values(board: chess.Board, phase) -> float:
 
 
 def eval_material(board: chess.Board, color_param=None) -> float:
-    # A color_param paraméter akkor használatos, hogyha csak az egyik felet akarjuk mérni
     score = 0
     for piece, value in config.PIECE_VALUES.items():
         if color_param is not None:
@@ -69,7 +64,6 @@ def eval_material(board: chess.Board, color_param=None) -> float:
     return score
 
 def eval_mobility(board: chess.Board, color_param=None) -> float:
-    # A color_param paraméter akkor használatos, hogyha csak az egyik felet akarjuk mérni
     def mobility(colorr):
         old_turn = board.turn
         try:
@@ -84,7 +78,6 @@ def eval_mobility(board: chess.Board, color_param=None) -> float:
     return mobility_score * 1.1
 
 def eval_king_safety(board: chess.Board, color_param=None) -> float:
-    # A color_param paraméter akkor használatos, hogyha csak az egyik felet akarjuk mérni
     score = 0
 
     ATTACK_WEIGHTS = {
@@ -141,7 +134,6 @@ def eval_king_safety(board: chess.Board, color_param=None) -> float:
     return score
 
 def eval_doubled_pawns(board: chess.Board, color_param=None) -> float:
-    # A color_param paraméter akkor használatos, hogyha csak az egyik felet akarjuk mérni
     score = 0
     if color_param is not None:
         colors = (color_param,)
@@ -159,7 +151,6 @@ def eval_doubled_pawns(board: chess.Board, color_param=None) -> float:
 
 
 def eval_isolated_pawns(board: chess.Board, color_param=None) -> float:
-    # A color_param paraméter akkor használatos, hogyha csak az egyik felet akarjuk mérni
     score = 0
     if color_param is not None:
         colors = (color_param,)
@@ -222,7 +213,6 @@ def eval_pawns(board: chess.Board) -> float:
     return score
 
 def eval_rook_open_files(board: chess.Board, color_param=None) -> float:
-    # A color_param paraméter akkor használatos, hogyha csak az egyik felet akarjuk mérni
     score = 0
     if color_param is not None:
         colors = (color_param,)
@@ -262,30 +252,24 @@ def eval_bishop_pair(board: chess.Board) -> float:
     return score
 
 def evaluate(board: chess.Board, ply) -> float:
-    ######################
-    # Objektív értékelés #
-    ######################
-
-    mate_score = 1_000_000
     if board.is_checkmate():
-        return -mate_score+ply if board.turn else mate_score-ply
+        return -config.mate_score+ply if board.turn else config.mate_score-ply
     if board.is_stalemate() or board.is_insufficient_material():
         return 0
 
     phase = game_phase(board)
     w = config.tapered_weights[phase]
+    s = styles.get_chosen_style()
     score = 0.0
-    position_values_score = eval_position_values(board, phase)
-    bishop_pair_score = eval_bishop_pair(board) * w["bishop_pair"]
+    position_values_score = eval_position_values(board, phase) *s["piece_placement"]
+    rook_open_files_score = eval_rook_open_files(board) *w["rook_files"] *s["rook_files"]
+    bishop_pair_score = eval_bishop_pair(board) *w["bishop_pair"] *s["bishop_pair"]
+    king_safety_score = eval_king_safety(board) *w["king_safety"] *s["king_safety"]
+    mobility_score = eval_mobility(board)       *w["mobility"]    *s["mobility"]
+    pawns_score = eval_pawns(board)          *w["pawn_structure"] *s["pawn_structure"]
     material_score = eval_material(board)
-    mobility_score = eval_mobility(board) * w["mobility"]
-    king_safety_score = eval_king_safety(board) * w["king_safety"]
-    pawns_score = eval_pawns(board) * w["pawn_structure"]
-    rook_open_files_score = eval_rook_open_files(board) * w["rook_files"]
 
-    #############
-    # Összeadás #
-    #############
+
     score += position_values_score
     score += bishop_pair_score
     score += material_score

@@ -21,6 +21,7 @@ from evaluate import evaluate
 from config import stop_event
 import config
 
+
 def mini_local_ordering(board: chess.Board, legal_moves):
     def score(move_):
         piece = board.piece_at(move_.from_square)
@@ -30,7 +31,7 @@ def mini_local_ordering(board: chess.Board, legal_moves):
             victim_value = config.PIECE_VALUES[victim.piece_type] if victim else 0
             attacker_value = config.PIECE_VALUES[attacker.piece_type] if attacker else 0
             return 1000 + 10 * victim_value - attacker_value
-        elif board.is_check(): # Ha nem ütés, akkor sakkban vagyunk, így ez ellen-sakk
+        elif board.is_check():
             return 10
         return 0
     return sorted(legal_moves, key=score, reverse=True)
@@ -93,10 +94,10 @@ def quiescence(board: chess.Board, alpha: float, beta: float, ply: int) -> float
             alpha = stand_pat
         legal_moves = board.generate_legal_captures()
     else:
-        legal_moves = board.legal_moves # Ha sakk van, akkor az összes legális lépés védi
+        legal_moves = board.legal_moves
 
     if board.is_fivefold_repetition() or board.is_seventyfive_moves() or board.is_stalemate() or board.can_claim_draw():
-        return 0.0  # Döntetlen
+        return 0.0
     elif board.is_game_over():
         ev = evaluate(board, ply)
         return ev if board.turn else -ev
@@ -104,8 +105,8 @@ def quiescence(board: chess.Board, alpha: float, beta: float, ply: int) -> float
     for move in mini_local_ordering(board, legal_moves):
         if stop_event.is_set():
             return 0
-        if not is_check: # Sakknál nincs see
-            if see(board, move) < 0: # See megfogta
+        if not is_check:
+            if see(board, move) < 0:
                 continue
         board.push(move)
         score = -quiescence(board, -beta, -alpha, ply+1)

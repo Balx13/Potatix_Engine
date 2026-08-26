@@ -21,7 +21,6 @@ import config
 
 
 def sorted_moves_with_value(moves, board: chess.Board) ->list:
-    # Olyan, mit a sorted() függvény, de azt is visszaadja, hogy az adott lépés hányas értékkel került az adott helyre
 
     sorted_moves = []
     for move in moves:
@@ -48,7 +47,6 @@ def history_score(board: chess.Board, move_):
         return 0
 
 def score(move_, board: chess.Board):
-    # pontozza az adott lépést
     """
     capture: -100-10000
     check: 500-600
@@ -74,18 +72,10 @@ def score(move_, board: chess.Board):
     return quiet_score
 
 def order_moves(board: chess.Board, moves, depth: int) -> list:
-    # Visszaadja a sorbarendezett lépéseket
-
     legal_moves_list = list(moves)
 
     killer_moves_ordered = []
 
-    for move in moves: # Hogyha van egy lépéses matt, akkor azt adjuk csak vissza
-        board.push(move)
-        if board.is_checkmate():
-            board.pop()
-            return [(move, 9999999)]
-        board.pop()
     if depth < len(config.killer_moves):
         if depth and config.killer_moves[depth]:
             for move in config.killer_moves[depth]:
@@ -97,6 +87,6 @@ def order_moves(board: chess.Board, moves, depth: int) -> list:
         killer_moves_ordered = [(move_, 10_000+history_score(board, move_)) for move_, _ in km]
 
     killer_moves_only = [move_ for move_, _ in killer_moves_ordered]
-    remaining_moves = [m for m in moves if m not in killer_moves_only]
+    remaining_moves = [m for m in moves if m not in set(killer_moves_only)]
 
     return killer_moves_ordered + sorted_moves_with_value(remaining_moves, board)
