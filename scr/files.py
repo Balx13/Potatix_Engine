@@ -42,32 +42,23 @@ def get_path(path: str,  external: bool = False) -> Path:
 
 def read_opening_book(board_fen) -> chess.Move | None:
     book_path = get_path("data/opening_book.jsonl")
-    try:
-        f = open(book_path, "r", encoding="utf-8")
-    except OSError as e:
-        print(f"info string Warning: cannot open the opening_book: {book_path}: {e}", flush=True)
-        return None
-
     target_fen = " ".join(board_fen.split()[:4])
     try:
-        with f:
+        with open(book_path, "r", encoding="utf-8") as f:
             for line_no, pst in enumerate(f, start=1):
                 pst = pst.strip()
                 if not pst:
                     continue
-                try:
-                    data = json.loads(pst)
-                    fen = data["fen"]
-                    moves = [m["move"] for m in data["top_moves"]]
-                except (json.JSONDecodeError, KeyError, TypeError) as e:
-                    print(f"info string opening_book: bad line {line_no}: {e}", flush=True)
-                    continue
+                data = json.loads(pst)
+                fen = data["fen"]
                 if fen == target_fen:
-                    return random.choice(moves)
-    except OSError as e:
-        print(f"info string opening_book: read error: {e}", flush=True)
+                    return random.choice(data["top_moves"])
+    except FileNotFoundError:
+        print(f"info string Warning: Opening book is not found.", flush=True)
         return None
-
+    except Exception as e:
+        print(f"info string Warning: Opening book read error: {e}", flush=True)
+        return None
     return None
 
 
