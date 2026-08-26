@@ -25,7 +25,7 @@
 - Killer moves
 - History heuristic
 - Optening book
-- Adaptive mode
+- Game Styles
 
 ## Limitations:
 ### Does not use...
@@ -37,18 +37,6 @@
 ## Licenses:
 - Everything about Potatix Engine — the source code, the source code, the logo, the name, and the documentation — is licensed under the GPLv3. \
 You are free to use, copy, and modify it under the terms of the GPL. (see: LICENCE.txt)
-
-## Custom Developments:
-1. **Adaptive Mode**
-
-
-Most chess engines search for the best move assuming an ideal opponent.
-The Potatix Engine, however, tries to exploit weaknesses in the opponent’s play.
-For example, if the opponent weakens their king’s safety in the middlegame, Potatix Engine will start attacking.
-
-- Status: Alpha
-- Adaptive mode is disabled by default
-- To work correctly, the position must be set using the `position startpos moves ...` command.
 
 ## Files
 ### The file distribution for the current version of the Potatix Engine is as follows:
@@ -96,7 +84,7 @@ The 'Potatix Engine' should not be confused with 'Potato Engine' or 'Potatix'.
 - Killer moves
 - History heuristic
 - Megnyitási könyv
-- Adaptív mód
+- Játékstílusok
 
 ## Korlátok:
 ### Nem használ...
@@ -109,17 +97,6 @@ The 'Potatix Engine' should not be confused with 'Potato Engine' or 'Potatix'.
 - Minden, ami a Potatix Engine-hez tartozik — a forráskód, a brinális kód, a logó, a név és a dokumentáció — a GPLv3 alatt van. \
 Szabadon használhatod, másolhatod és módosíthatod a GPL feltételei szerint. (lásd: LICENCE.txt)
 
-## Egyedi feljesztések:
-1. **Adaptív mód**
-
-
-A legtöbb sakkmotor úgy működik, hogy egy elméleti, tökéletes ellenfél ellen keresi a legjobb lépést.
-A Potatix Engine ezzel szemben az ellenfél gyengeségeit próbálja kihasználni.
-Például, ha az ellenfél a középjátékban gyengíti a király védelmét, a Potatix Engine támadásba lendül.
-
-- Állapota: Alfa
-- Az Adaptív mód alaértelmezetten le van tiltva.
-- A megfelelő működéshez a pozíciót a `position startpos moves ...` paranccsal kell átadni.
 
 ## Fájlok
 ### A Potatix Engine jelenlegi verziójának fájlelosztása a következő:
