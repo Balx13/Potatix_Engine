@@ -1,8 +1,4 @@
 """
-Opening Book Generator for Potatix Engine
-"""
-
-"""
 This file is part of Potatix Engine
 Copyright (C) 2026 Balázs André
 
@@ -17,8 +13,13 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+
+"""
+Opening Book Generator for Potatix Engine
+"""
+
 
 import asyncio
 import json
