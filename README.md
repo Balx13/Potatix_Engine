@@ -10,9 +10,6 @@
 ### Free and open-source chess engine
 
 
-> This engine is still in the alpha stage and is written in Python, so it is quite slow. Future plans include rewriting it in Rust to improve performance. \
-> Currently, it is a hobby project, but I plan to turn it into a competitive engine in the future.
-
 ## Current Features:
 - Negamax algorithm with Alpha-Beta pruning
 - Late Move Pruning and Late Move Reductions
@@ -69,8 +66,6 @@ The 'Potatix Engine' should not be confused with 'Potato Engine' or 'Potatix'.
 ## A porjektről
 ### Ingyenes és nyílt forráskódú sakkmotor
 
-> Ez a motor még alfa fázisban van Pythonban, így nagyon lassú. A jövőbeli tervek között szerepel, hogy átírom Rust nyelvbe a motor felgyorsítása érdekében. \
-> Jelenleg hobbi projekt, de a jövőben tervezem, hogy versenymotorrá alakítom.
 
 ## Jelenlegi Funkciók:
 - Negamax algoritmus AlphaBeta vágással
