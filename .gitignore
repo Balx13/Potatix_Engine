@@ -1,15 +1,15 @@
-# Pycarm mappái
-/.idea/
-/.venv/
-/.qudo
+# Rustc mappái
+/build
+/dist
 
 # Egyéb
 /Other_files
 
-# Build
-/build
-/dist
-
 /scripts/opening_book/lichess_elite_database_2021-10.pgn
 /scripts/opening_book/stockfish.exe
 /scripts/opening_book/opening_book.jsonl
+
+
+# Added by cargo
+
+/target
