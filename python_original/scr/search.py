@@ -160,10 +160,10 @@ def alphabeta(
             if not is_check and not is_capture:
                 piece = board.piece_at(best_move.from_square)
                 piece_type = piece.piece_type
-                history_index = config.history_heuristic[piece_type-1]\
+                history_index = config.history_heuristic[piece_type - 1]\
                 [best_move.from_square][best_move.to_square]
                 history_index = min(100, history_index + depth**2)
-                config.history_heuristic[piece_type-1][best_move.from_square][best_move.to_square] = history_index
+                config.history_heuristic[piece_type - 1][best_move.from_square][best_move.to_square] = history_index
 
 
     return max_eval, best_move

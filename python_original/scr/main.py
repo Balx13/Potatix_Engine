@@ -16,13 +16,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import config
-import evaluate
-import move_ordering
-import quiescence
-import search
-import time_manager
-import transposition_table
 import UCI
 
 def main():

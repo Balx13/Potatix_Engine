@@ -42,7 +42,7 @@ def sorted_moves_with_value(moves, board: chess.Board) ->list:
 def history_score(board: chess.Board, move_):
     piece = board.piece_at(move_.from_square)
     if piece:
-        return config.history_heuristic[piece.piece_type-1][move_.from_square][move_.to_square]
+        return config.history_heuristic[piece.piece_type - 1][move_.from_square][move_.to_square]
     else:
         return 0
 

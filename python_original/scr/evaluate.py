@@ -253,7 +253,7 @@ def eval_bishop_pair(board: chess.Board) -> float:
 
 def evaluate(board: chess.Board, ply) -> float:
     if board.is_checkmate():
-        return -config.mate_score+ply if board.turn else config.mate_score-ply
+        return -config.mate_score + ply if board.turn else config.mate_score - ply
     if board.is_stalemate() or board.is_insufficient_material():
         return 0
 
