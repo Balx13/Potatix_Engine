@@ -9,6 +9,7 @@
 ## About the project
 ### Free and open-source chess engine
 
+## Warning: Migration of the project to Rust is currently underway. To download and build the engine, use commit "3156439", as this is the last state before the rewrite began.
 
 ## Current Features:
 - Negamax algorithm with Alpha-Beta pruning
